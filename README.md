@@ -38,7 +38,7 @@ All your editing will be done in your www folder.
 To use the opentok library, make sure you include **Opentok.iOS.js** file in your HTML document.  
 ` <script type="text/javascript" charset="utf-8" src="Opentok.iOS.js"></script>`
 
-For smoother experience video video, you must prevent dragging. Uncomment the following lines in the HTML:
+For smoother experience with video, you must prevent dragging. Uncomment the following lines in the HTML:
 
     function preventBehavior(e) 
     { 
