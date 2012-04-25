@@ -9,16 +9,24 @@ Weave video chat into your web ( and now mobile! ) application.
 
 ## Step 2. Install Opentok Framework
 1. Clone from <https://github.com/opentok/opentok-ios-sdk>
+
 2. Drag the Opentok.framework directory into your XCODE *Frameworks* folder
+![framework](http://songz.github.com/phonegap-plugin-opentok/images/framework.png)
+
 3. click on your project in **File Navigator** and select **Build Settings**  
 
 > Make sure **Standard (armv7)** is selected for **Architectures**  
 > Make sure **armv7** is the ONLY option selected for **Valid Architectures**  
+![architecture](http://songz.github.com/phonegap-plugin-opentok/images/arch.png)
 
 ## Step 3. Install Opentok Phonegap Plugin
 1. Clone from <https://github.com/songz/phonegap-plugin-opentok>
+![ios](http://songz.github.com/phonegap-plugin-opentok/images/ioslib.png)
+
 2. Copy `OpentokPlugin.h`, `OpentokPlugin.m`, `OpentokStreamInfo.h`, and `OpentokStreamInfo.h` into your **Classes** folder
+
 3. Copy `Opentok.iOS.js` into your `www` folder
+![js](http://songz.github.com/phonegap-plugin-opentok/images/jslib.png)
 
 ### Done!
 
