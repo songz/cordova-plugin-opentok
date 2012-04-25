@@ -33,10 +33,10 @@ Make sure `Copy items into destination group's folder` is **not** selected
 
 2. Copy `OpentokPlugin.h`, `OpentokPlugin.m`, `OpentokStreamInfo.h`, and `OpentokStreamInfo.h` into your **Classes** folder  
 > Make sure `Copy items into destination group's folder` **is selected**  
-![ios](http://songz.github.com/phonegap-plugin-opentok/images/ioslib.png)
+![ios](http://songz.github.com/phonegap-plugin-opentok/images/iosplugin.png)
 
 3. Copy `Opentok.iOS.js` into your `www` folder, the file will automatically appear in your xcode project manager  
-![js](http://songz.github.com/phonegap-plugin-opentok/images/jslib.png)
+![js](http://songz.github.com/phonegap-plugin-opentok/images/jsplugin.png)
 
 4. In project manager, under `Supporting Files` folder, select `Cordova.plist`
 > Under `Plugins`, add a new entry: `Tokbox`, `OpentokPlugin`
