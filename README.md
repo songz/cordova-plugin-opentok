@@ -6,7 +6,7 @@ Weave video chat into your web ( and now mobile! ) application.
 ## Step 1. Install / create Cordova app
 <http://phonegap.com/start/>
 > Make sure 'use automatic reference counting' is **not** selected when you create the project.  
-> Before you proceed, make sure you have run the application and 'www' is linked in your project. If not, please look at the Cordova docs again! 
+> Before you proceed, make sure you have run the application and 'www' is linked in your project. If not, please look at the Cordova docs again!   
 ![www](http://songz.github.com/phonegap-plugin-opentok/images/www.png)
 
 ## Step 2. Install Opentok Framework
@@ -17,7 +17,7 @@ Be sure to git clone with --recursive to grab the required OpenTok iOS SDK submo
 `git clone --recursive https://github.com/opentok/OpenTok-iOS-Hello-World.git`
 
 2. Drag the Opentok.framework and all dependencies from Hello-World in xcode into your project's *Frameworks* folder.   
-Make sure `Copy items into destination group's folder` is **not** selected
+Make sure `Copy items into destination group's folder` is **not** selected  
 ![framework](http://songz.github.com/phonegap-plugin-opentok/images/frameworks.png)
 
 3. click on your project in **File Navigator** and select **Build Settings**  
@@ -26,13 +26,13 @@ Make sure `Copy items into destination group's folder` is **not** selected
 > Make sure **armv7** is the ONLY option selected for **Valid Architectures**   
 >> Sometimes xcode doesn't update immediately. Click outside on the white box and your change will appear!
 
-![architecture](http://songz.github.com/phonegap-plugin-opentok/images/arch.png)
+![architecture](http://songz.github.com/phonegap-plugin-opentok/images/arch.png)  
 
 ## Step 3. Install Opentok Phonegap Plugin
 1. Clone from <https://github.com/songz/phonegap-plugin-opentok>
 
 2. Copy `OpentokPlugin.h`, `OpentokPlugin.m`, `OpentokStreamInfo.h`, and `OpentokStreamInfo.h` into your **Classes** folder  
-> Make sure `Copy items into destination group's folder` **is selected**
+> Make sure `Copy items into destination group's folder` **is selected**  
 ![ios](http://songz.github.com/phonegap-plugin-opentok/images/ioslib.png)
 
 3. Copy `Opentok.iOS.js` into your `www` folder, the file will automatically appear in your xcode project manager  
@@ -40,7 +40,7 @@ Make sure `Copy items into destination group's folder` is **not** selected
 
 4. In project manager, under `Supporting Files` folder, select `Cordova.plist`
 > Under `Plugins`, add a new entry: `Tokbox`, `OpentokPlugin`
->> Make sure your drag your entry to the bottom. Sometimes, the entry does not update immediately. Click on another file, then click on plist again.
+>> Make sure your drag your entry to the bottom. Sometimes, the entry does not update immediately. Click on another file, then click on plist again.  
 ![plist](http://songz.github.com/phonegap-plugin-opentok/images/plist.png) 
 
 
