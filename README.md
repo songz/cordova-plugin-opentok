@@ -20,7 +20,7 @@ Be sure to git clone with --recursive to grab the required OpenTok iOS SDK submo
 Make sure `Copy items into destination group's folder` is **not** selected  
 ![framework](http://songz.github.com/phonegap-plugin-opentok/images/frameworks.png)
 
-3. click on your project in **File Navigator** and select **Build Settings**  
+3. click on your project in **Project Manager** and select **Build Settings**  
 
 > Make sure **Standard (armv7)** is selected for **Architectures**  
 > Make sure **armv7** is the ONLY option selected for **Valid Architectures**   
