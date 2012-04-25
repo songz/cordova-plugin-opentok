@@ -21,9 +21,9 @@ Weave video chat into your web ( and now mobile! ) application.
 
 ## Step 3. Install Opentok Phonegap Plugin
 1. Clone from <https://github.com/songz/phonegap-plugin-opentok>
-![ios](http://songz.github.com/phonegap-plugin-opentok/images/ioslib.png)
 
 2. Copy `OpentokPlugin.h`, `OpentokPlugin.m`, `OpentokStreamInfo.h`, and `OpentokStreamInfo.h` into your **Classes** folder
+![ios](http://songz.github.com/phonegap-plugin-opentok/images/ioslib.png)
 
 3. Copy `Opentok.iOS.js` into your `www` folder
 ![js](http://songz.github.com/phonegap-plugin-opentok/images/jslib.png)
