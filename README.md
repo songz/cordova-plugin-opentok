@@ -28,6 +28,8 @@ Make sure `Copy items into destination group's folder` is **not** selected
 
 ![architecture](http://songz.github.com/phonegap-plugin-opentok/images/arch.png)  
 
+**Note** When testing, please run your app in your device, **NOT** the simulator. Opentok SDK require access to camera, and simulator does not have camera and will therefore give you errors. 
+
 ## Step 3. Install Opentok Phonegap Plugin
 1. Clone from <https://github.com/songz/phonegap-plugin-opentok>
 
@@ -41,7 +43,8 @@ Make sure `Copy items into destination group's folder` is **not** selected
 4. In project manager, under `Supporting Files` folder, select `Cordova.plist`
 > Under `Plugins`, add a new entry: `Tokbox`, `OpentokPlugin`
 >> Make sure your drag your entry to the bottom. Sometimes, the entry does not update immediately. Click on another file, then click on plist again.  
-![plist](http://songz.github.com/phonegap-plugin-opentok/images/plist.png) 
+> Under `ExternalHosts`, add a new entry with the value *.  
+![plist](http://songz.github.com/phonegap-plugin-opentok/images/cplist.png) 
 
 
 ### Done!
@@ -73,6 +76,7 @@ All code should be written in `onDeviceReady` function because it is executed af
 
 ## Quick Tutorial:
 Go through our [15 minute tutorial](http://www.tokbox.com/opentok/api/documentation/gettingstarted)! After that, try implementing the same thing on your cordova app.   
-Here's a completed version of a working `index.html` file:
+Included in the repo is a sample.html that you can copy/paste that is modeled after the getting started tutorial. Have Fun!
 
+----
 
