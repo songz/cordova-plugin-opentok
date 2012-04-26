@@ -41,10 +41,10 @@ Make sure `Copy items into destination group's folder` is **not** selected
 ![js](http://songz.github.com/phonegap-plugin-opentok/images/jsplugin.png)
 
 4. In project manager, under `Supporting Files` folder, select `Cordova.plist`
-> Under `Plugins`, add a new entry: `Tokbox`, `OpentokPlugin`  
->> Make sure your drag your entry to the bottom. Sometimes, the entry does not update immediately. Click on another file, then click on plist again.  
+    * Under `Plugins`, add a new entry: `Tokbox`, `OpentokPlugin`  
+    > Make sure your drag your entry to the bottom. Sometimes, the entry does not update immediately. Click on another file, then click on plist again.  
 
-> Under `ExternalHosts`, add a new entry with the value *.  
+    * Under `ExternalHosts`, add a new entry with the value *.  
 ![plist](http://songz.github.com/phonegap-plugin-opentok/images/cplist.png) 
 
 
@@ -76,8 +76,8 @@ All code should be written in `onDeviceReady` function because it is executed af
 ---
 
 ## Quick Tutorial:
-Go through our [15 minute tutorial](http://www.tokbox.com/opentok/api/documentation/gettingstarted)! After that, try implementing the same thing on your cordova app.   
-Included in the repo is a sample.html that you can copy/paste that is modeled after the getting started tutorial. Have Fun!
+* Go through our [15 minute tutorial](http://www.tokbox.com/opentok/api/documentation/gettingstarted)! After that, try implementing the same thing on your cordova app.   
+* Included in the repo is a sample.html that you can copy/paste that is modeled after the getting started tutorial. Have Fun!
 
 ----
 
