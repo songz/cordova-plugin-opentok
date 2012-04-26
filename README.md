@@ -43,6 +43,7 @@ Make sure `Copy items into destination group's folder` is **not** selected
 4. In project manager, under `Supporting Files` folder, select `Cordova.plist`
 > Under `Plugins`, add a new entry: `Tokbox`, `OpentokPlugin`  
 >> Make sure your drag your entry to the bottom. Sometimes, the entry does not update immediately. Click on another file, then click on plist again.  
+
 > Under `ExternalHosts`, add a new entry with the value *.  
 ![plist](http://songz.github.com/phonegap-plugin-opentok/images/cplist.png) 
 
