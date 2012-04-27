@@ -1,15 +1,19 @@
 function TBError(){
-    navigator.notification.alert("Error!");
+  navigator.notification.alert("Error!");
 };
 function TBNothing(){
   console.log("TB NOTHING IS CALLED!");
 };
 
-// Helper: Dom Element replace with UIView
+/**
+* Function Helpers
+* @param {String} divName   Id of the div
+* @return {top:y, left:x}   Returns an object with position coordinates
+*/
 function getPosition(divName){
   pubDiv = document.getElementById(divName);
 
-  // Get the absolute position of element
+  // Get the position of element
   var curtop = curleft = 0;
   if(pubDiv.offsetParent){
     do{
@@ -20,26 +24,38 @@ function getPosition(divName){
   return {top:curtop, left:curleft};
 }
 
-function replaceWithObject(divName, connectionId){
+
+/**
+* replaceWithObject  Replace input divName with object element
+* @param {String}, {String} divName, connectionId   Id of the div
+* @return {top:y, left:x}   Returns an object with position coordinates
+*/
+function replaceWithObject(divName, connectionId, properties){
   // Replace and add to streamsConnected
   var newId = "TBStreamConnection"+connectionId;
   var oldDiv = document.getElementById(divName);
   var objDiv = document.createElement("object");
   oldDiv.parentNode.replaceChild(objDiv, oldDiv);
+
+  // Setting object Attributes
   objDiv.id = newId;
-  objDiv.style.width = "330px";
-  objDiv.style.height = "240px";
+  objDiv.style.width = properties.width+"px";
+  objDiv.style.height = properties.height+"px";
   objDiv.setAttribute('cid',connectionId);
   objDiv.textContext = connectionId;
   objDiv.className = 'TBstreamObject';
   return getPosition(objDiv.id);
 }
 
+
+/**
+ * TBSession Object
+ *
+ */
 function TBSession(){
     var self = this;
-    self.streamsConnected = [];
 
-    this.connect = function(apiKey, token){
+    this.connect = function(apiKey, token, properties){
         console.log("JS: Connect Called");
         self.apiKey = apiKey;
         self.token = token;
@@ -53,22 +69,42 @@ function TBSession(){
       Cordova.exec(self.streamDisconnectedHandler, TBError, "Tokbox", "disconnect", [] );
     };
 
-    this.publish = function(divName){
+    this.publish = function(divName, properties){
       console.log("JS: Publish Called");
-      var position = replaceWithObject(divName, self.connection.connectionId);
-      return Cordova.exec(TBNothing, TBError, "Tokbox", "publish", [position.top, position.left] );
+      var width = 320, height = 240;
+      if(properties){
+        if(properties.width){
+          width = properties.width;
+        }
+        if(properties.height){
+          height = properties.height;
+        }
+      }
+      pubProperties = {width:width, height:height};
+      var position = replaceWithObject(divName, self.connection.connectionId, pubProperties);
+      // Would like to pass into exec as {top:35, left:3535, width:35, height:458}
+      return Cordova.exec(TBNothing, TBError, "Tokbox", "publish", [position.top, position.left, pubProperties.width, pubProperties.height] );
     };
 
     this.unpublish = function(){
       return Cordova.exec(TBNothing, TBError, "Tokbox", "unpublish", [] );
     };
 
-    this.subscribe = function(stream, divName){
+    this.subscribe = function(stream, divName, properties){
       console.log("JS: Subscribe Called");
       var connectionId = stream.connection.connectionId; 
-      var position = replaceWithObject(divName, connectionId);
-      self.streamsConnected.push(connectionId);
-      return Cordova.exec(TBNothing, TBError, "Tokbox", "subscribe", [connectionId, position.top, position.left] );
+      var width = 320, height = 240;
+      if(properties){
+        if(properties.width){
+          width = properties.width;
+        }
+        if(properties.height){
+          height = properties.height;
+        }
+      }
+      var property = {width:width, height:height};
+      var position = replaceWithObject(divName, connectionId, property);
+      return Cordova.exec(TBNothing, TBError, "Tokbox", "subscribe", [connectionId, position.top, position.left, property.width, property.height] );
     };
 
     this.addEventListener = function(event, handler){
