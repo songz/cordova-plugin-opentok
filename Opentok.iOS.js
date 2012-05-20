@@ -1,15 +1,10 @@
-function TBError(){
-  navigator.notification.alert("Error!");
+function TBError(error){
+  navigator.notification.alert(error);
 };
 function TBNothing(){
   console.log("TB NOTHING IS CALLED!");
 };
 
-/**
-* Function Helpers
-* @param {String} divName   Id of the div
-* @return {top:y, left:x}   Returns an object with position coordinates
-*/
 function getPosition(divName){
   pubDiv = document.getElementById(divName);
 
@@ -22,17 +17,11 @@ function getPosition(divName){
     }while(pubDiv = pubDiv.offsetParent);
   }
   return {top:curtop, left:curleft};
-}
+};
 
-
-/**
-* replaceWithObject  Replace input divName with object element
-* @param {String}, {String} divName, connectionId   Id of the div
-* @return {top:y, left:x}   Returns an object with position coordinates
-*/
-function replaceWithObject(divName, connectionId, properties){
+function replaceWithObject(divName, streamId, properties){
   // Replace and add to streamsConnected
-  var newId = "TBStreamConnection"+connectionId;
+  var newId = "TBStreamConnection"+streamId;
   var oldDiv = document.getElementById(divName);
   var objDiv = document.createElement("object");
   oldDiv.parentNode.replaceChild(objDiv, oldDiv);
@@ -41,10 +30,65 @@ function replaceWithObject(divName, connectionId, properties){
   objDiv.id = newId;
   objDiv.style.width = properties.width+"px";
   objDiv.style.height = properties.height+"px";
-  objDiv.setAttribute('cid',connectionId);
-  objDiv.textContext = connectionId;
+  objDiv.setAttribute('streamId',streamId);
+  objDiv.textContext = streamId;
   objDiv.className = 'TBstreamObject';
   return getPosition(objDiv.id);
+};
+
+
+/** 
+ * TBSubscriber Object
+ *
+ */
+function TBSubscriber(stream, divName, properties, env){
+  console.log("JS: Subscribing");
+  var width = 320, height = 240, subscribeToVideo="true";
+  if(properties){
+    if(properties.width){
+      width = properties.width;
+    }
+    if(properties.height){
+      height = properties.height;
+    }
+    if(properties.subscribeToVideo === false){
+      subscribeToVideo="false";
+    }
+  }
+  var property = {width:width, height:height};
+  var position = replaceWithObject(divName, stream.streamId, property);
+  Cordova.exec(TBNothing, TBError, "Tokbox", "subscribe", [stream.streamId, position.top, position.left, property.width, property.height, subscribeToVideo] );
+}
+
+
+/** 
+ * TBPublisher Object
+ *
+ */
+function TBPublisher(divName, properties, env){
+      console.log("JS: Publish Called");
+      var width = 160, height = 120, name="", publishAudio="true", publishVideo="true";
+      if(properties){
+        if(properties.width){
+          width = properties.width;
+        }
+        if(properties.height){
+          height = properties.height;
+        }
+        if(properties.name){
+          name = properties.name;
+        }
+        if(properties.publishAudio===false){
+          publishAudio="false"
+        }
+        if(properties.publishVideo===false){
+          publishVideo="false"
+        }
+      }
+      var pubProperties = {width:width, height:height};
+      var position = replaceWithObject(divName, env.connection.connectionId, pubProperties);
+      //Cordova.exec(TBNothing, TBError, "Tokbox", "publish", [position.top, position.left, pubProperties.width, pubProperties.height, name] );
+      Cordova.exec(TBNothing, TBError, "Tokbox", "publish", [position.top, position.left, pubProperties.width, pubProperties.height, name, publishAudio, publishVideo] );
 }
 
 
@@ -52,70 +96,43 @@ function replaceWithObject(divName, connectionId, properties){
  * TBSession Object
  *
  */
-function TBSession(){
+function TBSession(sid, production){
     var self = this;
+    self.sessionId = sid;
 
-    this.connect = function(apiKey, token, properties){
-        console.log("JS: Connect Called");
-        self.apiKey = apiKey;
-        self.token = token;
-        Cordova.exec(self.sessionConnectedHandler, TBError, "Tokbox", "connect", [self.apiKey, self.token] );
+    // production is set as strings because NSStrings are most reliable for Phonegap Plugins
+    if(production){
+      self.production = "true";
+    }else{
+      self.production="false";
+    }
+    // ios: InitSession creates an OTSession Object with given sessionId
+    Cordova.exec(TBNothing, TBNothing, "Tokbox", "initSession", [self.sessionId, self.production] );
 
-        // Housekeeping Listeners
-        Cordova.exec(self.streamDisconnectedHandler, TBError, "Tokbox", "streamDisconnectedHandler", [] );
-        return;
-    };
-    this.disconnect = function(){
-      Cordova.exec(self.streamDisconnectedHandler, TBError, "Tokbox", "disconnect", [] );
-    };
-
-    this.publish = function(divName, properties){
-      console.log("JS: Publish Called");
-      var width = 320, height = 240;
-      if(properties){
-        if(properties.width){
-          width = properties.width;
-        }
-        if(properties.height){
-          height = properties.height;
-        }
+    this.cleanUpDom = function(){
+      // Remove all dom objects:
+      var objects = document.getElementsByClassName('TBstreamObject');
+      for(var i = 0; i < objects.length; i++) {
+        var element = objects[i];
+        element.parentNode.removeChild(element);
       }
-      pubProperties = {width:width, height:height};
-      var position = replaceWithObject(divName, self.connection.connectionId, pubProperties);
-      // Would like to pass into exec as {top:35, left:3535, width:35, height:458}
-      return Cordova.exec(TBNothing, TBError, "Tokbox", "publish", [position.top, position.left, pubProperties.width, pubProperties.height] );
     };
-
-    this.unpublish = function(){
-      return Cordova.exec(TBNothing, TBError, "Tokbox", "unpublish", [] );
-    };
-
-    this.subscribe = function(stream, divName, properties){
-      console.log("JS: Subscribe Called");
-      var connectionId = stream.connection.connectionId; 
-      var width = 320, height = 240;
-      if(properties){
-        if(properties.width){
-          width = properties.width;
-        }
-        if(properties.height){
-          height = properties.height;
-        }
-      }
-      var property = {width:width, height:height};
-      var position = replaceWithObject(divName, connectionId, property);
-      return Cordova.exec(TBNothing, TBError, "Tokbox", "subscribe", [connectionId, position.top, position.left, property.width, property.height] );
+    this.sessionDisconnectedHandler = function(event){
+      console.log("JS: Session Disconnected Handler Called");
+      self.cleanUpDom();
     };
 
     this.addEventListener = function(event, handler){
         console.log("JS: Add Event Listener Called");
 
         // Set Handlers based on Events
+        // Events: sessionConnected, sessionDisconnected, streamCreated, streamDestroyed
         if(event == 'sessionConnected'){
           // Parse information returned from iOS before calling handler
-          self.sessionConnectedHandler = function(response){
-            self.connection = {connectionId:response};
-            return handler({streams:[]});
+          self.sessionConnectedHandler = function(event){
+            self.connection = event.connection;
+            // When user first connect, there are no streams in the session
+            return handler(event);
           }
         }else if(event == 'streamCreated'){
           // Parse information returned from iOS before calling handler
@@ -124,21 +141,63 @@ function TBSession(){
             var stream = {connection:{connectionId:arr[0]}, streamId:arr[1]};
             return handler({streams:[stream]});
           };
-          
-          // Set up Stream Created Handler: Could receive many callbacks
-          Cordova.exec(self.streamCreatedHandler, TBNothing, "Tokbox", "addStreamCreatedEvent", [] );
-        } 
+          // ios: After setting up function, set up listener in ios 
+          Cordova.exec(self.streamCreatedHandler, TBNothing, "Tokbox", "streamCreatedHandler", [] );
+        }else if(event=='sessionDisconnected'){
+          self.sessionDisconnectedHandler = function(event){
+            self.cleanUpDom();
+            return handler(event)
+          }
+        }
+    };
+
+    this.connect = function(apiKey, token, properties){
+        console.log("JS: Connect Called");
+        self.apiKey = apiKey;
+        self.token = token;
+        // ios: Set up key/token, and call _session connectWithApiKey
+        Cordova.exec(self.sessionConnectedHandler, TBError, "Tokbox", "connect", [self.apiKey, self.token] );
+
+        // Housekeeping Listeners: Session needs to be removed from DOM after being created
+        Cordova.exec(self.streamDisconnectedHandler, TBError, "Tokbox", "streamDisconnectedHandler", [] );
+        Cordova.exec(self.sessionDisconnectedHandler, TBError, "Tokbox", "sessionDisconnectedHandler", [] );
+        return;
+    };
+
+    this.disconnect = function(){
+      Cordova.exec(self.sessionDisconnectedHandler, TBError, "Tokbox", "disconnect", [] );
+    };
+
+    this.publish = function(divName, properties){
+      self.publisher = new TBPublisher(divName, properties, self);
+      return self.publisher
+    };
+
+    this.unpublish = function(){
+      var elementId = "TBStreamConnection"+self.connection.connectionId;
+      var element = document.getElementById(elementId);
+      if(element){
+        element.parentNode.removeChild(element);
+        self.updateObjects();
+      }
+      return Cordova.exec(TBNothing, TBError, "Tokbox", "unpublish", [] );
+    };
+
+    this.subscribe = function(stream, divName, properties){
+      return new TBSubscriber(stream, divName, properties, self);
     };
 
     // Housekeeping:
-    this.streamDisconnectedHandler = function(connectionId){
-      console.log("JS: Diconnected Handler Executed");
-      var elementId = "TBStreamConnection"+connectionId;
+    this.streamDisconnectedHandler = function(streamId){
+      console.log("JS: Stream Disconnected Handler Executed");
+      var elementId = "TBStreamConnection"+streamId;
       var element = document.getElementById(elementId);
-      element.parentNode.removeChild(element);
-      self.updateObjects();
+      if(element){
+        element.parentNode.removeChild(element);
+        self.updateObjects();
+      }
       return;
-    }
+    };
     
     // When stream disconnects, this function repositions all objects
     this.updateObjects = function(){
@@ -146,20 +205,26 @@ function TBSession(){
       var objects = document.getElementsByClassName('TBstreamObject')
       for(var i=0; i<objects.length; i++ ){
         console.log("JS: Object updated");
-        var cid = objects[i].getAttribute('cid');
+        var streamId = objects[i].getAttribute('streamId');
         var id = objects[i].id;
         var position = getPosition(id);
-        Cordova.exec(TBNothing, TBError, "Tokbox", "updateView", [cid, position.top, position.left] );
+        Cordova.exec(TBNothing, TBError, "Tokbox", "updateView", [streamId, position.top, position.left] );
       }
       return
     };
 };
 
 var TB = {
-    initSession: function(sid){
-        var result = new TBSession();
-        result.sessionId = sid;
-        Cordova.exec(TBNothing, TBNothing, "Tokbox", "initSession", [result.sessionId] );
-        return result;
+    initSession: function(sid, production){
+      return new TBSession(sid, production);
+    },
+    setLogLevel: function(a){
+     console.log("Log Level Set");
+    },
+    addEventListener: function(event, handler){
+      if(event=="exception"){
+        console.log("JS: TB Exception Handler added");
+        Cordova.exec(handler, TBError, "Tokbox", "exceptionHandler", [] );
+      }
     }
 };
