@@ -9,7 +9,7 @@
 #import "OpentokPlugin.h"
 
 
-@implementation OpentokPlugin{
+@implementation OpenTokPlugin{
     OTSession* _session;
     OTPublisher* _publisher;
     OTSubscriber* _subscriber;

@@ -47,7 +47,7 @@ TBUpdateObjects = ()->
     streamId = e.getAttribute('streamId')
     id = e.id
     position = getPosition(id)
-    Cordova.exec(TBSuccess, TBError, "Tokbox", "updateView", [streamId, position.top, position.left, position.width, position.height] )
+    Cordova.exec(TBSuccess, TBError, "TokBox", "updateView", [streamId, position.top, position.left, position.width, position.height] )
   return
 
 
@@ -61,7 +61,7 @@ window.TB =
   , addEventListener: (event, handler) ->
     if(event=="exception")
       console.log("JS: TB Exception Handler added")
-      Cordova.exec(handler, TBError, "Tokbox", "exceptionHandler", [] )
+      Cordova.exec(handler, TBError, "TokBox", "exceptionHandler", [] )
 
 class TBPublisher
   constructor: (@key, @domId, @properties={}) ->
@@ -83,7 +83,7 @@ class TBPublisher
     @obj = replaceWithObject(@domId, "TBPublisher", {width:width, height:height})
     position = getPosition(@obj.id)
     TBUpdateObjects()
-    Cordova.exec(TBSuccess, TBError, "Tokbox", "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo] )
+    Cordova.exec(TBSuccess, TBError, "TokBox", "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo] )
 
 
 class TBSession
@@ -95,7 +95,7 @@ class TBSession
     else
       @production = "false"
     # ios: InitSession creates an OTSession Object with given sessionId
-    Cordova.exec(TBSuccess, TBSuccess, "Tokbox", "initSession", [@sessionId, @production] )
+    Cordova.exec(TBSuccess, TBSuccess, "TokBox", "initSession", [@sessionId, @production] )
 
   cleanUpDom: ->
     objects = document.getElementsByClassName('TBstreamObject')
@@ -125,7 +125,7 @@ class TBSession
         return handler({streams:[stream]})
 
       # ios: After setting up function, set up listener in ios
-      Cordova.exec(@streamCreatedHandler, TBSuccess, "Tokbox", "streamCreatedHandler", [] )
+      Cordova.exec(@streamCreatedHandler, TBSuccess, "TokBox", "streamCreatedHandler", [] )
     else if(event=='sessionDisconnected')
       @sessionDisconnectedHandler = (event) ->
         @cleanUpDom()
@@ -136,15 +136,15 @@ class TBSession
     @apiKey = apiKey
     @token = token
     # ios: Set up key/token, and call _session connectWithApiKey
-    Cordova.exec(@sessionConnectedHandler, TBError, "Tokbox", "connect", [@apiKey, @token] )
+    Cordova.exec(@sessionConnectedHandler, TBError, "TokBox", "connect", [@apiKey, @token] )
 
     # Housekeeping Listeners: Session needs to be removed from DOM after being created
-    Cordova.exec(@streamDisconnectedHandler, TBError, "Tokbox", "streamDisconnectedHandler", [] )
-    Cordova.exec(@sessionDisconnectedHandler, TBError, "Tokbox", "sessionDisconnectedHandler", [] )
+    Cordova.exec(@streamDisconnectedHandler, TBError, "TokBox", "streamDisconnectedHandler", [] )
+    Cordova.exec(@sessionDisconnectedHandler, TBError, "TokBox", "sessionDisconnectedHandler", [] )
     return
 
   disconnect: () ->
-    Cordova.exec(@sessionDisconnectedHandler, TBError, "Tokbox", "disconnect", [] )
+    Cordova.exec(@sessionDisconnectedHandler, TBError, "TokBox", "disconnect", [] )
 
   publish: (divName, properties) ->
     @publisher = new TBPublisher(divName, properties, @)
@@ -153,7 +153,7 @@ class TBSession
     @publisher = publisher
     newId = "TBStreamConnection"+@connection.connectionId
     @publisher.obj.id = newId
-    Cordova.exec(TBSuccess, TBError, "Tokbox", "publish", [] )
+    Cordova.exec(TBSuccess, TBError, "TokBox", "publish", [] )
   unpublish:() ->
     console.log("JS: Unpublish")
 
@@ -162,7 +162,7 @@ class TBSession
     if(element)
       element.parentNode.removeChild(element)
       TBUpdateObjects()
-    return Cordova.exec(TBSuccess, TBError, "Tokbox", "unpublish", [] )
+    return Cordova.exec(TBSuccess, TBError, "TokBox", "unpublish", [] )
 
   subscribe: (stream, divName, properties) ->
     return new TBSubscriber(stream, divName, properties)
@@ -189,5 +189,5 @@ TBSubscriber = (stream, divName, properties)->
       subscribeToVideo="false"
   obj = replaceWithObject(divName, stream.streamId, {width:width, height:height})
   position = getPosition(obj.id)
-  Cordova.exec(TBSuccess, TBError, "Tokbox", "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo] )
+  Cordova.exec(TBSuccess, TBError, "TokBox", "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo] )
 

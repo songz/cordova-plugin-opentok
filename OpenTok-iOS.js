@@ -62,7 +62,7 @@
       streamId = e.getAttribute('streamId');
       id = e.id;
       position = getPosition(id);
-      Cordova.exec(TBSuccess, TBError, "Tokbox", "updateView", [streamId, position.top, position.left, position.width, position.height]);
+      Cordova.exec(TBSuccess, TBError, "TokBox", "updateView", [streamId, position.top, position.left, position.width, position.height]);
     }
   };
 
@@ -79,7 +79,7 @@
     addEventListener: function(event, handler) {
       if (event === "exception") {
         console.log("JS: TB Exception Handler added");
-        return Cordova.exec(handler, TBError, "Tokbox", "exceptionHandler", []);
+        return Cordova.exec(handler, TBError, "TokBox", "exceptionHandler", []);
       }
     }
   };
@@ -116,7 +116,7 @@
       });
       position = getPosition(this.obj.id);
       TBUpdateObjects();
-      Cordova.exec(TBSuccess, TBError, "Tokbox", "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo]);
+      Cordova.exec(TBSuccess, TBError, "TokBox", "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo]);
     }
 
     return TBPublisher;
@@ -134,7 +134,7 @@
       } else {
         this.production = "false";
       }
-      Cordova.exec(TBSuccess, TBSuccess, "Tokbox", "initSession", [this.sessionId, this.production]);
+      Cordova.exec(TBSuccess, TBSuccess, "TokBox", "initSession", [this.sessionId, this.production]);
     }
 
     TBSession.prototype.cleanUpDom = function() {
@@ -175,7 +175,7 @@
             streams: [stream]
           });
         };
-        return Cordova.exec(this.streamCreatedHandler, TBSuccess, "Tokbox", "streamCreatedHandler", []);
+        return Cordova.exec(this.streamCreatedHandler, TBSuccess, "TokBox", "streamCreatedHandler", []);
       } else if (event === 'sessionDisconnected') {
         return this.sessionDisconnectedHandler = function(event) {
           this.cleanUpDom();
@@ -188,13 +188,13 @@
       console.log("JS: Connect Called");
       this.apiKey = apiKey;
       this.token = token;
-      Cordova.exec(this.sessionConnectedHandler, TBError, "Tokbox", "connect", [this.apiKey, this.token]);
-      Cordova.exec(this.streamDisconnectedHandler, TBError, "Tokbox", "streamDisconnectedHandler", []);
-      Cordova.exec(this.sessionDisconnectedHandler, TBError, "Tokbox", "sessionDisconnectedHandler", []);
+      Cordova.exec(this.sessionConnectedHandler, TBError, "TokBox", "connect", [this.apiKey, this.token]);
+      Cordova.exec(this.streamDisconnectedHandler, TBError, "TokBox", "streamDisconnectedHandler", []);
+      Cordova.exec(this.sessionDisconnectedHandler, TBError, "TokBox", "sessionDisconnectedHandler", []);
     };
 
     TBSession.prototype.disconnect = function() {
-      return Cordova.exec(this.sessionDisconnectedHandler, TBError, "Tokbox", "disconnect", []);
+      return Cordova.exec(this.sessionDisconnectedHandler, TBError, "TokBox", "disconnect", []);
     };
 
     TBSession.prototype.publish = function(divName, properties) {
@@ -207,7 +207,7 @@
       this.publisher = publisher;
       newId = "TBStreamConnection" + this.connection.connectionId;
       this.publisher.obj.id = newId;
-      return Cordova.exec(TBSuccess, TBError, "Tokbox", "publish", []);
+      return Cordova.exec(TBSuccess, TBError, "TokBox", "publish", []);
     };
 
     TBSession.prototype.unpublish = function() {
@@ -219,7 +219,7 @@
         element.parentNode.removeChild(element);
         TBUpdateObjects();
       }
-      return Cordova.exec(TBSuccess, TBError, "Tokbox", "unpublish", []);
+      return Cordova.exec(TBSuccess, TBError, "TokBox", "unpublish", []);
     };
 
     TBSession.prototype.subscribe = function(stream, divName, properties) {
@@ -260,7 +260,7 @@
       height: height
     });
     position = getPosition(obj.id);
-    return Cordova.exec(TBSuccess, TBError, "Tokbox", "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo]);
+    return Cordova.exec(TBSuccess, TBError, "TokBox", "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo]);
   };
 
 }).call(this);

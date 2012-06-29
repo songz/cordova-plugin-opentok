@@ -11,7 +11,7 @@
 #import <UIKit/UIKit.h>
 #import <Opentok/Opentok.h>
 
-@interface OpentokPlugin : CDVPlugin <OTSessionDelegate, OTPublisherDelegate, OTSubscriberDelegate>
+@interface OpenTokPlugin : CDVPlugin <OTSessionDelegate, OTPublisherDelegate, OTSubscriberDelegate>
 
 @property(nonatomic, copy) NSString* callbackID;
 @property(nonatomic, copy) NSString* streamCreatedId;
