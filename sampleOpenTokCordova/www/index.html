@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html>
+<!--
+#
+# Licensed to the Apache Software Foundation (ASF) under one
+# or more contributor license agreements.  See the NOTICE file
+# distributed with this work for additional information
+# regarding copyright ownership.  The ASF licenses this file
+# to you under the Apache License, Version 2.0 (the
+# "License"); you may not use this file except in compliance
+# with the License.  You may obtain a copy of the License at
+# 
+# http://www.apache.org/licenses/LICENSE-2.0
+# 
+# Unless required by applicable law or agreed to in writing,
+# software distributed under the License is distributed on an
+# "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+#  KIND, either express or implied.  See the License for the
+# specific language governing permissions and limitations
+# under the License.
+#
+-->
+  <head>
+  <title>OpenTok Sample</title>
+  
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no;" />
+	<meta charset="utf-8" />
+
+	<!-- iPad/iPhone specific css below, add after your main css >
+	<link rel="stylesheet" media="only screen and (max-device-width: 1024px)" href="ipad.css" type="text/css" />		
+	<link rel="stylesheet" media="only screen and (max-device-width: 480px)" href="iphone.css" type="text/css" />		
+	-->
+	<script type="text/javascript" charset="utf-8" src="cordova-1.8.1.js"></script>
+    <script type="text/javascript" charset="utf-8" src="OpenTok-iOS.js"></script>
+        
+    <script type="text/javascript">
+    //Prevenging Dragging
+	function preventBehavior(e){ 
+      e.preventDefault(); 
+    };
+	document.addEventListener("touchmove", preventBehavior, false);
+
+	
+	function onBodyLoad(){		
+		document.addEventListener("deviceready", onDeviceReady, false);
+	}
+        
+	function onDeviceReady(){
+        // Device is ready to go. Write your code in here!
+        
+        // Initialize variables
+        var apiKey = '1127';
+        var sessionId = '14685d1ac5907f4a2814fed28294d3f797f34955';
+        var token = 'devtoken';  
+        
+        // Create a session and publisher objects
+		var publisher = TB.initPublisher(apiKey, 'pubElement');
+        var session = TB.initSession(sessionId);
+        
+        // Bind event listeners to sessions
+        session.addEventListener('sessionConnected', sessionConnectedHandler);
+        session.addEventListener('streamCreated', streamCreatedHandler);  
+        
+        // Connect to session!
+        session.connect('1127', 'devtoken');
+        
+        // Handler when session is created
+        function sessionConnectedHandler(event) {
+            // Start publishing to session
+            session.publish(publisher);
+        }
+        
+        function streamCreatedHandler(event) {
+            // Whenever new streams are created, subscribe to them!
+            subscribeToStreams(event.streams);
+        }
+        
+        function subscribeToStreams(streams) {
+            // Make sure we don't subscribe to ourself
+            if (streams[0].connection.connectionId == session.connection.connectionId) {
+                return;
+            }
+            
+            // Create the div to put the subscriber element in to
+            var div = document.createElement('div');
+            div.setAttribute('id', 'stream' + streams[0].streamId);
+            document.body.appendChild(div);
+            
+            // Subscribe to the stream
+            session.subscribe(streams[0], div.id);
+        }
+	}
+    </script>
+  </head>
+    
+  <body onload="onBodyLoad()">
+	<h1>OpenTok plugin for Cordova</h1>
+      <div id="pubElement"></div>
+  </body>
+</html>
