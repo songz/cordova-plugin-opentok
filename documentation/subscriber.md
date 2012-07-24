@@ -1,23 +1,18 @@
 # Subscriber Object
 
-## Description
-
 The Subscriber object references a stream that you have subscribed to. The subscribe() method of the Session object returns a Subscriber object.
 
 ## Properties
 
+**session** (Session) — The session to which this subscriber belongs.
+
 **stream** (Stream) — The stream to which you are subscribing.
 
-*Note*: This property should only be used as a read-only entity. The results of using JavaScript to directly change the property will be unpredictable.
+**subscribeToAudio** (Boolean) — Whether to subscribe to the stream’s audio. You determine this when you call the Session.subscribe() method.
 
+**subscribeToVideo** (Boolean) — Whether to subscribe to the stream’s video. You determine this when you call the Session.subscribe() method.
 
-## Learn More!
-[Session Object](session.md)  
-[Publisher Object](publisher.md)  
-[Stream Object](stream.md)  
-[Subscriber Object](subscriber.md)  
-[ExceptionEvent Object](exceptionEvent.md)  
-[Connection Object](connection.md)  
+*Note*: These properties should only be used as a read-only entities. The results of using JavaScript to directly change the properties will be unpredictable.
 
 
 ## License

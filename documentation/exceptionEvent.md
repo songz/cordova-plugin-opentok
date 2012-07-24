@@ -1,22 +1,12 @@
 # ExceptionEvent Object
 
-## Description
-
-The TB object dispatches exception events when the TokBox API encounters an exception (error). The ExceptionEvent object defines the properties of the event object that is dispatched.
+The TB object dispatches an exception event when the TokBox API encounters an exception (error). The ExceptionEvent object defines
+the properties of the event object that is dispatched.
 
 ## Properties
 
 **code** (Number) — The error code.
 **message** (String) — The error message. Check the message property for more details about the error.
-
-## Learn More!
-[Session Object](session.md)  
-[Publisher Object](publisher.md)  
-[Stream Object](stream.md)  
-[Subscriber Object](subscriber.md)  
-[ExceptionEvent Object](exceptionEvent.md)  
-[Connection Object](connection.md)  
-
 
 ## License
 

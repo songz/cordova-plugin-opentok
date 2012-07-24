@@ -8,18 +8,10 @@ To initialize a session, call the TB.initSession() method, which returns the Ses
 
 ## Properties
 
-**connectionId** (String) - The ID of this connection.
+**connectionId** (String) — The ID of this connection.
 
-**creationTime** (Integer) - The timestamp for the creation of the connection. This value is calculated in milliseconds. You can convert this value to a Date object by calling new Date(creationTime), where creationTime is the creationTime property of the Connection object.
+**creationTime** (Number) — The timestamp for the creation of the connection. This value is calculated in milliseconds. You can convert this value to a Date object by calling new Date(creationTime), where creationTime is the creationTime property of the Connection object.
 
-
-## Learn More!
-[Session Object](session.md)  
-[Publisher Object](publisher.md)  
-[Stream Object](stream.md)  
-[Subscriber Object](subscriber.md)  
-[ExceptionEvent Object](exceptionEvent.md)  
-[Connection Object](connection.md)  
 
 
 ## License
