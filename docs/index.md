@@ -4,6 +4,8 @@ The OpenTok API lets you add live video to your app. [Find out more online](http
 
 For basic information on getting started with the OpenTok PhoneGap plugin, see the [Read Me file](../README.md).
 
+### The PhoneGap Plugin Library is a Subset of the OpenTok JavaScript Library
+
 ## Usage
 
 To use the OpenTok PhoneGap plugin, include the OpenTok JavaScript file in your HTML file.
