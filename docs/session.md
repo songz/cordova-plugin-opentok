@@ -27,12 +27,12 @@ The Session object returned by the `TB.initSession()` method provides access to 
 
 Example Code:  
 ```javascript
-session.addEventListener( 'streamCreated', function(e){
-  console.log(e);
+session.addEventListener( 'streamCreated', function(streamEvent){
+  subscriber = session.subscribe( streamEvent.streams[0] );
 });
 ```
 
-Registers a method as an event listener for a specific event. See <a href="#events">Session events</a>.
+Registers a method as an event listener for a specific event. See [Session Events](sessionEvents.md).
 
 #### Parameters
 
@@ -42,27 +42,23 @@ Registers a method as an event listener for a specific event. See <a href="#even
 
 
 <a name="connect"></a>
-### connect()
+### connect( apiKey:String, token [, properties:Object] )
 
+Example Code:  
 ```javascript
-session.connect( apiKey:String, token [, properties:Object] )
+session.connect( '1127', 'T1==aeoi3h3...' )
 ```
 
-Connects to an OpenTok session. Pass the API key as the apiKey parameter. You obtain a API key when you register with TokBox. Pass the token string as the token parameter.
+Connects to an OpenTok session.  
+Upon a successful connection, the Session object dispatches a `sessionConnected` event. Call the `addEventListener()` method to set up an event listener to process this event before calling other methods of the Session object.
 
-Before calling this method, obtain a Session object by calling the TB.initSession(), which creates a session object based on a session ID.
-
-Upon a successful connection, the Session object dispatches a sessionConnected event. Call the addEventListener() method to set up an event listener to process this event before calling other methods of the Session object.
-
-The Session object dispatches a connectionCreated event when other clients create connections to the session.
-
-The TB object dispatches an exception event if there is an error connecting to Session
+The TB object dispatches an `exceptionEvent` if there is an error connecting to Session
 
 #### Parameters
 
 **apikey** (String) - The API key that TokBox provided you when you registered for the OpenTok API.
 
-**token** (String) - The session token. You generate a session token using the OpenTok server-side libraries or the Session and Token Generator page.
+**token** (String) - The session token. You generate a session token using the OpenTok server-side libraries or the Session and [Token Generator page](http://www.tokbox.com/opentok/api/tools/generator)
 
 **properties** (Object) — Optional. There are currently no properties available for this function.
 
@@ -74,11 +70,12 @@ The TB object dispatches an exception event if there is an error connecting to S
 <a name="disconnect"></a>
 ### disconnect()
 
+Example Code:  
 ```javascript
 session.disconnect()
 ```
 
-Calling the disconnect() method ends your connection with the session. In the course of terminating your connection, it also ceases publishing any stream(s) you were publishing.
+Calling the `disconnect()` method ends your connection with the session. In the course of terminating your connection, it also ceases publishing any stream(s) you were publishing.
 
 #### Events dispatched
 
@@ -172,29 +169,4 @@ sessionConnected
 sessionDisconnected  
 streamCreated  
 streamDestroyed  
-
-
-## License
-
-Copyright (c) 2012 TokBox, Inc.
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in 
-the Software without restriction, including without limitation the rights to 
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
-of the Software, and to permit persons to whom the Software is furnished to do 
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all 
-copies or substantial portions of the Software.
-
-The software complies with Terms of Service for the OpenTok platform described 
-in http://www.tokbox.com/termsofservice
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
-SOFTWARE.
 
