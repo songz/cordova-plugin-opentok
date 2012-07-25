@@ -2,9 +2,7 @@
 
 The OpenTok API lets you add live video to your app. [Find out more online](http://www.tokbox.com/opentok/api).
 
-For general information and installation instructions see the [Read Me file](../README.md).
-
-For an overview of the core concepts of OpenTok, please visit our [Developer Page](http://www.tokbox.com/opentok/api/documentation/gettingstarted)
+For an overview of the core concepts of OpenTok, please visit our [OpenTok Developer Page](http://www.tokbox.com/opentok/api/documentation/gettingstarted)
 
 ### This PhoneGap Plugin Library is a subset of the OpenTok JavaScript Library
 
@@ -21,31 +19,31 @@ To use the OpenTok PhoneGap plugin, include the OpenTok JavaScript file in your 
 <table>
 	<tr>
 		<td>
-      <a href="connection.md">Connection</a>
+      [Connection](connection.md)
     </td>
     <td>Represents a connection to an OpenTok session</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="publisher.md">Publisher</a>
+      [Publisher](publisher.md)
     </td>
     <td>Provides information about the publishing stream</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="session.md">Session</a>
+      [Session](session.md)
     </td>
     <td>Provides access to much of the OpenTok functionality.</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="stream.md">Stream</a>
+      [Stream](stream.md)
     </td>
     <td>Specifies a stream and provides information about it</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="subscriber.md">Subscriber</a>
+      [Subscriber](subscriber.md)
     </td>
     <td>References a stream that you have subscribed to</td>
 	</tr>
