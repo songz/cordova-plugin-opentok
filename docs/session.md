@@ -4,29 +4,32 @@ The Session object returned by the `TB.initSession()` method provides access to 
 
 ## Properties
 
-**connection** (Connection) - The Connection Object for this session. The connection property is only available once the `sessionConnected` event has been triggered. If the session fails to connect, this property shall remain nil.
+**connection** ([Connection](connection.md)) - The Connection Object for this session. The connection property is only available once the `sessionConnected` event has been triggered. If the session fails to connect, this property shall remain nil.
 
 **connectionCount** (Integer) - The number of discrete clients connected to this session. 
 
-**sessionId** (String) - The session ID of this instance. (Note: a Session object is not connected to the TokBox server until you call the connect() method of the object and the object dispatches a connected event. See TB.initSession() and connect()).
+**sessionId** (String) - The session ID of this instance. (Note: a Session object is not connected to the TokBox server until you call the `connect()` method of the object and the object dispatches a connected event. See `TB.initSession()` and `connect()` ).
 
 
 ## Methods
 
-[addEventListener()](#addEventListener)<br>
-[connect()](#connect)<br>
-[disconnect()](#disconnect)<br>
-[publish()](#publish)<br>
-[subscribe()](#subscribe)<br>
-[unpublish()](#unpublish)<br>
-[unsubscribe()](#unsubscribe)<br>
+[addEventListener()](#addEventListener)  
+[connect()](#connect)  
+[disconnect()](#disconnect)  
+[publish()](#publish)  
+[subscribe()](#subscribe)  
+[unpublish()](#unpublish)  
+[unsubscribe()](#unsubscribe)  
 
 
 <a name="addEventListener"></a>
-### addEventListener()
+### addEventListener( type:String, listener:Function )
 
+Example Code:  
 ```javascript
-session.addEventListener(type:String, listener:Function)
+session.addEventListener( 'streamCreated', function(e){
+  console.log(e);
+});
 ```
 
 Registers a method as an event listener for a specific event. See <a href="#events">Session events</a>.
