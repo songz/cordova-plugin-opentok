@@ -4,16 +4,20 @@ TB Object lets you initialize the OpenTok API and set up exception event handlin
 
 ## Methods
 
-[TB.addEventListener()](#addEventListener)<br>
-[TB.initPublisher()](#initPublisher)<br>
-[TB.initSession()](#initSession)
+[TB.addEventListener()](#addEventListener)  
+[TB.initPublisher()](#initPublisher)  
+[TB.initSession()](#initSession)  
 
 
 
 <a id="addEventListener"></a>
-### TB.addEventListener()
+### TB.addEventListener(type:String, listener:Function)
+
+Example Code:  
 ```javascript
-TB.addEventListener(type:String, listener:Function)
+TB.addEventListener( 'exception', function(e){
+  console.log( e.message );
+});
 ```
 
 Registers a method as an event listener for a specific event. The TB class dispatches exception events, defined by the
@@ -21,18 +25,17 @@ Registers a method as an event listener for a specific event. The TB class dispa
 
 #### Parameters
 
-**type** (String) — This string identifying the type of event. The TB object can only dispatch one type of event: an exception event. The only
-type of event the TB object dispatches is an 'exception' event.
+**type** (String) — This string identifying the type of event. The TB object can only dispatch one type of event: an exception event. The only type of event the TB object dispatches is an 'exception' event.
 
-**listener** (Function) — The function to be invoked when the TB object dispatches the event. An [ExceptionEvent](ExceptionEvent.md) object
-is passed into this function.
+**listener** (Function) — The function to be invoked when the TB object dispatches the event. An [ExceptionEvent](ExceptionEvent.md) object is passed into this function.
 
 
 <a id="initPublisher"></a>
-### TB.initPublisher()
+### TB.initPublisher( apiKey:String [, replaceElementId:String] [, properties:Object] )
 
+Example Code:  
 ```javascript
-var publisher = TB.initPublisher( apiKey:String [, replaceElementId:String] [, properties:Object] )
+var publisher = TB.initPublisher( '1127', 'myPublisherDiv', {name:"HelloWorld"} );
 ```
 
 Initializes and returns a Publisher object. You can use this Publisher object to test the microphone and camera attached to the Publisher, and then pass this Publisher object to Session.publish() to publish a stream to a session.
@@ -57,17 +60,19 @@ Valid Inputs: 'Front' or 'Back'
 
 #### Return
 
-**Publisher** — A Publisher object.
+**Publisher** ( [Publisher](publisher.md) ) — A Publisher object.
 
 
 <a id="initSession"></a>
-### TB.initSession()
+### TB.initSession(sessionId:String)
+
+Example Code:  
 ```javascript
-var session = TB.initSession(sessionId:String)
+var session = TB.initSession( "1_mx..." )
 ```
 
 Initializes and returns the local session object for a specified session ID.  
-You connect to the session using the connect() method of the Session object returned by the TB.initSession() method. TB.initSession() does not initiate communications with the cloud, it simply initializes the Session object that you can use to connect (and to perform other operations once connected).
+You connect to the session using the `connect()` method of the Session object returned by the `TB.initSession()` method. `TB.initSession()` does not initiate communications with the cloud, it simply initializes the Session object that you can use to connect (and to perform other operations once connected).
 
 #### Parameters
 
@@ -75,33 +80,6 @@ You connect to the session using the connect() method of the Session object retu
 
 #### Returns
 
-**Session** — The session object through which all further interactions with the session will occur.
-
-
-
-## License
-
-Copyright (c) 2012 TokBox, Inc.
-Permission is hereby granted, free of charge, to any person obtaining a copy of
-this software and associated documentation files (the "Software"), to deal in 
-the Software without restriction, including without limitation the rights to 
-use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies 
-of the Software, and to permit persons to whom the Software is furnished to do 
-so, subject to the following conditions:
-
-The above copyright notice and this permission notice shall be included in all 
-copies or substantial portions of the Software.
-
-The software complies with Terms of Service for the OpenTok platform described 
-in http://www.tokbox.com/termsofservice
-
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR 
-IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, 
-FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE 
-AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER 
-LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM, 
-OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE 
-SOFTWARE.
-
+**Session** ( [Session](session.md) ) - The session object through which all further interactions with the session will occur.
 
 
