@@ -34,7 +34,7 @@ is not available in the simulator.
 ## Step 3. Install the OpenTok PhoneGap Plugin
 1. Clone from <https://github.com/songz/phonegap-plugin-opentok>.
 
-2. Copy `OpentokPlugin.h`, `OpentokPlugin.m`, `OpentokStreamInfo.h`, and `OpentokStreamInfo.h` into your **Classes** folder  
+2. Copy `OpentokPlugin.h` and `OpentokPlugin.m` into your **Classes** folder  
 > Make sure **Copy items into destination group's folder** *is selected*.
 >
 ![ios](http://songz.github.com/phonegap-plugin-opentok/images/iosplugin.png)
@@ -43,7 +43,7 @@ is not available in the simulator.
 ![js](http://songz.github.com/phonegap-plugin-opentok/images/jsplugin.png)
 
 4. In the XCode project manager, under `Supporting Files` folder, select `Cordova.plist`.
-> Under `Plugins`, add a new entry: `Tokbox`, `OpentokPlugin`  
+> Under `Plugins`, add a new entry: `TokBox`, `OpenTokPlugin`  
 >> Make sure your drag your entry to the bottom. Sometimes, the entry does not update immediately. Click on another file, then click on plist again.  
 
 > Under `ExternalHosts`, add a new entry with the value *.  
@@ -85,6 +85,10 @@ After that, try implementing the same thing on your PhoneGap app.
 For details on the API, see [the OpenTok PhoneGap Plugin API reference](documentation/index.md).
 
 Have Fun!
+
+----
+
+## [Check out Documentation!](docs/README.md)
 
 ----
 
