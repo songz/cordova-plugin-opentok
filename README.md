@@ -4,31 +4,34 @@ PhoneGap Plugin for OpenTok iOS
 Weave video chat into your web (and now mobile!) application.
 
 ## Step 1. Install and create a PhoneGap app
-** Make sure You have PhoneGap 2.0 Installed ** If you haven't, check out PhoneGap's [Getting Started](http://docs.phonegap.com/en/2.0.0/guide_getting-started_ios_index.md.html#Getting%20Started%20with%20iOS) Page.
+**Make sure You have PhoneGap 2.0 Installed** If you haven't, check out PhoneGap's [Getting Started](http://docs.phonegap.com/en/2.0.0/guide_getting-started_ios_index.md.html#Getting%20Started%20with%20iOS) Page.
 
-1. Create a PhoneGap app by going to your PhoneGap's Bin folder, and type into Terminal:
+1. Create a PhoneGap app by going to your PhoneGap's Bin folder, and type into Terminal:  
 `./create <project_folder_path> <bundle_id> <project_name>`  
-*Example: * `./create ~/Development/OpenTokApp me.songz.OpenTokApp OpenTokApp`
+*Example:*  
+`./create ~/Development/OpenTokApp me.songz.OpenTokApp OpenTokApp`
 
 2. Go to ~/Development/OpenTokApp directory that you just created, and launch `*.xcodeproj` file in the folder  
 
 
 ## Step 2. Add the OpenTok iOS SDK to your project
-The easiest way is to do this: take a working OpenTok app and clone OpenTok Framework and all the dependencies to your project.  Here's how to do that.
+The easiest way is to do this: take a working OpenTok app and copy the OpenTok Framework and all the dependencies to your project.  Here's how to do that.
 
 1. Clone from <https://github.com/opentok/OpenTok-iOS-Hello-World.git> and open the Hello-World xcode project.  
 Be sure to git clone with --recursive to grab the required OpenTok iOS SDK submodule!  
 `git clone --recursive https://github.com/opentok/OpenTok-iOS-Hello-World.git`
 
-2. In XCode, drag the Opentok.framework and all dependencies from the Hello-World project into your project's *Frameworks* folder.   
-Make sure **Copy items into destination group's folder** is *not* selected  
+2. In XCode, drag the OpenTok.framework from Hello-World project into your project's *Frameworks* folder.
+Select *Copy Items into destination group's folder* so you don't depend on the Hello-World project.
+
+3. In XCode, drag the frameworks that OpenTok needs to run that are not currently in your project.
+Since these are iOS frameworks, you already have the in your system. Make sure **Copy items into destination group's folder** is *not* selected  
 ![framework](http://songz.github.com/phonegap-plugin-opentok/images/frameworks.png)
 
-3. Click on your project in the XCode project manager and select **Build Settings**. 
+4. Click on your project in the XCode project manager and select **Build Settings**. 
 
 > Make sure **Standard (armv7)** is selected for **Architectures**.
 > Make sure **armv7** is the *only* option selected for **Valid Architectures**.
->> (Sometimes XCode doesn't update immediately. Click outside on the white box and your change will appear.)
 
 ![architecture](http://songz.github.com/phonegap-plugin-opentok/images/arch.png)  
 
@@ -59,16 +62,8 @@ is not available in the simulator.
 ## Getting Started on your Project:
 All your editing will be done in your www folder.
 
-To use the opentok library, make sure you include **Opentok.iOS.js** file in your HTML document.  
-` <script type="text/javascript" charset="utf-8" src="Opentok.iOS.js"></script>`
-
-For smoother experience with video, you should prevent dragging. Uncomment the following lines in the HTML:
-
-    function preventBehavior(e) 
-    { 
-      e.preventDefault(); 
-    };
-    document.addEventListener("touchmove", preventBehavior, false);
+To use the opentok library, make sure you include **OpenTok.js** file in your HTML document.  
+` <script type="text/javascript" charset="utf-8" src="OpenTok.js"></script>`
 
 All code should be written in `onDeviceReady` function because it is executed after all the devices/libraries DOM has loaded.
 
@@ -80,19 +75,15 @@ All code should be written in `onDeviceReady` function because it is executed af
 ---
 
 ## Tutorial and sample code
-Go through the 15-minute [Getting started tutorial](http://www.tokbox.com/opentok/api/documentation/gettingstarted)! 
+Go through the 15-minute [Getting started tutorial](http://www.tokbox.com/opentok/api/documentation/gettingstarted) to learn the Basics!  
 
-Next, look at the Included in the OpenTok PhoneGap plugin project is a samples directory. It includes a helloworld.html sample file, which is based on the [OpenTok HelloWorld sample application](http://www.tokbox.com/opentok/api/tools/js/tutorials/helloworld.html). Check the ReadMe file in the samples directory for more information.
-
-After that, try implementing the same thing on your PhoneGap app.
-
-For details on the API, see [the OpenTok PhoneGap Plugin API reference](documentation/index.md).
+Next, look at the included in the Samples folder and follow the instructions in the README. It will show you how to get something start right away based on the [OpenTok HelloWorld sample application](http://www.tokbox.com/opentok/api/tools/js/tutorials/helloworld.html).  
 
 Have Fun!
 
 ----
 
-## [Check out Documentation!](docs/README.md)
+## [Documentation for PhoneGap Plugin](docs/README.md)
 
 ----
 
