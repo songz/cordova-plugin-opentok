@@ -82,7 +82,7 @@ Have Fun!
 
 ----
 
-## [Documentation for PhoneGap Plugin](docs/README.md)
+## [Documentation for PhoneGap Plugin](/opentok/PhoneGap-Plugin/blob/master/docs/README.md)
 
 ----
 
