@@ -19,31 +19,31 @@ To use the OpenTok PhoneGap plugin, include the OpenTok JavaScript file in your 
 <table>
 	<tr>
 		<td>
-      [Connection](connection.md)
+      <a href="connection.md">Connection</a>
     </td>
     <td>Represents a connection to an OpenTok session</td>
 	</tr>
 	<tr>
 		<td>
-      [Publisher](publisher.md)
+      <a href="publisher.md">Publisher</a>
     </td>
     <td>Provides information about the publishing stream</td>
 	</tr>
 	<tr>
 		<td>
-      [Session](session.md)
+      <a href="session.md">Session</a>
     </td>
     <td>Provides access to much of the OpenTok functionality.</td>
 	</tr>
 	<tr>
 		<td>
-      [Stream](stream.md)
+      <a href="stream.md">Stream</a>
     </td>
     <td>Specifies a stream and provides information about it</td>
 	</tr>
 	<tr>
 		<td>
-      [Subscriber](subscriber.md)
+      <a href="subscriber.md">Subscriber</a>
     </td>
     <td>References a stream that you have subscribed to</td>
 	</tr>
