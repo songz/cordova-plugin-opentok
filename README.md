@@ -26,7 +26,7 @@ Select *Copy Items into destination group's folder* so you don't depend on the H
 
 3. In XCode, drag the frameworks that OpenTok needs to run that are not currently in your project.
 Since these are iOS frameworks, you already have the in your system. Make sure *Copy items into destination group's folder* is **not** selected  
-![framework](http://songz.github.com/phonegap-plugin-opentok/images/frameworks.png)
+![framework](http://farm9.staticflickr.com/8292/7652859756_e381a15f8d_c.jpg)
 
 4. Click on your project in the XCode project manager and select **Build Settings**. 
 Make sure **Standard (armv7)** is selected for **Architectures**.  
@@ -41,19 +41,18 @@ is not available in the simulator.
 1. Clone from <https://github.com/opentok/PhoneGap-Plugin>.
 `git clone https://github.com/opentok/PhoneGap-Plugin`
 
-2. Copy `OpenTokPlugin.h` and `OpenTokPlugin.m` into your **Classes** folder  
-> Make sure **Copy items into destination group's folder** *is selected*.
->
-![ios](http://songz.github.com/phonegap-plugin-opentok/images/iosplugin.png)
+2. Copy `OpenTokPlugin.h` and `OpenTokPlugin.m` from the **src** folder into your Project's **Plugins** folder  
+Make sure **Copy items into destination group's folder** *is selected*.  
+![ios](http://farm9.staticflickr.com/8024/7653034446_b580c9f2cb_c.jpg)  
 
-3. Copy `OpenTok.js` into your `www/js` folder.  
-![js](http://songz.github.com/phonegap-plugin-opentok/images/jsplugin.png)
+3. Copy `OpenTok.js` from **src** folder into your Project's `www/js` folder.  
+![js](http://farm8.staticflickr.com/7270/7653034354_b5996da824_c.jpg)
 
-4. In the XCode project manager, under `Supporting Files` folder, select `Cordova.plist`.
-> Under `Plugins`, add a new entry: `TokBox`, `OpenTokPlugin`  
+4. In the XCode project manager, under `Resources` folder, select `Cordova.plist`.
+Under `Plugins`, add a new entry: `TokBox`, `OpenTokPlugin`  
 
-> Under `ExternalHosts`, add a new entry with the value *.  
-![plist](http://songz.github.com/phonegap-plugin-opentok/images/cplist.png) 
+Under `ExternalHosts`, add a new entry with the value *.  
+![plist](http://farm9.staticflickr.com/8423/7653034248_aa0d14781e_c.jpg) 
 
 
 ---
