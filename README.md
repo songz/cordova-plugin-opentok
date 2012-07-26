@@ -25,17 +25,16 @@ Be sure to git clone with --recursive to grab the required OpenTok iOS SDK submo
 Select *Copy Items into destination group's folder* so you don't depend on the Hello-World project.
 
 3. In XCode, drag the frameworks that OpenTok needs to run that are not currently in your project.
-Since these are iOS frameworks, you already have the in your system. Make sure **Copy items into destination group's folder** is *not* selected  
+Since these are iOS frameworks, you already have the in your system. Make sure *Copy items into destination group's folder* is **not** selected  
 ![framework](http://songz.github.com/phonegap-plugin-opentok/images/frameworks.png)
 
 4. Click on your project in the XCode project manager and select **Build Settings**. 
-
-> Make sure **Standard (armv7)** is selected for **Architectures**.
-> Make sure **armv7** is the *only* option selected for **Valid Architectures**.
+Make sure **Standard (armv7)** is selected for **Architectures**.  
+Make sure **armv7** is the *only* option selected for **Valid Architectures**.  
 
 ![architecture](http://songz.github.com/phonegap-plugin-opentok/images/arch.png)  
 
-**Note** When testing, please run your app in your device, **NOT** the simulator. The OpenTok iOS SDK requires access to the camera, which
+**Note** When testing, please run your app in your device, and **NOT** the simulator. The OpenTok iOS SDK requires access to the camera, which
 is not available in the simulator. 
 
 ## Step 3. Install the OpenTok PhoneGap Plugin
@@ -47,7 +46,7 @@ is not available in the simulator.
 >
 ![ios](http://songz.github.com/phonegap-plugin-opentok/images/iosplugin.png)
 
-3. Copy `OpenTok.js` into your `www/js` folder. The file will automatically appear in the XCode project manager. 
+3. Copy `OpenTok.js` into your `www/js` folder.  
 ![js](http://songz.github.com/phonegap-plugin-opentok/images/jsplugin.png)
 
 4. In the XCode project manager, under `Supporting Files` folder, select `Cordova.plist`.
