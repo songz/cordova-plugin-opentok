@@ -62,12 +62,12 @@ All your editing will be done in your www folder.
 To use the opentok library, make sure you include **OpenTok.js** file in your HTML document.  
 ` <script type="text/javascript" charset="utf-8" src="OpenTok.js"></script>`
 
-All code should be written in `onDeviceReady` function because it is executed after all the devices/libraries DOM has loaded.
+All JavaScript code should be written in `deviceready` function in */js/index.js* folder because it is executed after all dependencies has loaded.
 
-	function onDeviceReady()
-	{
-		// do your thing!
-	}
+    deviceready: function() {
+        // Do Your Stuff Here!
+        app.report('deviceready');
+    },
 
 ---
 
