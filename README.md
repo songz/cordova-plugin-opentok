@@ -4,10 +4,14 @@ PhoneGap Plugin for OpenTok iOS
 Weave video chat into your web (and now mobile!) application.
 
 ## Step 1. Install and create a PhoneGap app
-<http://phonegap.com/start/>
-> Make sure **Use automatic reference counting** is *not* selected when you create the project.  
-> Before you proceed, make sure you have run the application and 'www' is linked in your project. If not, please look at the PhoneGap docs again!   
-![www](http://songz.github.com/phonegap-plugin-opentok/images/www.png)
+** Make sure You have PhoneGap 2.0 Installed ** If you haven't, check out PhoneGap's [Getting Started](http://docs.phonegap.com/en/2.0.0/guide_getting-started_ios_index.md.html#Getting%20Started%20with%20iOS) Page.
+
+1. Create a PhoneGap app by going to your PhoneGap's Bin folder, and type into Terminal:
+`./create <project_folder_path> <bundle_id> <project_name>`  
+*Example: * `./create ~/Development/OpenTokApp me.songz.OpenTokApp OpenTokApp`
+
+2. Go to ~/Development/OpenTokApp directory that you just created, and launch `*.xcodeproj` file in the folder  
+
 
 ## Step 2. Add the OpenTok iOS SDK to your project
 The easiest way is to do this: take a working OpenTok app and clone OpenTok Framework and all the dependencies to your project.  Here's how to do that.
@@ -32,19 +36,19 @@ Make sure **Copy items into destination group's folder** is *not* selected
 is not available in the simulator. 
 
 ## Step 3. Install the OpenTok PhoneGap Plugin
-1. Clone from <https://github.com/songz/phonegap-plugin-opentok>.
+1. Clone from <https://github.com/opentok/PhoneGap-Plugin>.
+`git clone https://github.com/opentok/PhoneGap-Plugin`
 
-2. Copy `OpentokPlugin.h` and `OpentokPlugin.m` into your **Classes** folder  
+2. Copy `OpenTokPlugin.h` and `OpenTokPlugin.m` into your **Classes** folder  
 > Make sure **Copy items into destination group's folder** *is selected*.
 >
 ![ios](http://songz.github.com/phonegap-plugin-opentok/images/iosplugin.png)
 
-3. Copy `Opentok.iOS.js` into your `www` folder. The file will automatically appear in the XCode project manager. 
+3. Copy `OpenTok.js` into your `www/js` folder. The file will automatically appear in the XCode project manager. 
 ![js](http://songz.github.com/phonegap-plugin-opentok/images/jsplugin.png)
 
 4. In the XCode project manager, under `Supporting Files` folder, select `Cordova.plist`.
 > Under `Plugins`, add a new entry: `TokBox`, `OpenTokPlugin`  
->> Make sure your drag your entry to the bottom. Sometimes, the entry does not update immediately. Click on another file, then click on plist again.  
 
 > Under `ExternalHosts`, add a new entry with the value *.  
 ![plist](http://songz.github.com/phonegap-plugin-opentok/images/cplist.png) 
