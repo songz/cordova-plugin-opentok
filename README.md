@@ -48,9 +48,8 @@ Make sure **Copy items into destination group's folder** *is selected*.
 3. Copy `OpenTok.js` from **src** folder into your Project's `www/js` folder.  
 ![js](http://farm8.staticflickr.com/7270/7653034354_b5996da824_c.jpg)
 
-4. In the XCode project manager, under `Resources` folder, select `Cordova.plist`.
+4. In the XCode project manager, under `Resources` folder, select `Cordova.plist`.  
 Under `Plugins`, add a new entry: `TokBox`, `OpenTokPlugin`  
-
 Under `ExternalHosts`, add a new entry with the value *.  
 ![plist](http://farm9.staticflickr.com/8423/7653034248_aa0d14781e_c.jpg) 
 
