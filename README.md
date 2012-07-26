@@ -21,12 +21,12 @@ The easiest way is to do this: take a working OpenTok app and copy the OpenTok F
 Be sure to git clone with --recursive to grab the required OpenTok iOS SDK submodule!  
 `git clone --recursive https://github.com/opentok/OpenTok-iOS-Hello-World.git`
 
-2. In XCode, drag the OpenTok.framework from Hello-World project into your project's *Frameworks* folder.
-Select *Copy Items into destination group's folder* so you don't depend on the Hello-World project.
-
-3. In XCode, drag the frameworks that OpenTok needs to run that are not currently in your project.
-Since these are iOS frameworks, you already have the in your system. Make sure *Copy items into destination group's folder* is **not** selected  
+2. In XCode, drag the OpenTok.framework and all the frameworks that OpenTok needs to run that are not currently in your project.
+Make sure *Copy items into destination group's folder* is **not** selected  
 ![framework](http://farm9.staticflickr.com/8292/7652859756_e381a15f8d_c.jpg)
+
+3. Drag **opentok.bundle** file from Hello-World project into the *Resources* folder for your project
+![bundle](http://farm9.staticflickr.com/8429/7653284900_972a5bf403_b.jpg)
 
 4. Click on your project in the XCode project manager and select **Build Settings**. 
 Make sure **Standard (armv7)** is selected for **Architectures**.  
@@ -68,6 +68,11 @@ All JavaScript code should be written in `deviceready` function in */js/index.js
         // Do Your Stuff Here!
         app.report('deviceready');
     },
+
+When you are Deploying into your device:
+1. Make sure your set the Target in the Scheme drop-down menu on the toolbar to **your project name**  
+2. Make sure your device is selected for deployment  
+![deploy](http://farm9.staticflickr.com/8028/7653284796_4c018c0ce6_z.jpg)
 
 ---
 

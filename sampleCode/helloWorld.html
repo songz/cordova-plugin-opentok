@@ -1,0 +1,35 @@
+<!DOCTYPE HTML>
+<html lang="en-US">
+<head>
+	<meta charset="UTF-8">
+	<title></title>
+</head>
+<body>
+	<script type="text/javascript">
+	var session = TB.initSession(""); // Replace with your own session ID. See http://www.tokbox.com/opentok/api/tools/generator
+	
+	var publisher = TB.initPublisher('', '') // Replace with your API key and Div Id element
+	
+	session.addEventListener("sessionConnected", sessionConnectedHandler);
+	session.addEventListener("streamCreated", streamCreatedHandler);
+	session.connect("", ""); // Replace with your API key and token. See http://www.tokbox.com/
+	function sessionConnectedHandler(event) {
+		 subscribeToStreams(event.streams);
+		 session.publish();
+	}
+	
+	function streamCreatedHandler(event) {
+		subscribeToStreams(event.streams);
+	}
+	
+	function subscribeToStreams(streams) {
+		for (i = 0; i < streams.length; i++) {
+			var stream = streams[i];
+			if (stream.connection.connectionId != session.connection.connectionId) {
+				session.subscribe(stream);
+			}
+		}
+	}
+	</script>
+</body>
+</html>
