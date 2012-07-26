@@ -69,7 +69,7 @@ All JavaScript code should be written in `deviceready` function in */js/index.js
         app.report('deviceready');
     },
 
-When you are Deploying into your device:
+When you are Deploying into your device:  
 1. Make sure your set the Target in the Scheme drop-down menu on the toolbar to **your project name**  
 2. Make sure your device is selected for deployment  
 ![deploy](http://farm9.staticflickr.com/8028/7653284796_4c018c0ce6_z.jpg)
