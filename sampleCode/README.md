@@ -1,6 +1,7 @@
 # Sample Project
 
 Get Started with OpenTok Right Away!
+This tutorial will show you how to get something start right away based on the [OpenTok HelloWorld sample application](http://www.tokbox.com/opentok/api/tools/js/tutorials/helloworld.html).  
 
 ## Copy - Paste
 
