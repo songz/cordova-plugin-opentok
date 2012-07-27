@@ -49,23 +49,65 @@ TBUpdateObjects = ()->
     position = getPosition(id)
     Cordova.exec(TBSuccess, TBError, "TokBox", "updateView", [streamId, position.top, position.left, position.width, position.height] )
   return
+TBGenerateDomHelper = ->
+  domId = "PubSub" + Date.now()
+  div = document.createElement('div')
+  div.setAttribute( 'id', domId )
+  document.body.appendChild(div)
+  return domId
 
 
+# TB Object:
+#   Methods: 
+#     TB.addEventListener( type:String, listener:Function )
+#     TB.initPublisher( apiKey:String [, replaceElementId:String] [, properties:Object] ):Publisher
+#     TB.initSession( sessionId:String [, production] ):Session 
+#     TB.removeEventListner( type:String, listener:Function )
+#  Methods that doesn't do anything:
+#     TB.setLogLevel(logLevel:String)
 window.TB =
-  initSession: (sid, production) ->
-    return new TBSession(sid, production)
-  , initPublisher: (key, domId="", properties={}) ->
-    console.log key
-    console.log domId
-    console.log properties
-    return new TBPublisher(key, domId, properties)
-  , setLogLevel: (a) ->
-   console.log("Log Level Set")
-  , addEventListener: (event, handler) ->
+  addEventListener: (event, handler) ->
     if(event=="exception")
       console.log("JS: TB Exception Handler added")
       Cordova.exec(handler, TBError, "TokBox", "exceptionHandler", [] )
+  , initSession: (sid, production) ->
+    if production? and (typeof(production)=="boolean" )
+      return new TBSession(sid, production)
+    return new TBSession(sid, false)
+  , initPublisher: (one, two, three) ->
+    if( three? )
+      # apiKey, domId, properties
+      return new TBPublisher(one, two, three)
+    if( two? )
+      # apiKey, domId || apiKey, properties || domId, properties
+      if( typeof(two) == "object" )
+        objDiv = document.getElementById(one)
+        if objDiv?
+          return new TBPublisher("", one, two)
+        domId = TBGenerateDomHelper()
+        return new TBPublisher(one, domId, two)
+      else
+        return new TBPublisher(one, two, {})
+    # apiKey || domId
+    objDiv = document.getElementById(one)
+    if objDiv?
+      return new TBPublisher("", one, {})
+    else
+      domId = TBGenerateDomHelper()
+      return new TBPublisher(one, domId, {})
+  , setLogLevel: (a) ->
+   console.log("Log Level Set")
 
+window.TBTesting = (handler) ->
+  Cordova.exec(handler, TBError, "TokBox", "TBTesting", [] )
+
+# Publisher Object:
+#   Properties:
+#     id (String) — The ID of the DOM element through which the Publisher stream is displayed
+#     session (Session) — The Session to which the Publisher is publishing a stream. If the Publisher is not publishing a stream to a Session, this property is set to null.
+#     replaceElementId (String) — The ID of the DOM element that was replaced when the Publisher video stream was inserted.
+#   Methods: 
+#     destroy() - not yet implemented
 class TBPublisher
   constructor: (@key, @domId, @properties={}) ->
     console.log("JS: Publish Called")
@@ -87,17 +129,13 @@ class TBPublisher
     position = getPosition(@obj.id)
     TBUpdateObjects()
     Cordova.exec(TBSuccess, TBError, "TokBox", "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo] )
+  destroy: ->
+    Cordova.exec(TBSuccess, TBError, "TokBox", "destroyPublisher", [] )
 
 
 class TBSession
-  constructor: (sid, production) ->
-    @sessionId = sid
-    # production is set as strings because NSStrings are most reliable for Phonegap Plugins
-    if(@production? and production)
-      @production = "true"
-    else
-      @production = "false"
-    # ios: InitSession creates an OTSession Object with given sessionId
+  constructor: (@sessionId, @production) ->
+    console.log @production
     Cordova.exec(TBSuccess, TBSuccess, "TokBox", "initSession", [@sessionId, @production] )
 
   cleanUpDom: ->
@@ -134,7 +172,7 @@ class TBSession
         @cleanUpDom()
         return handler(event)
 
-  connect: (apiKey, token, properties) ->
+  connect: (apiKey, token, properties={}) ->
     console.log("JS: Connect Called")
     @apiKey = apiKey
     @token = token
@@ -167,8 +205,21 @@ class TBSession
       TBUpdateObjects()
     return Cordova.exec(TBSuccess, TBError, "TokBox", "unpublish", [] )
 
-  subscribe: (stream, divName, properties) ->
-    return new TBSubscriber(stream, divName, properties)
+  subscribe: (one, two, three) ->
+    if( three? )
+      # stream, domId, properties
+      return new TBSubscriber(one, two, three)
+    if( two? )
+      # stream, domId || stream, properties
+      if( typeof(two) == "object" )
+        domId = TBGenerateDomHelper()
+        return new TBSubscriber(one, domId, two)
+      else
+        return new TBSubscriber(one, two, {})
+    # stream
+    domId = TBGenerateDomHelper()
+    return new TBSubscriber(one, domId, {})
+
 
   streamDisconnectedHandler: (streamId) ->
     console.log("JS: Stream Disconnected Handler Executed")

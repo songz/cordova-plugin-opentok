@@ -20,8 +20,13 @@
 @property(nonatomic, copy) NSString* exceptionId;
 
 // Tokbox Library Functions
--(void)initSession:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+// TB
 - (void)initPublisher:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+-(void)initSession:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+
+// Publisher
+- (void)destroy:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+
 -(void)streamCreatedHandler:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
 -(void)connect:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
 -(void)disconnect:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
@@ -37,6 +42,10 @@
 
 // HouseKeeping
 - (void)updateView:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+
+
+
+- (void)TBTesting:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
 
 @end
 

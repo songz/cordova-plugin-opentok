@@ -27,21 +27,18 @@
  ****/
 // Called by TB.addEventListener('exception', fun...)
 -(void)exceptionHandler:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
-    NSLog(@"iOS Added exception Event Handler");
     self.exceptionId = [arguments pop];
 }
 
 // Called by TB.initsession()
 -(void)initSession:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
-    NSLog(@"iOS Initializing Session");
-    
     // Get Parameters
     NSString* callback = [arguments pop];
     NSString* sessionId = [arguments objectAtIndex:0];
-    NSString* production = [arguments objectAtIndex:1];
+    BOOL production = [[arguments objectAtIndex:1] boolValue];
     
     // Create Session
-    if ([production isEqualToString:@"true"]) {
+    if ( production ) {
         _session = [[OTSession alloc] initWithSessionId:sessionId delegate:self environment:OTSessionEnvironmentProduction];
     }else {
         _session = [[OTSession alloc] initWithSessionId:sessionId delegate:self];
@@ -57,7 +54,6 @@
 
 // Called by TB.initPublisher()
 - (void)initPublisher:(NSMutableArray *)arguments withDict:(NSMutableDictionary *)options{
-    NSLog(@"iOS initPublisher");
     BOOL bpubAudio = YES;
     BOOL bpubVideo = YES;
     
@@ -93,6 +89,12 @@
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self writeJavascript: [pluginResult toSuccessCallbackString:callback]];
 }
+
+/*** Publisher Methods
+ ****/
+- (void)destroy:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
+}
+
 
 // Called by addEventListener() for streamCreated
 - (void)streamCreatedHandler:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
@@ -243,13 +245,17 @@
     [self writeJavascript: [callbackResult toSuccessCallbackString:self.streamCreatedId]];
 }
 - (void)session:(OTSession*)session didFailWithError:(NSError*)error {
-    NSLog(@"iOS Session didFailWithError");
+    NSLog(@"Error: Session did not Connect");
+    NSNumber* code = [NSNumber numberWithInt:[error code]];
     NSMutableDictionary* err = [[NSMutableDictionary alloc] init];
     [err setObject:error.localizedDescription forKey:@"message"];
+    [err setObject:code forKey:@"code"];
     
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary: err];
-    [pluginResult setKeepCallbackAsBool:YES];
-    [self writeJavascript: [pluginResult toSuccessCallbackString:self.exceptionId]];
+    if (self.exceptionId) {
+        CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary: err];
+        [pluginResult setKeepCallbackAsBool:YES];
+        [self writeJavascript: [pluginResult toSuccessCallbackString:self.exceptionId]];
+    }
 }
 - (void)sessionDidDisconnect:(OTSession*)session{
     NSString* alertMessage = [NSString stringWithFormat:@"Session disconnected: (%@)", session.sessionId];
@@ -324,6 +330,20 @@
 /**** End of Errors
  ****/
 
+
+
+- (void)TBTesting:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
+    if (!self.exceptionId) {
+        self.exceptionId = [arguments pop];
+    }
+    
+    NSMutableDictionary* err = [[NSMutableDictionary alloc] init];
+    [err setObject:@"HMMM Test Error!" forKey:@"message"];
+    
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary: err];
+    [pluginResult setKeepCallbackAsBool:YES];
+    [self writeJavascript: [pluginResult toSuccessCallbackString:self.exceptionId]];
+}
 
 
 /***** Notes
