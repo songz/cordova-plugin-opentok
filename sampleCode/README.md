@@ -10,9 +10,9 @@ This tutorial will show you how to get something start right away based on the [
 3. Replace `js/index.js` in your project with `index.js` in this folder.  
 4. Compile and run our iOS app in your device.  
 
-## Steam your iOS video into your site  
+## Steam video from your device into your site  
 1. Put `helloWorld.html` in your local server.  
-2. Open `hellWorld.html` from your server and you should be able to see video from your device.  
+2. Open `hellWorld.html` from your computer's browser and you should be able to see video from your device.  
 
 ### Have Fun!
 
