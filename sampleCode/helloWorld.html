@@ -5,31 +5,44 @@
 	<title></title>
 </head>
 <body>
-	<script type="text/javascript">
-	var session = TB.initSession(""); // Replace with your own session ID. See http://www.tokbox.com/opentok/api/tools/generator
-	
-	var publisher = TB.initPublisher('', '') // Replace with your API key and Div Id element
-	
-	session.addEventListener("sessionConnected", sessionConnectedHandler);
-	session.addEventListener("streamCreated", streamCreatedHandler);
-	session.connect("", ""); // Replace with your API key and token. See http://www.tokbox.com/
-	function sessionConnectedHandler(event) {
-		 subscribeToStreams(event.streams);
-		 session.publish();
-	}
-	
-	function streamCreatedHandler(event) {
-		subscribeToStreams(event.streams);
-	}
-	
-	function subscribeToStreams(streams) {
-		for (i = 0; i < streams.length; i++) {
-			var stream = streams[i];
-			if (stream.connection.connectionId != session.connection.connectionId) {
-				session.subscribe(stream);
-			}
-		}
-	}
-	</script>
+  <div id="myPublisherDiv"></div>
+
+  <script src="http://staging.tokbox.com/v0.91/js/TB.min.js"></script>
+  <script type="text/javascript">
+    var apiKey = ""; // Replace with your apiKey.
+    var sessionId = ""; // Replace with your own session ID. Make sure it matches index.html
+    var token = ""; // Replace with your session Token.
+    // To Generate Sessions and Tokens, See http://www.tokbox.com/opentok/api/tools/generator
+
+    var session = TB.initSession(sessionId); 
+    var publisher = TB.initPublisher( apiKey, "myPublisherDiv" ); // Replace with your API key
+
+    session.addEventListener("sessionConnected", sessionConnectedHandler);
+    session.addEventListener("streamCreated", streamCreatedHandler);
+    session.connect(apiKey, token);
+
+    function sessionConnectedHandler(event) {
+      subscribeToStreams(event.streams);
+      session.publish( publisher );
+    }
+
+    function streamCreatedHandler(event) {
+      subscribeToStreams(event.streams);
+    }
+
+    function subscribeToStreams(streams) {
+      for (i = 0; i < streams.length; i++) {
+        var stream = streams[i];
+        if (stream.connection.connectionId != session.connection.connectionId) {
+          var div = document.createElement('div');
+          div.setAttribute('id', 'stream' + stream.streamId);
+          document.body.appendChild(div);
+          session.subscribe(stream, div.id);
+        }
+      }
+    }
+  </script>
 </body>
 </html>
+
+
