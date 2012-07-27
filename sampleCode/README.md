@@ -5,8 +5,15 @@ This tutorial will show you how to get something start right away based on the [
 
 ## Copy - Paste
 
-1. Fill out your apiKey, Session, and Token in `js/index.js` and `helloWorld.html`.  
+1. Fill out your apiKey, sessionId, and token in `js/index.js` and `helloWorld.html`.  
 2. Replace `index.html` in your project with `index.html` in this folder.  
 3. Replace `js/index.js` in your project with `index.js` in this folder.  
-4. Put `helloWorld.html` in your local server.  
-5. Run your app, and access `helloWorld.html` from your server. **Done!**  
+4. Compile and run our iOS app in your device.  
+
+## Steam your iOS video into your site  
+1. Put `helloWorld.html` in your local server.  
+2. Open `hellWorld.html` from your server and you should be able to see video from your device.  
+
+### Have Fun!
+
+## [Documentation for PhoneGap Plugin](/opentok/PhoneGap-Plugin/blob/master/docs/README.md)
