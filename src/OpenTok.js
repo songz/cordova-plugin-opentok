@@ -71,6 +71,15 @@
       return new TBSession(sid, production);
     },
     initPublisher: function(key, domId, properties) {
+      if (domId == null) {
+        domId = "";
+      }
+      if (properties == null) {
+        properties = {};
+      }
+      console.log(key);
+      console.log(domId);
+      console.log(properties);
       return new TBPublisher(key, domId, properties);
     },
     setLogLevel: function(a) {

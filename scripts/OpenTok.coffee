@@ -54,7 +54,10 @@ TBUpdateObjects = ()->
 window.TB =
   initSession: (sid, production) ->
     return new TBSession(sid, production)
-  , initPublisher: (key, domId, properties) ->
+  , initPublisher: (key, domId="", properties={}) ->
+    console.log key
+    console.log domId
+    console.log properties
     return new TBPublisher(key, domId, properties)
   , setLogLevel: (a) ->
    console.log("Log Level Set")

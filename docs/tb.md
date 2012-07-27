@@ -7,6 +7,7 @@ TB Object lets you initialize the OpenTok API and set up exception event handlin
 [TB.addEventListener()](#addEventListener)  
 [TB.initPublisher()](#initPublisher)  
 [TB.initSession()](#initSession)  
+[TB.removeEventListener()](#removeEventListener)  
 
 
 
@@ -31,7 +32,7 @@ Registers a method as an event listener for a specific event. The TB class dispa
 
 
 <a id="initPublisher"></a>
-### TB.initPublisher( apiKey:String [, replaceElementId:String] [, properties:Object] )
+### TB.initPublisher( apiKey:String [, replaceElementId:String] [, properties:Object] ):Publisher
 
 Example Code:  
 ```javascript
@@ -64,7 +65,7 @@ Valid Inputs: 'Front' or 'Back'
 
 
 <a id="initSession"></a>
-### TB.initSession(sessionId:String)
+### TB.initSession(sessionId:String):Session
 
 Example Code:  
 ```javascript
@@ -81,5 +82,23 @@ You connect to the session using the `connect()` method of the Session object re
 #### Returns
 
 **Session** ( [Session](session.md) ) - The session object through which all further interactions with the session will occur.
+
+
+<a id="removeEventListener"></a>
+### TB.removeEventListener( type:String, listener:Function )  
+
+Example Code:  
+```javascript
+TB.addEventListener( 'exception', eventHandlerFunction );
+```
+
+Removes an event listener for a specific event  
+
+#### Parameters
+
+**type** (String) — This string identifying the type of event. The TB object can only dispatch one type of event: an exception event. The only type of event the TB object dispatches is an 'exception' event.
+
+**listener** (Function) — The event listener function to remove.  
+The TB object throws an exception if the listener name is invalid.  
 
 
