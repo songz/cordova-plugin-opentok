@@ -11,7 +11,7 @@ Weave video chat into your web (and now mobile!) application.
 *Example:*  
 `./create ~/Development/OpenTokApp me.songz.OpenTokApp OpenTokApp`
 
-2. Go to ~/Development/OpenTokApp directory that you just created, and launch `*.xcodeproj` file in the folder  
+2. In the project directory that you just created, and launch `*.xcodeproj` file.  
 
 
 ## Step 2. Add the OpenTok iOS SDK to your project
@@ -21,7 +21,7 @@ The easiest way is to do this: take a working OpenTok app and copy the OpenTok F
 Be sure to git clone with --recursive to grab the required OpenTok iOS SDK submodule!  
 `git clone --recursive https://github.com/opentok/OpenTok-iOS-Hello-World.git`
 
-2. In XCode, drag the OpenTok.framework and all the frameworks that OpenTok needs to run that are not currently in your project.
+2. In XCode, drag the OpenTok.framework and all the frameworks that OpenTok needs to run that are not currently in your project.  
 Make sure *Copy items into destination group's folder* is **not** selected  
 ![framework](http://farm9.staticflickr.com/8292/7652859756_e381a15f8d_c.jpg)
 
