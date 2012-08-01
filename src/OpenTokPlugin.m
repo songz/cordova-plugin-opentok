@@ -39,8 +39,10 @@
     
     // Create Session
     if ( production ) {
+        NSLog(@"PRODUCTION!");
         _session = [[OTSession alloc] initWithSessionId:sessionId delegate:self environment:OTSessionEnvironmentProduction];
     }else {
+        NSLog(@" NOT PRODUCTION!");
         _session = [[OTSession alloc] initWithSessionId:sessionId delegate:self];
     }
     
@@ -76,7 +78,8 @@
     NSString* publishVideo = [arguments objectAtIndex:6];
     if ([publishVideo isEqualToString:@"false"]) {
         bpubVideo = NO;
-    }    
+    }
+    int zIndex = [[arguments objectAtIndex:7] intValue];
     
     // Publish and set View
     _publisher = [[OTPublisher alloc] initWithDelegate:self name:name];
@@ -84,6 +87,9 @@
     [_publisher setPublishVideo:bpubVideo];
     [self.webView.superview addSubview:_publisher.view];
     [_publisher.view setFrame:CGRectMake(left, top, width, height)];
+    if (zIndex>0) {
+        _publisher.view.layer.zPosition = zIndex;
+    }
     
     // Return to Javascript
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -151,9 +157,14 @@
     int left = [[arguments objectAtIndex:2] intValue];
     int width = [[arguments objectAtIndex:3] intValue];
     int height = [[arguments objectAtIndex:4] intValue];
+    NSString* tmp = [arguments objectAtIndex:5];
+    int zIndex = [[arguments objectAtIndex:6] intValue];
     
     OTSubscriber* sub = [streamDictionary objectForKey:sid];
     [sub.view setFrame:CGRectMake(left, top, width, height)];
+    if (zIndex>0) {
+        sub.view.layer.zPosition = zIndex;
+    }
     [self.webView.superview addSubview:sub.view];
     
     // Return to JS event handler
@@ -183,6 +194,9 @@
 
 // OTSession Connection Delegates
 - (void)sessionDidConnect:(OTSession*)session{
+    NSLog(@"iOS Connected to Session");
+    NSLog(@"iOS Connected to Session");
+    NSLog(@"iOS Connected to Session");
     NSLog(@"iOS Connected to Session");
     
     NSMutableDictionary* sessionDict = [[NSMutableDictionary alloc] init];
@@ -246,6 +260,7 @@
 }
 - (void)session:(OTSession*)session didFailWithError:(NSError*)error {
     NSLog(@"Error: Session did not Connect");
+    NSLog(@"Error: %@", error);
     NSNumber* code = [NSNumber numberWithInt:[error code]];
     NSMutableDictionary* err = [[NSMutableDictionary alloc] init];
     [err setObject:error.localizedDescription forKey:@"message"];

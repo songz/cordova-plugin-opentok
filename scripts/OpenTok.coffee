@@ -96,10 +96,19 @@ window.TB =
       domId = TBGenerateDomHelper()
       return new TBPublisher(one, domId, {})
   , setLogLevel: (a) ->
-   console.log("Log Level Set")
+    console.log("Log Level Set")
 
 window.TBTesting = (handler) ->
   Cordova.exec(handler, TBError, "TokBox", "TBTesting", [] )
+
+TBGetZIndex = (ele) ->
+  while( ele? )
+    val = document.defaultView.getComputedStyle(ele,null).getPropertyValue('z-index')
+    console.log val
+    if ( parseInt(val) )
+      return val
+    ele = ele.offsetParent
+  return 0
 
 # Publisher Object:
 #   Properties:
@@ -116,6 +125,7 @@ class TBPublisher
     name="TBNameHolder"
     publishAudio="true"
     publishVideo="true"
+    zIndex = TBGetZIndex(document.getElementById(@domId))
     if(@properties?)
       width = @properties.width ? 160
       height = @properties.height ? 120
@@ -124,11 +134,10 @@ class TBPublisher
         publishAudio="false"
       if(@properties.publisherVideo? and @properties.publishVideo==false)
         publishVideo="false"
-    #position = replaceWithObject(@domId, env.connection.connectionId, pubProperties)
     @obj = replaceWithObject(@domId, "TBPublisher", {width:width, height:height})
     position = getPosition(@obj.id)
     TBUpdateObjects()
-    Cordova.exec(TBSuccess, TBError, "TokBox", "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo] )
+    Cordova.exec(TBSuccess, TBError, "TokBox", "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo, zIndex] )
   destroy: ->
     Cordova.exec(TBSuccess, TBError, "TokBox", "destroyPublisher", [] )
 
@@ -235,6 +244,7 @@ TBSubscriber = (stream, divName, properties)->
   width = 160
   height = 120
   subscribeToVideo="true"
+  zIndex = TBGetZIndex(document.getElementById(divName))
   if(properties?)
     width = properties.width ? 160
     height = properties.height ? 120
@@ -243,5 +253,5 @@ TBSubscriber = (stream, divName, properties)->
       subscribeToVideo="false"
   obj = replaceWithObject(divName, stream.streamId, {width:width, height:height})
   position = getPosition(obj.id)
-  Cordova.exec(TBSuccess, TBError, "TokBox", "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo] )
+  Cordova.exec(TBSuccess, TBError, "TokBox", "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex] )
 

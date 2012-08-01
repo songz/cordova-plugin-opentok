@@ -6,9 +6,9 @@ var app = {
         document.addEventListener('deviceready', this.deviceready, false);
     },
     deviceready: function() {
-      var apiKey = ""; // Replace with your apiKey.
-      var sessionId = ""; // Replace with your own session ID. Make sure it matches helloWorld.html
-      var token = ""; // Replace with your session Token.
+      var apiKey = "16178811"; // Replace with your apiKey.
+      var sessionId = "2_MX4xNjE3ODgxMX5-MjAxMi0wNy0yOCAxODo0MDo1NS43MTU2MzQrMDA6MDB-MC41MDIzNjAwNzUyNDl-"; // Replace with your own session ID. Make sure it matches helloWorld.html
+      var token = "T1==cGFydG5lcl9pZD0xNjE3ODgxMSZzaWc9MmQ4YzRlYTc4NGIyOTRjZDg1ODgxNDM5NDVjOGU1MzYwZTMzY2UyZTpzZXNzaW9uX2lkPTJfTVg0eE5qRTNPRGd4TVg1LU1qQXhNaTB3TnkweU9DQXhPRG8wTURvMU5TNDNNVFUyTXpRck1EQTZNREItTUM0MU1ESXpOakF3TnpVeU5EbC0mY3JlYXRlX3RpbWU9MTM0Mzc3MDczMyZleHBpcmVfdGltZT0xMzQzODU3MTMzJnJvbGU9cHVibGlzaGVyJmNvbm5lY3Rpb25fZGF0YT0mbm9uY2U9ODMzMDA4"; // Replace with your session Token.
       // To Generate Sessions and Tokens, See http://www.tokbox.com/opentok/api/tools/generator
 
       var session = TB.initSession(sessionId); 
