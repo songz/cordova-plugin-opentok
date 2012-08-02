@@ -1,9 +1,8 @@
 //
 //  OpentokPlugin.m
-//  opentokTest
 //
-//  Created by Song Zheng on 4/19/12.
-//  Copyright (c) 2012 __MyCompanyName__. All rights reserved.
+//  Copyright (c) 2012 TokBox. All rights reserved.
+//  Please see the LICENSE included with this distribution for details.
 //
 
 #import "OpentokPlugin.h"
