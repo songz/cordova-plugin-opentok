@@ -61,31 +61,31 @@ To use the OpenTok PhoneGap plugin, include the OpenTok JavaScript file in your 
 <table>
 	<tr>
 		<td>
-      <a href="exceptionEvent.md">exception</a>
+      <a href="/opentok/PhoneGap-Plugin/blob/master/docs/exceptionEvent.md">exception</a>
     </td>
 		<td>Triggered when errors or unexpected behavior is encountered</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="sessionEvents.md">sessionConnected</a>
+      <a href="/opentok/PhoneGap-Plugin/blob/master/docs/sessionEvents.md">sessionConnected</a>
     </td>
 		<td>Triggered when session has successfully connected</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="sessionEvents.md">sessionDisconnected</a>
+      <a href="/opentok/PhoneGap-Plugin/blob/master/docs/sessionEvents.md">sessionDisconnected</a>
     </td>
 		<td>Triggered when a session has disconnected</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="streamEvents.md">streamCreated</a>
+      <a href="/opentok/PhoneGap-Plugin/blob/master/docs/streamEvents.md">streamCreated</a>
     </td>
 		<td>Triggered when new stream has been created in a session</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="streamEvents.md">streamDestroyed</a>
+      <a href="/opentok/PhoneGap-Plugin/blob/master/docs/streamEvents.md">streamDestroyed</a>
     </td>
 		<td>Triggered when stream has ended in a session</td>
 	</tr>
