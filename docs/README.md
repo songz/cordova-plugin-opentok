@@ -19,7 +19,7 @@ To use the OpenTok PhoneGap plugin, include the OpenTok JavaScript file in your 
 <table>
 	<tr>
 		<td>
-      <a href="connection.md">Connection</a>
+      [Connection](connection.md)
     </td>
     <td>Represents a connection to an OpenTok session</td>
 	</tr>
