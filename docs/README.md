@@ -19,37 +19,37 @@ To use the OpenTok PhoneGap plugin, include the OpenTok JavaScript file in your 
 <table>
 	<tr>
 		<td>
-      <a href="/opentok/PhoneGap-Plugion/blob/master/docs/connection.md">Connection</a>
+      <a href="/opentok/PhoneGap-Plugin/blob/master/docs/connection.md">Connection</a>
     </td>
     <td>Represents a connection to an OpenTok session</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="publisher.md">Publisher</a>
+      <a href="/opentok/PhoneGap-Plugin/blob/master/docs/publisher.md">Publisher</a>
     </td>
     <td>Provides information about the publishing stream</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="session.md">Session</a>
+      <a href="/opentok/PhoneGap-Plugin/blob/master/docs/session.md">Session</a>
     </td>
     <td>Provides access to much of the OpenTok functionality.</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="stream.md">Stream</a>
+      <a href="/opentok/PhoneGap-Plugin/blob/master/docs/stream.md">Stream</a>
     </td>
     <td>Specifies a stream and provides information about it</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="subscriber.md">Subscriber</a>
+      <a href="/opentok/PhoneGap-Plugin/blob/master/docs/subscriber.md">Subscriber</a>
     </td>
     <td>References a stream that you have subscribed to</td>
 	</tr>
 	<tr>
 		<td>
-      <a href="tb.md">TB</a>
+      <a href="/opentok/PhoneGap-Plugin/blob/master/docs/tb.md">TB</a>
     </td>
     <td>Lets you initialize the OpenTok API and set up exception event handling</td>
 	</tr>
