@@ -66,7 +66,9 @@ TBGenerateDomHelper = ->
 #  Methods that doesn't do anything:
 #     TB.setLogLevel(logLevel:String)
 window.TB =
-  addEventListener: (event, handler) ->
+  updateViews: ->
+    TBUpdateObjects()
+  , addEventListener: (event, handler) ->
     if(event=="exception")
       console.log("JS: TB Exception Handler added")
       Cordova.exec(handler, TBError, "TokBox", "exceptionHandler", [] )

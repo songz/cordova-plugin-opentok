@@ -76,6 +76,9 @@
   };
 
   window.TB = {
+    updateViews: function() {
+      return TBUpdateObjects();
+    },
     addEventListener: function(event, handler) {
       if (event === "exception") {
         console.log("JS: TB Exception Handler added");

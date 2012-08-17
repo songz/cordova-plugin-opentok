@@ -96,6 +96,6 @@ To use the OpenTok PhoneGap plugin, include the OpenTok JavaScript file in your 
 
 Since the video View is a native UIView on top of the phoneGap's web view, moving the 'object' DOM will have no effect on the video. To update Video position, call this function:
 
-    TBUpdateObjects()
+    TB.updateViews()
 
 
