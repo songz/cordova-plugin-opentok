@@ -65,7 +65,7 @@ Valid Inputs: 'Front' or 'Back'
 
 
 <a name="initSession"></a>
-### TB.initSession( sessionId:String [, production:Boolean ] ):Session
+### TB.initSession( sessionId:String ):Session
 
 Example Code:  
 ```javascript

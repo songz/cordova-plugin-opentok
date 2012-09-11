@@ -39,7 +39,7 @@
     // Create Session
     if ( production ) {
         NSLog(@"PRODUCTION!");
-        _session = [[OTSession alloc] initWithSessionId:sessionId delegate:self environment:OTSessionEnvironmentProduction];
+        _session = [[OTSession alloc] initWithSessionId:sessionId delegate:self];
     }else {
         NSLog(@" NOT PRODUCTION!");
         _session = [[OTSession alloc] initWithSessionId:sessionId delegate:self];
