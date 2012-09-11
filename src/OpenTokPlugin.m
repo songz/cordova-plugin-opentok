@@ -235,11 +235,8 @@
     [sessionDict setObject:connection forKey:@"connection"];
     
     // Session Environment
-    if (session.environment==OTSessionEnvironmentProduction) {
-        [sessionDict setObject:@"production" forKey:@"environment"];
-    }else {
-        [sessionDict setObject:@"staging" forKey:@"environment"];
-    }
+    // Changed to production by default
+    [sessionDict setObject:@"production" forKey:@"environment"];
     
     // After session dictionary is constructed, return the result!
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:sessionDict];
