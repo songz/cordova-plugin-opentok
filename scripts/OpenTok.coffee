@@ -134,7 +134,7 @@ class TBPublisher
       name = @properties.name ? ""
       if(@properties.publishAudio? and @properties.publishAudio==false)
         publishAudio="false"
-      if(@properties.publisherVideo? and @properties.publishVideo==false)
+      if(@properties.publishVideo? and @properties.publishVideo==false)
         publishVideo="false"
     @obj = replaceWithObject(@domId, "TBPublisher", {width:width, height:height})
     position = getPosition(@obj.id)
