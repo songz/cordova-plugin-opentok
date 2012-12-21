@@ -13,6 +13,7 @@
     OTPublisher* _publisher;
     OTSubscriber* _subscriber;
     NSMutableDictionary *subscriberDictionary;
+    NSMutableDictionary *streamDictionary;
 }
 
 @synthesize callbackID;
@@ -47,6 +48,7 @@
     
     // Initialize Dictionary, contains DOM info for every stream
     subscriberDictionary = [[NSMutableDictionary alloc] init];
+    streamDictionary = [[NSMutableDictionary alloc] init];
     
     // Return Result
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -159,7 +161,11 @@
     NSString* tmp = [arguments objectAtIndex:5];
     int zIndex = [[arguments objectAtIndex:6] intValue];
     
-    OTSubscriber* sub = [subscriberDictionary objectForKey:sid];
+    // Acquire Stream, then create a subscriber object and put it into dictionary
+    OTStream* myStream = [streamDictionary objectForKey:sid];
+    OTSubscriber* sub = [[OTSubscriber alloc] initWithStream:myStream delegate:self];
+    [subscriberDictionary setObject:myStream forKey:myStream.streamId];
+    
     [sub.view setFrame:CGRectMake(left, top, width, height)];
     if (zIndex>0) {
         sub.view.layer.zPosition = zIndex;
@@ -245,8 +251,8 @@
 - (void)session:(OTSession*)mySession didReceiveStream:(OTStream*)stream{
     NSLog(@"iOS Received Stream");
 
-    OTSubscriber* subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
-    [subscriberDictionary setObject:subscriber forKey:stream.streamId];
+    // Store stream in streamDictionary, keeps track of available streams
+    [streamDictionary setObject:stream forKey:stream.streamId];
     
     // Set up result, trigger JS event handler
     NSString* result = [[NSString alloc] initWithFormat:@"%@ %@", stream.connection.connectionId, stream.streamId];
@@ -311,6 +317,7 @@
         _publisher.view.frame = CGRectMake(left, top, width, height);
     }
 
+    // Pulls the subscriber object from dictionary to prepare it for update
     OTSubscriber* streamInfo = [subscriberDictionary objectForKey:sid];
     
     if (streamInfo) {
