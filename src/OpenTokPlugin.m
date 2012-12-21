@@ -12,7 +12,7 @@
     OTSession* _session;
     OTPublisher* _publisher;
     OTSubscriber* _subscriber;
-    NSMutableDictionary *streamDictionary;
+    NSMutableDictionary *subscriberDictionary;
 }
 
 @synthesize callbackID;
@@ -46,7 +46,7 @@
     }
     
     // Initialize Dictionary, contains DOM info for every stream
-    streamDictionary = [[NSMutableDictionary alloc] init];
+    subscriberDictionary = [[NSMutableDictionary alloc] init];
     
     // Return Result
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -159,7 +159,7 @@
     NSString* tmp = [arguments objectAtIndex:5];
     int zIndex = [[arguments objectAtIndex:6] intValue];
     
-    OTSubscriber* sub = [streamDictionary objectForKey:sid];
+    OTSubscriber* sub = [subscriberDictionary objectForKey:sid];
     [sub.view setFrame:CGRectMake(left, top, width, height)];
     if (zIndex>0) {
         sub.view.layer.zPosition = zIndex;
@@ -246,7 +246,7 @@
     NSLog(@"iOS Received Stream");
 
     OTSubscriber* subscriber = [[OTSubscriber alloc] initWithStream:stream delegate:self];
-    [streamDictionary setObject:subscriber forKey:stream.streamId];
+    [subscriberDictionary setObject:subscriber forKey:stream.streamId];
     
     // Set up result, trigger JS event handler
     NSString* result = [[NSString alloc] initWithFormat:@"%@ %@", stream.connection.connectionId, stream.streamId];
@@ -311,7 +311,7 @@
         _publisher.view.frame = CGRectMake(left, top, width, height);
     }
 
-    OTSubscriber* streamInfo = [streamDictionary objectForKey:sid];
+    OTSubscriber* streamInfo = [subscriberDictionary objectForKey:sid];
     
     if (streamInfo) {
         // Reposition the video feeds!
