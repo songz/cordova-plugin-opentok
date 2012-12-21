@@ -161,7 +161,7 @@
         if ((this.properties.publishAudio != null) && this.properties.publishAudio === false) {
           publishAudio = "false";
         }
-        if ((this.properties.publisherVideo != null) && this.properties.publishVideo === false) {
+        if ((this.properties.publishVideo != null) && this.properties.publishVideo === false) {
           publishVideo = "false";
         }
       }
