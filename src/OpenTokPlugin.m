@@ -164,7 +164,7 @@
     // Acquire Stream, then create a subscriber object and put it into dictionary
     OTStream* myStream = [streamDictionary objectForKey:sid];
     OTSubscriber* sub = [[OTSubscriber alloc] initWithStream:myStream delegate:self];
-    [subscriberDictionary setObject:myStream forKey:myStream.streamId];
+    [subscriberDictionary setObject:sub forKey:myStream.streamId];
     
     [sub.view setFrame:CGRectMake(left, top, width, height)];
     if (zIndex>0) {
