@@ -62,7 +62,7 @@
       streamId = e.getAttribute('streamId');
       id = e.id;
       position = getPosition(id);
-      Cordova.exec(TBSuccess, TBError, "TokBox", "updateView", [streamId, position.top, position.left, position.width, position.height]);
+      Cordova.exec(TBSuccess, TBError, "TokBox", "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e)]);
     }
   };
 

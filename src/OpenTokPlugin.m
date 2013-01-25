@@ -312,9 +312,11 @@
     int left = [[arguments objectAtIndex:2] intValue];
     int width = [[arguments objectAtIndex:3] intValue];
     int height = [[arguments objectAtIndex:4] intValue];
+    int zIndex = [[arguments objectAtIndex:5] intValue];
     if ([sid isEqualToString:@"TBPublisher"]) {
         NSLog(@"The Width is: %d", width);
         _publisher.view.frame = CGRectMake(left, top, width, height);
+        _publisher.view.layer.zPosition = zIndex;
     }
 
     // Pulls the subscriber object from dictionary to prepare it for update
@@ -324,6 +326,7 @@
         // Reposition the video feeds!
 //        streamInfo.subscriber.view.frame = CGRectMake(left, top, width, height);
         streamInfo.view.frame = CGRectMake(left, top, width, height);
+        streamInfo.view.layer.zPosition = zIndex;
     }
     
     CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
