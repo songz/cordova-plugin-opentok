@@ -58,7 +58,7 @@ The TB object dispatches an `exceptionEvent` if there is an error connecting to 
 
 **apikey** (String) - The API key that TokBox provided you when you registered for the OpenTok API.
 
-**token** (String) - The session token. You generate a session token using the OpenTok server-side libraries or the Session and [Token Generator page](http://www.tokbox.com/opentok/api/tools/generator)
+**token** (String) - The session token. You generate a session token using the OpenTok server-side libraries or the [OpenTok dashboard](https://dashboard.tokbox.com/projects)
 
 **properties** (Object) — Optional. There are currently no properties available for this function.
 

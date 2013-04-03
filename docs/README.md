@@ -1,8 +1,8 @@
 # OpenTok PhoneGap Plugin API Reference
 
-The OpenTok API lets you add live video to your app. [Find out more online](http://www.tokbox.com/opentok/api).
+The OpenTok API lets you add live video to your app. [Find out more online](http://www.tokbox.com/platform).
 
-For an overview of the core concepts of OpenTok, please visit our [OpenTok Developer Page](http://www.tokbox.com/opentok/api/documentation/gettingstarted)
+For an overview of the core concepts of OpenTok, please visit our [OpenTok Developer Page](http://www.tokbox.com/opentok/demo)
 
 ### This PhoneGap Plugin Library is a subset of the OpenTok JavaScript Library
 

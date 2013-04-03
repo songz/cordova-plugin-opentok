@@ -77,7 +77,7 @@ When you are Deploying into your device:
 ---
 
 ## Tutorial and sample code
-Go through the 15-minute [Getting started tutorial](http://www.tokbox.com/opentok/api/documentation/gettingstarted) to learn the Basics!  
+Go through the [OpenTok API demo](http://www.tokbox.com/opentok/demo) to learn the basics!  
 
 Next, look at the included in the sampleCode folder and follow the [instructions](/opentok/PhoneGap-Plugin/tree/master/sampleCode) in the README.  
 
