@@ -37,7 +37,7 @@ TBError = (error) ->
   navigator.notification.alert(error)
 
 TBSuccess = ->
-  console.log("TB NOTHING IS CALLED!")
+  console.log("success")
 
 TBUpdateObjects = ()->
   console.log("JS: Objects being updated")
@@ -72,10 +72,8 @@ window.TB =
     if(event=="exception")
       console.log("JS: TB Exception Handler added")
       Cordova.exec(handler, TBError, "TokBox", "exceptionHandler", [] )
-  , initSession: (sid, production) ->
-    if production? and (typeof(production)=="boolean" )
-      return new TBSession(sid, production)
-    return new TBSession(sid, false)
+  , initSession: (sid) ->
+    return new TBSession(sid)
   , initPublisher: (one, two, three) ->
     if( three? )
       # apiKey, domId, properties
@@ -145,9 +143,8 @@ class TBPublisher
 
 
 class TBSession
-  constructor: (@sessionId, @production) ->
-    console.log @production
-    Cordova.exec(TBSuccess, TBSuccess, "TokBox", "initSession", [@sessionId, @production] )
+  constructor: (@sessionId) ->
+    Cordova.exec(TBSuccess, TBSuccess, "TokBox", "initSession", [@sessionId] )
 
   cleanUpDom: ->
     objects = document.getElementsByClassName('TBstreamObject')

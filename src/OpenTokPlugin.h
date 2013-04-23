@@ -20,31 +20,31 @@
 
 // Tokbox Library Functions
 // TB
-- (void)initPublisher:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
--(void)initSession:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+- (void)initPublisher:(CDVInvokedUrlCommand*)command;
+-(void)initSession:(CDVInvokedUrlCommand*)command;
 
 // Publisher
-- (void)destroy:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+- (void)destroy:(CDVInvokedUrlCommand*)command;
 
--(void)streamCreatedHandler:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
--(void)connect:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
--(void)disconnect:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void)publish:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void)unpublish:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void)subscribe:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
-- (void)unsubscribe:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+-(void)streamCreatedHandler:(CDVInvokedUrlCommand*)command;
+-(void)connect:(CDVInvokedUrlCommand*)command;
+-(void)disconnect:(CDVInvokedUrlCommand*)command;
+- (void)publish:(CDVInvokedUrlCommand*)command;
+- (void)unpublish:(CDVInvokedUrlCommand*)command;
+- (void)subscribe:(CDVInvokedUrlCommand*)command;
+- (void)unsubscribe:(CDVInvokedUrlCommand*)command;
 
 // Listeners
--(void)streamDisconnectedHandler:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
--(void)sessionDisconnectedHandler:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
--(void)exceptionHandler:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+-(void)streamDisconnectedHandler:(CDVInvokedUrlCommand*)command;
+-(void)sessionDisconnectedHandler:(CDVInvokedUrlCommand*)command;
+-(void)exceptionHandler:(CDVInvokedUrlCommand*)command;
 
 // HouseKeeping
-- (void)updateView:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+- (void)updateView:(CDVInvokedUrlCommand*)command;
 
 
 
-- (void)TBTesting:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options;
+- (void)TBTesting:(CDVInvokedUrlCommand*)command;
 
 @end
 

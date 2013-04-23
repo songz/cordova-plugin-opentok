@@ -26,25 +26,17 @@
 /*** TB Methods
  ****/
 // Called by TB.addEventListener('exception', fun...)
--(void)exceptionHandler:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
-    self.exceptionId = [arguments pop];
+-(void)exceptionHandler:(CDVInvokedUrlCommand*)command{
+    self.exceptionId = command.callbackId;
 }
 
 // Called by TB.initsession()
--(void)initSession:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
+-(void)initSession:(CDVInvokedUrlCommand*)command{
     // Get Parameters
-    NSString* callback = [arguments pop];
-    NSString* sessionId = [arguments objectAtIndex:0];
-    BOOL production = [[arguments objectAtIndex:1] boolValue];
+    NSString* sessionId = [command.arguments objectAtIndex:0];
     
     // Create Session
-    if ( production ) {
-        NSLog(@"PRODUCTION!");
-        _session = [[OTSession alloc] initWithSessionId:sessionId delegate:self];
-    }else {
-        NSLog(@" NOT PRODUCTION!");
-        _session = [[OTSession alloc] initWithSessionId:sessionId delegate:self];
-    }
+    _session = [[OTSession alloc] initWithSessionId:sessionId delegate:self];
     
     // Initialize Dictionary, contains DOM info for every stream
     subscriberDictionary = [[NSMutableDictionary alloc] init];
@@ -52,35 +44,35 @@
     
     // Return Result
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self writeJavascript: [pluginResult toSuccessCallbackString:callback]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 // Called by TB.initPublisher()
-- (void)initPublisher:(NSMutableArray *)arguments withDict:(NSMutableDictionary *)options{
+- (void)initPublisher:(CDVInvokedUrlCommand *)command{
+    NSLog(@"iOS creating Publisher");
     BOOL bpubAudio = YES;
     BOOL bpubVideo = YES;
     
     // Get Parameters
-    NSString* callback = [arguments pop];
-    int top = [[arguments objectAtIndex:0] intValue];
-    int left = [[arguments objectAtIndex:1] intValue];
-    int width = [[arguments objectAtIndex:2] intValue];
-    int height = [[arguments objectAtIndex:3] intValue];
+    int top = [[command.arguments objectAtIndex:0] intValue];
+    int left = [[command.arguments objectAtIndex:1] intValue];
+    int width = [[command.arguments objectAtIndex:2] intValue];
+    int height = [[command.arguments objectAtIndex:3] intValue];
     
-    NSString* name = [arguments objectAtIndex:4];
+    NSString* name = [command.arguments objectAtIndex:4];
     if ([name isEqualToString:@"TBNameHolder"]) {
         name = [[UIDevice currentDevice] name];
     }
     
-    NSString* publishAudio = [arguments objectAtIndex:5];
+    NSString* publishAudio = [command.arguments objectAtIndex:5];
     if ([publishAudio isEqualToString:@"false"]) {
         bpubAudio = NO;
     }
-    NSString* publishVideo = [arguments objectAtIndex:6];
+    NSString* publishVideo = [command.arguments objectAtIndex:6];
     if ([publishVideo isEqualToString:@"false"]) {
         bpubVideo = NO;
     }
-    int zIndex = [[arguments objectAtIndex:7] intValue];
+    int zIndex = [[command.arguments objectAtIndex:7] intValue];
     
     // Publish and set View
     _publisher = [[OTPublisher alloc] initWithDelegate:self name:name];
@@ -94,72 +86,72 @@
     
     // Return to Javascript
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self writeJavascript: [pluginResult toSuccessCallbackString:callback]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 /*** Publisher Methods
  ****/
-- (void)destroy:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
+- (void)destroy:(CDVInvokedUrlCommand*)command{
 }
 
 
 // Called by addEventListener() for streamCreated
-- (void)streamCreatedHandler:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
+- (void)streamCreatedHandler:(CDVInvokedUrlCommand*)command{
     NSLog(@"iOS Adding Stream Created Event Listener");
-    self.streamCreatedId = [arguments pop];
+    self.streamCreatedId = command.callbackId;
 }
 
 
 /*** Session Methods
  ****/
 // Called by session.connect(key, token)
-- (void)connect:(NSMutableArray *)arguments withDict:(NSMutableDictionary *)options{
+- (void)connect:(CDVInvokedUrlCommand *)command{
     NSLog(@"iOS Connecting to Session");
     
     // Get Parameters
-    self.callbackID = [arguments pop];
-    NSString* tbKey = [arguments objectAtIndex:0];
-    NSString* tbToken = [arguments objectAtIndex:1];
+    self.callbackID = command.callbackId;
+    NSString* tbKey = [command.arguments objectAtIndex:0];
+    NSString* tbToken = [command.arguments objectAtIndex:1];
     
     [_session connectWithApiKey:tbKey token:tbToken];
 }
 
 // Called by session.disconnect()
-- (void)disconnect:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
+- (void)disconnect:(CDVInvokedUrlCommand*)command{
     [_session disconnect];
 }
 
 // Called by session.publish(top, left)
-- (void)publish:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
-    NSLog(@"iOS session Publish with Publisher");
-    self.callbackID = [arguments pop];
+- (void)publish:(CDVInvokedUrlCommand*)command{
+    NSLog(@"iOS Publish stream to session");
+    self.callbackID = command.callbackId;
     [_session publish:_publisher];
     
     // Return to Javascript
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self writeJavascript: [pluginResult toSuccessCallbackString:self.callbackID]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackID];
 }
 
 // Called by session.unpublish(...)
-- (void)unpublish:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
+- (void)unpublish:(CDVInvokedUrlCommand*)command{
     NSLog(@"iOS Unpublishing publisher");
     [_session unpublish:_publisher];
 }
 
 // Called by session.subscribe(streamId, top, left)
-- (void)subscribe:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
+- (void)subscribe:(CDVInvokedUrlCommand*)command{
     NSLog(@"iOS subscribing to stream");
     
     // Get Parameters
-    self.callbackID = [arguments pop];
-    NSString* sid = [arguments objectAtIndex:0];
+    self.callbackID = command.callbackId;
+    NSString* sid = [command.arguments objectAtIndex:0];
     
-    int top = [[arguments objectAtIndex:1] intValue];
-    int left = [[arguments objectAtIndex:2] intValue];
-    int width = [[arguments objectAtIndex:3] intValue];
-    int height = [[arguments objectAtIndex:4] intValue];
-    NSString* tmp = [arguments objectAtIndex:5];
-    int zIndex = [[arguments objectAtIndex:6] intValue];
+    int top = [[command.arguments objectAtIndex:1] intValue];
+    int left = [[command.arguments objectAtIndex:2] intValue];
+    int width = [[command.arguments objectAtIndex:3] intValue];
+    int height = [[command.arguments objectAtIndex:4] intValue];
+    NSString* tmp = [command.arguments objectAtIndex:5];
+    int zIndex = [[command.arguments objectAtIndex:6] intValue];
     
     // Acquire Stream, then create a subscriber object and put it into dictionary
     OTStream* myStream = [streamDictionary objectForKey:sid];
@@ -174,11 +166,11 @@
     
     // Return to JS event handler
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [self writeJavascript: [pluginResult toSuccessCallbackString:self.callbackID]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackID];
 }
 
 // Called by session.subscribe(streamId, top, left)
-- (void)unsubscribe:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
+- (void)unsubscribe:(CDVInvokedUrlCommand*)command{
     NSLog(@"iOS unSubscribing to stream");
 }
 
@@ -192,16 +184,13 @@
 - (void)subscriber:(OTSubscriber*)subscrib didFailWithError:(NSError*)error{
     CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: subscrib.stream.connection.connectionId];
     [callbackResult setKeepCallbackAsBool:YES];
-    //    [self writeJavascript: [callbackResult toSuccessCallbackString:self.streamDisconnectedId]];
+    //    [self.commandDelegate [callbackResult toSuccessCallbackString:self.streamDisconnectedId]];
 }
 
 
 
 // OTSession Connection Delegates
 - (void)sessionDidConnect:(OTSession*)session{
-    NSLog(@"iOS Connected to Session");
-    NSLog(@"iOS Connected to Session");
-    NSLog(@"iOS Connected to Session");
     NSLog(@"iOS Connected to Session");
     
     NSMutableDictionary* sessionDict = [[NSMutableDictionary alloc] init];
@@ -229,7 +218,16 @@
     // SessionStreams
     NSMutableArray* streamsArray = [[NSMutableArray alloc] init];
     for(id key in session.streams){
-        [streamsArray addObject: [session.streams objectForKey:key]];
+        OTStream* aStream = [session.streams objectForKey:key];
+        [streamDictionary setObject:aStream forKey:aStream.streamId];
+
+        NSMutableDictionary* streamInfo = [[NSMutableDictionary alloc] init];
+        [streamInfo setObject:aStream.streamId forKey:@"streamId"];
+        
+        NSMutableDictionary* connectionInfo = [[NSMutableDictionary alloc] init];
+        [connectionInfo setObject:aStream.connection.connectionId forKey:@"streamId"];
+        [streamInfo setObject:connectionInfo forKey:@"connection"];
+        [streamsArray addObject: streamInfo];
     }
     [sessionDict setObject:streamsArray forKey:@"streams"];
     
@@ -240,13 +238,16 @@
     [connection setObject:strDate forKey:@"creationTime"];
     [sessionDict setObject:connection forKey:@"connection"];
     
+    
     // Session Environment
     // Changed to production by default
     [sessionDict setObject:@"production" forKey:@"environment"];
     
+    NSLog(@"object for session is %@", sessionDict);
+    
     // After session dictionary is constructed, return the result!
     CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:sessionDict];
-    [self writeJavascript: [pluginResult toSuccessCallbackString:self.callbackID]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackID];
 }
 - (void)session:(OTSession*)mySession didReceiveStream:(OTStream*)stream{
     NSLog(@"iOS Received Stream");
@@ -258,7 +259,8 @@
     NSString* result = [[NSString alloc] initWithFormat:@"%@ %@", stream.connection.connectionId, stream.streamId];
     CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: result];
     [callbackResult setKeepCallbackAsBool:YES];
-    [self writeJavascript: [callbackResult toSuccessCallbackString:self.streamCreatedId]];
+    //[self.commandDelegate [callbackResult toSuccessCallbackString:self.streamCreatedId];
+    [self.commandDelegate sendPluginResult:callbackResult callbackId:self.streamCreatedId];
 }
 - (void)session:(OTSession*)session didFailWithError:(NSError*)error {
     NSLog(@"Error: Session did not Connect");
@@ -271,7 +273,7 @@
     if (self.exceptionId) {
         CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary: err];
         [pluginResult setKeepCallbackAsBool:YES];
-        [self writeJavascript: [pluginResult toSuccessCallbackString:self.exceptionId]];
+        [self.commandDelegate sendPluginResult:pluginResult callbackId:self.exceptionId];
     }
 }
 - (void)sessionDidDisconnect:(OTSession*)session{
@@ -285,34 +287,34 @@
     
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:event];
     [pluginResult setKeepCallbackAsBool:YES];
-    [self writeJavascript: [pluginResult toSuccessCallbackString:self.sessionDisconnectedId]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.sessionDisconnectedId];
 }
 - (void)session:(OTSession*)session didDropStream:(OTStream*)stream{
     NSLog(@"iOS Drop Stream");
     CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: stream.streamId];
     [callbackResult setKeepCallbackAsBool:YES];
-    [self writeJavascript: [callbackResult toSuccessCallbackString:self.streamDisconnectedId]];
+    [self.commandDelegate sendPluginResult:callbackResult callbackId:self.streamDisconnectedId];
 }
 
 
 // Called by addEventListener() for session/stream Disconnected
--(void)streamDisconnectedHandler:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
-    self.streamDisconnectedId = [arguments pop];
+-(void)streamDisconnectedHandler:(CDVInvokedUrlCommand*)command{
+    self.streamDisconnectedId = command.callbackId;
 }
--(void)sessionDisconnectedHandler:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
-    self.sessionDisconnectedId = [arguments pop];
+-(void)sessionDisconnectedHandler:(CDVInvokedUrlCommand*)command{
+    self.sessionDisconnectedId = command.callbackId;
 }
 
 
 // Helper function to update Views
-- (void)updateView:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
-    NSString* callback = [arguments pop];
-    NSString* sid = [arguments objectAtIndex:0];
-    int top = [[arguments objectAtIndex:1] intValue];
-    int left = [[arguments objectAtIndex:2] intValue];
-    int width = [[arguments objectAtIndex:3] intValue];
-    int height = [[arguments objectAtIndex:4] intValue];
-    int zIndex = [[arguments objectAtIndex:5] intValue];
+- (void)updateView:(CDVInvokedUrlCommand*)command{
+    NSString* callback = command.callbackId;
+    NSString* sid = [command.arguments objectAtIndex:0];
+    int top = [[command.arguments objectAtIndex:1] intValue];
+    int left = [[command.arguments objectAtIndex:2] intValue];
+    int width = [[command.arguments objectAtIndex:3] intValue];
+    int height = [[command.arguments objectAtIndex:4] intValue];
+    int zIndex = [[command.arguments objectAtIndex:5] intValue];
     if ([sid isEqualToString:@"TBPublisher"]) {
         NSLog(@"The Width is: %d", width);
         _publisher.view.frame = CGRectMake(left, top, width, height);
@@ -324,14 +326,14 @@
     
     if (streamInfo) {
         // Reposition the video feeds!
-//        streamInfo.subscriber.view.frame = CGRectMake(left, top, width, height);
         streamInfo.view.frame = CGRectMake(left, top, width, height);
         streamInfo.view.layer.zPosition = zIndex;
     }
     
     CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [callbackResult setKeepCallbackAsBool:YES];
-    [self writeJavascript: [callbackResult toSuccessCallbackString:callback]];
+    //[self.commandDelegate sendPluginResult:callbackResult toSuccessCallbackString:command.callbackId];
+    [self.commandDelegate sendPluginResult:callbackResult callbackId:command.callbackId];
 }
 
 
@@ -345,7 +347,7 @@
     
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary: err];
     [pluginResult setKeepCallbackAsBool:YES];
-    [self writeJavascript: [pluginResult toSuccessCallbackString:self.exceptionId]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.exceptionId];
 }
 
 /**** End of Errors
@@ -353,9 +355,9 @@
 
 
 
-- (void)TBTesting:(NSMutableArray*)arguments withDict:(NSMutableDictionary*)options{
+- (void)TBTesting:(CDVInvokedUrlCommand*)command{
     if (!self.exceptionId) {
-        self.exceptionId = [arguments pop];
+        self.exceptionId = command.callbackId;
     }
     
     NSMutableDictionary* err = [[NSMutableDictionary alloc] init];
@@ -363,21 +365,21 @@
     
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary: err];
     [pluginResult setKeepCallbackAsBool:YES];
-    [self writeJavascript: [pluginResult toSuccessCallbackString:self.exceptionId]];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.exceptionId];
 }
 
 
 /***** Notes
  
  
- NSString *stringObtainedFromJavascript = [arguments objectAtIndex:0];
+ NSString *stringObtainedFromJavascript = [command.arguments objectAtIndex:0];
  CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: stringObtainedFromJavascript];
  
  if(YES){
- [self writeJavascript: [pluginResult toSuccessCallbackString:self.callbackID]];
+ [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackID]];
  }else{
  //Call  the Failure Javascript function
- [self writeJavascript: [pluginResult toErrorCallbackString:self.callbackID]];  
+ [self.commandDelegate [pluginResult toErrorCallbackString:self.callbackID]];  
  }
  
 ******/
