@@ -4,7 +4,7 @@ PhoneGap Plugin for OpenTok iOS
 Weave video chat into your web (and now mobile!) application.
 
 ## Step 1. Install and create a PhoneGap app
-**Make sure You have PhoneGap 2.0 Installed** If you haven't, check out PhoneGap's [Getting Started](http://docs.phonegap.com/en/2.0.0/guide_getting-started_ios_index.md.html#Getting%20Started%20with%20iOS) Page.
+**Make sure You have PhoneGap 2.9 Installed** If you haven't, check out PhoneGap's [Getting Started](http://docs.phonegap.com/en/2.0.0/guide_getting-started_ios_index.md.html#Getting%20Started%20with%20iOS) Page.
 
 1. Create a PhoneGap app by going to your PhoneGap's Bin folder, and type into Terminal:  
 `./create <project_folder_path> <bundle_id> <project_name>`  
@@ -28,12 +28,6 @@ Make sure *Copy items into destination group's folder* is **not** selected
 3. Drag **opentok.bundle** file from Hello-World project into the *Resources* folder for your project
 ![bundle](http://farm9.staticflickr.com/8429/7653284900_972a5bf403_b.jpg)
 
-4. Click on your project in the XCode project manager and select **Build Settings**. 
-Make sure **Standard (armv7)** is selected for **Architectures**.  
-Make sure **armv7** is the *only* option selected for **Valid Architectures**.  
-
-![architecture](http://songz.github.com/phonegap-plugin-opentok/images/arch.png)  
-
 **Note** When testing, please run your app in your device, and **NOT** the simulator. The OpenTok iOS SDK requires access to the camera, which
 is not available in the simulator. 
 
@@ -48,11 +42,14 @@ Make sure **Copy items into destination group's folder** *is selected*.
 3. Copy `OpenTok.js` from **src** folder into your Project's `www/js` folder.  
 ![js](http://farm8.staticflickr.com/7270/7653034354_b5996da824_c.jpg)
 
-4. In the XCode project manager, under `Resources` folder, select `Cordova.plist`.  
-Under `Plugins`, add a new entry: `TokBox`, `OpenTokPlugin`  
-Under `ExternalHosts`, add a new entry with the value *.  
-![plist](http://farm9.staticflickr.com/8423/7653034248_aa0d14781e_c.jpg) 
+4. In the XCode project manager, select `config.xml`.  
+Under `widget`, add a new feature entry for our plugin  
 
+```
+<feature name="TokBox">
+  <param name="ios-package" value="OpenTokPlugin"/>
+</feature>
+```
 
 ---
 
