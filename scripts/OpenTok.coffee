@@ -149,11 +149,10 @@ class TBSession
   cleanUpDom: ->
     objects = document.getElementsByClassName('TBstreamObject')
     for e in objects
-      element.parentNode.removeChild(e)
+      e.parentNode.removeChild(e)
 
   sessionDisconnectedHandler: (event) ->
-    console.log("JS: Session Disconnected Handler Called")
-    @cleanUpDom()
+    #@cleanUpDom()
 
   addEventListener: (event, handler) ->
     console.log("JS: Add Event Listener Called")
@@ -166,6 +165,13 @@ class TBSession
         @connection = event.connection
         # When user first connect, there are no streams in the session
         return handler(event)
+    else if(event == 'streamDestroyed')
+      # Parse information returned from iOS before calling handler
+      @streamDisconnectedHandler = (response) ->
+        console.log "streamDestroyedHandler "
+        arr = response.split(' ')
+        stream = {connection:{connectionId:arr[0]}, streamId:arr[1]}
+        return handler({streams:[stream]})
     else if(event == 'streamCreated')
       # Parse information returned from iOS before calling handler
       @streamCreatedHandler = (response) ->
@@ -176,11 +182,11 @@ class TBSession
       # ios: After setting up function, set up listener in ios
       Cordova.exec(@streamCreatedHandler, TBSuccess, "TokBox", "streamCreatedHandler", [] )
     else if(event=='sessionDisconnected')
-      @sessionDisconnectedHandler = (event) ->
-        @cleanUpDom()
+      @sessionDisconnectedHandler = (event) =>
+        #@cleanUpDom()
         return handler(event)
 
-  connect: (apiKey, token, properties={}) ->
+  connect: (apiKey, token, properties={}) =>
     console.log("JS: Connect Called")
     @apiKey = apiKey
     @token = token
@@ -193,7 +199,7 @@ class TBSession
     return
 
   disconnect: () ->
-    Cordova.exec(@sessionDisconnectedHandler, TBError, "TokBox", "disconnect", [] )
+    Cordova.exec(TBSuccess, TBError, "TokBox", "disconnect", [] )
 
   publish: (divName, properties) ->
     @publisher = new TBPublisher(divName, properties, @)

@@ -101,7 +101,6 @@
     self.streamCreatedId = command.callbackId;
 }
 
-
 /*** Session Methods
  ****/
 // Called by session.connect(key, token)
@@ -291,7 +290,8 @@
 }
 - (void)session:(OTSession*)session didDropStream:(OTStream*)stream{
     NSLog(@"iOS Drop Stream");
-    CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: stream.streamId];
+    NSString* result = [[NSString alloc] initWithFormat:@"%@ %@", stream.connection.connectionId, stream.streamId];
+    CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: result];
     [callbackResult setKeepCallbackAsBool:YES];
     [self.commandDelegate sendPluginResult:callbackResult callbackId:self.streamDisconnectedId];
 }
@@ -299,8 +299,10 @@
 
 // Called by addEventListener() for session/stream Disconnected
 -(void)streamDisconnectedHandler:(CDVInvokedUrlCommand*)command{
+    NSLog(@"iOS Adding Stream Destroyed Event Listener");
     self.streamDisconnectedId = command.callbackId;
 }
+
 -(void)sessionDisconnectedHandler:(CDVInvokedUrlCommand*)command{
     self.sessionDisconnectedId = command.callbackId;
 }
