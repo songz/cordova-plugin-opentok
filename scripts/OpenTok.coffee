@@ -222,17 +222,30 @@ class TBSession
   subscribe: (one, two, three) ->
     if( three? )
       # stream, domId, properties
-      return new TBSubscriber(one, two, three)
+      subscriber = new TBSubscriber(one, two, three)
+      return subscriber
     if( two? )
       # stream, domId || stream, properties
       if( typeof(two) == "object" )
         domId = TBGenerateDomHelper()
-        return new TBSubscriber(one, domId, two)
+        subscriber = new TBSubscriber(one, domId, two)
+        return subscriber
       else
-        return new TBSubscriber(one, two, {})
+        subscriber = new TBSubscriber(one, two, {})
+        return subscriber
     # stream
     domId = TBGenerateDomHelper()
-    return new TBSubscriber(one, domId, {})
+    subscriber = new TBSubscriber(one, domId, {})
+    return subscriber
+
+  unsubscribe: (subscriber) ->
+    console.log("JS: Unsubscribe")
+    elementId = subscriber.id
+    element = document.getElementById(elementId)
+    if(element)
+      element.parentNode.removeChild(element)
+      TBUpdateObjects()
+    return Cordova.exec(TBSuccess, TBError, "TokBox", "unsubscribe", [subscriber.streamId] )
 
 
   streamDisconnectedHandler: (streamId) ->
@@ -246,6 +259,7 @@ class TBSession
   
 TBSubscriber = (stream, divName, properties)->
   console.log("JS: Subscribing")
+  @streamId = stream.streamId
   width = 160
   height = 120
   subscribeToVideo="true"
