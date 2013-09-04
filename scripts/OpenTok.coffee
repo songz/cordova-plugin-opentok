@@ -240,9 +240,10 @@ class TBSession
 
   unsubscribe: (subscriber) ->
     console.log("JS: Unsubscribe")
-    elementId = subscriber.id
-    element = document.getElementById(elementId)
+    elementId = subscriber.streamId
+    element = document.getElementById( "TBStreamConnection#{elementId}" )
     if(element)
+      alert "removing element"
       element.parentNode.removeChild(element)
       TBUpdateObjects()
     return Cordova.exec(TBSuccess, TBError, "TokBox", "unsubscribe", [subscriber.streamId] )
@@ -257,7 +258,7 @@ class TBSession
       TBUpdateObjects()
     return
   
-TBSubscriber = (stream, divName, properties)->
+TBSubscriber = (stream, divName, properties) ->
   console.log("JS: Subscribing")
   @streamId = stream.streamId
   width = 160
