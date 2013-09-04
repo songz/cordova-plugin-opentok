@@ -144,6 +144,7 @@
     // Get Parameters
     self.callbackID = command.callbackId;
     NSString* sid = [command.arguments objectAtIndex:0];
+   
     
     int top = [[command.arguments objectAtIndex:1] intValue];
     int left = [[command.arguments objectAtIndex:2] intValue];
@@ -171,6 +172,12 @@
 // Called by session.subscribe(streamId, top, left)
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command{
     NSLog(@"iOS unSubscribing to stream");
+    //Get Parameters
+    NSString* sid = [command.arguments objectAtIndex:0];
+    OTSubscriber * subscriber = [subscriberDictionary objectForKey:sid];
+    [subscriber close];
+    subscriber = nil;
+    [subscriberDictionary removeObjectForKey:sid];
 }
 
 
@@ -178,6 +185,7 @@
  ****/
 - (void)subscriberDidConnectToStream:(OTSubscriber*)sub{
     NSLog(@"iOS Connected To Stream");
+     
 }
 
 - (void)subscriber:(OTSubscriber*)subscrib didFailWithError:(NSError*)error{
