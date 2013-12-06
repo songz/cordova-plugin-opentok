@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
+    id="com.tokbox.opentok.phonegap"
+    version="1.0.2">
+
+    <name>OpenTok PhoneGap Plugin</name>
+    <description>Add live video streaming to your PhoneGap Application</description>
+    <license>Apache 2.0</license>
+    <keywords>opentok,tokbox</keywords>
+
+
+    <!-- ios -->
+    <platform name="ios">
+      <asset src="www/opentok.js" target="js/opentok.js" />
+
+      <header-file src="src/OpenTokPlugin.h" />
+      <source-file src="src/OpenTokPlugin.m" />
+      <resource-file src="src/ios/Opentok.framework/Resources/opentok.bundle" />
+
+      <framework src="src/ios/Opentok.framework" custom="true" />
+      <framework src="Foundation.framework" />
+      <framework src="UIKit.framework" />
+      <framework src="AVFoundation.framework" />
+      <framework src="QuartzCore.framework" />
+      <framework src="OpenGLES.framework" />
+      <framework src="CoreVideo.framework" />
+      <framework src="AudioToolbox.framework" />
+      <framework src="Security.framework" />
+      <framework src="CoreMedia.framework" />
+      <framework src="SystemConfiguration.framework" />
+      <framework src="CFNetwork.framework" />
+      <framework src="CoreTelephony.framework" />
+      <framework src="libstdc++.6.0.9.dylib" />
+      <framework src="libz.dylib" />
+
+      <!-- Adopts project's config.xml to include the OpenTokPlugin and domain whitelists -->
+      <config-file target="config.xml" parent="/*/plugins">
+          <feature name="TokBox">
+              <param name="ios-package" value="OpenTokPlugin"/>
+          </feature>
+      </config-file>
+      <config-file target="config.xml" parent="/*">
+        <access origin="*" />
+      </config-file>
+    </platform>
+</plugin>
