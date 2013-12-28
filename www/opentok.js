@@ -63,7 +63,7 @@
       streamId = e.getAttribute('streamId');
       id = e.id;
       position = getPosition(id);
-      Cordova.exec(TBSuccess, TBError, "TokBox", "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e)]);
+      Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e)]);
     }
   };
 
@@ -83,7 +83,7 @@
     addEventListener: function(event, handler) {
       if (event === "exception") {
         console.log("JS: TB Exception Handler added");
-        return Cordova.exec(handler, TBError, "TokBox", "exceptionHandler", []);
+        return Cordova.exec(handler, TBError, "OpenTokPlugin", "exceptionHandler", []);
       }
     },
     initSession: function(sid) {
@@ -120,7 +120,7 @@
   };
 
   window.TBTesting = function(handler) {
-    return Cordova.exec(handler, TBError, "TokBox", "TBTesting", []);
+    return Cordova.exec(handler, TBError, "OpenTokPlugin", "TBTesting", []);
   };
 
   TBGetZIndex = function(ele) {
@@ -167,11 +167,11 @@
       });
       position = getPosition(this.obj.id);
       TBUpdateObjects();
-      Cordova.exec(TBSuccess, TBError, "TokBox", "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo, zIndex]);
+      Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo, zIndex]);
     }
 
     TBPublisher.prototype.destroy = function() {
-      return Cordova.exec(TBSuccess, TBError, "TokBox", "destroyPublisher", []);
+      return Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "destroyPublisher", []);
     };
 
     return TBPublisher;
@@ -189,7 +189,7 @@
         }
         return TBSession.prototype.connect.apply(_this, arguments);
       };
-      Cordova.exec(TBSuccess, TBSuccess, "TokBox", "initSession", [this.sessionId]);
+      Cordova.exec(TBSuccess, TBSuccess, "OpenTokPlugin", "initSession", [this.sessionId]);
     }
 
     TBSession.prototype.cleanUpDom = function() {
@@ -242,7 +242,7 @@
             streams: [stream]
           });
         };
-        return Cordova.exec(this.streamCreatedHandler, TBSuccess, "TokBox", "streamCreatedHandler", []);
+        return Cordova.exec(this.streamCreatedHandler, TBSuccess, "OpenTokPlugin", "streamCreatedHandler", []);
       } else if (event === 'sessionDisconnected') {
         return this.sessionDisconnectedHandler = function(event) {
           return handler(event);
@@ -257,13 +257,13 @@
       console.log("JS: Connect Called");
       this.apiKey = apiKey;
       this.token = token;
-      Cordova.exec(this.sessionConnectedHandler, TBError, "TokBox", "connect", [this.apiKey, this.token]);
-      Cordova.exec(this.streamDisconnectedHandler, TBError, "TokBox", "streamDisconnectedHandler", []);
-      Cordova.exec(this.sessionDisconnectedHandler, TBError, "TokBox", "sessionDisconnectedHandler", []);
+      Cordova.exec(this.sessionConnectedHandler, TBError, "OpenTokPlugin", "connect", [this.apiKey, this.token]);
+      Cordova.exec(this.streamDisconnectedHandler, TBError, "OpenTokPlugin", "streamDisconnectedHandler", []);
+      Cordova.exec(this.sessionDisconnectedHandler, TBError, "OpenTokPlugin", "sessionDisconnectedHandler", []);
     };
 
     TBSession.prototype.disconnect = function() {
-      return Cordova.exec(TBSuccess, TBError, "TokBox", "disconnect", []);
+      return Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "disconnect", []);
     };
 
     TBSession.prototype.publish = function(divName, properties) {
@@ -276,7 +276,7 @@
       this.publisher = publisher;
       newId = "TBStreamConnection" + this.connection.connectionId;
       this.publisher.obj.id = newId;
-      return Cordova.exec(TBSuccess, TBError, "TokBox", "publish", []);
+      return Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "publish", []);
     };
 
     TBSession.prototype.unpublish = function() {
@@ -288,7 +288,7 @@
         element.parentNode.removeChild(element);
         TBUpdateObjects();
       }
-      return Cordova.exec(TBSuccess, TBError, "TokBox", "unpublish", []);
+      return Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "unpublish", []);
     };
 
     TBSession.prototype.subscribe = function(one, two, three) {
@@ -322,7 +322,7 @@
         element.parentNode.removeChild(element);
         TBUpdateObjects();
       }
-      return Cordova.exec(TBSuccess, TBError, "TokBox", "unsubscribe", [subscriber.streamId]);
+      return Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "unsubscribe", [subscriber.streamId]);
     };
 
     TBSession.prototype.streamDisconnectedHandler = function(streamId) {
@@ -361,7 +361,7 @@
       height: height
     });
     position = getPosition(obj.id);
-    return Cordova.exec(TBSuccess, TBError, "TokBox", "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex]);
+    return Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex]);
   };
 
 }).call(this);

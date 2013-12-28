@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-    id="com.tokbox.opentok.phonegap"
+    id="com.tokbox.opentok.phonegap.OpenTokPlugin"
     version="1.0.2">
 
     <name>OpenTok PhoneGap Plugin</name>
@@ -8,6 +8,32 @@
     <license>Apache 2.0</license>
     <keywords>opentok,tokbox</keywords>
 
+    <platform name="android">
+      <asset src="www/opentok.js" target="js/opentok.js" />
+
+      <source-file src="src/android/com/tokbox/opentok/phonegap/OpenTokAndroidPlugin.java"
+        target-dir="src/com/tokbox/opentok/phonegap/" />
+
+      <config-file target="AndroidManifest.xml" parent="/manifest">
+        <uses-permission android:name="android.permission.CAMERA" />
+        <uses-permission android:name="android.permission.INTERNET" />
+        <uses-permission android:name="android.permission.RECORD_AUDIO" />
+        <uses-permission android:name="android.permission.WAKE_LOCK" />
+        <uses-feature android:name="android.hardware.camera" android:required="true" />
+        <uses-feature android:name="android.hardware.autofocus" android:required="true" />
+      </config-file>
+
+      <!-- copy opentok sdk -->
+      <source-file src="src/android/libs/opentok-android-sdk-2.0.jar" target-dir="libs/" />
+      <source-file src="src/android/libs/armeabi/libopentok.so" target-dir="libs/armeabi" />
+
+      <config-file target="config.xml" parent="/*">
+        <feature name="OpenTokPlugin">
+          <param name="android-package" value="com.tokbox.opentok.phonegap.OpenTokAndroidPlugin"/>
+        </feature>
+      </config-file>
+      
+    </platform>
 
     <!-- ios -->
     <platform name="ios">
@@ -35,7 +61,7 @@
 
       <!-- Adopts project's config.xml to include the OpenTokPlugin and domain whitelists -->
       <config-file target="config.xml" parent="/*/plugins">
-          <feature name="TokBox">
+          <feature name="OpenTokPlugin">
               <param name="ios-package" value="OpenTokPlugin"/>
           </feature>
       </config-file>
