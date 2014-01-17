@@ -1,34 +1,54 @@
-streamElements = {}
+# define constants
+OTPlugin = "OpenTokPlugin"
+PublisherStreamId = "TBPublisher"
+PublisherTypeClass = "OT_publisher"
+SubscriberTypeClass = "OT_subscriber"
+VideoContainerClass = "OT_video-container"
 
+DefaultWidth = 264
+DefaultHeight = 198
+
+streamElements = {} # keep track of DOM elements for each stream
+
+#
+# Helper methods
+#
 getPosition = (divName) ->
   # Get the position of element
   pubDiv = document.getElementById(divName)
-  width = pubDiv.style.width
-  height = pubDiv.style.height
-  curtop = curleft = 0
-  if(pubDiv.offsetParent)
+  width = pubDiv.offsetWidth
+  height = pubDiv.offsetHeight
+  curtop = pubDiv.offsetTop
+  curleft = pubDiv.offsetLeft
+  while(pubDiv = pubDiv.offsetParent)
     curleft += pubDiv.offsetLeft
     curtop += pubDiv.offsetTop
-    while(pubDiv = pubDiv.offsetParent)
-      curleft += pubDiv.offsetLeft
-      curtop += pubDiv.offsetTop
   return {top:curtop, left:curleft, width:width, height:height}
 
-replaceWithObject = (divName, streamId, properties) ->
+replaceWithVideoStream = (divName, streamId, properties) ->
+  typeClass = if streamId == PublisherStreamId then PublisherTypeClass else SubscriberTypeClass
   element = document.getElementById(divName)
-  element.setAttribute( "class", "OT_root" )
+  element.setAttribute( "class", "OT_root #{typeClass}" )
   element.setAttribute( "data-streamid", streamId )
   element.style.width = properties.width+"px"
   element.style.height = properties.height+"px"
+  element.style.overflow = "hidden"
+  element.style['background-color'] = "#000000"
   streamElements[ streamId ] = element
 
   internalDiv = document.createElement( "div" )
-  internalDiv.setAttribute( "class", "OT_video-container" )
+  internalDiv.setAttribute( "class", VideoContainerClass)
   internalDiv.style.width = "100%"
   internalDiv.style.height = "100%"
   internalDiv.style.left = "0px"
   internalDiv.style.top = "0px"
 
+  videoElement = document.createElement( "video" )
+  videoElement.style.width = "100%"
+  videoElement.style.height = "100%"
+  # todo: js change styles or append css stylesheets? Concern: users will not be able to change via css
+
+  internalDiv.appendChild( videoElement )
   element.appendChild( internalDiv )
   return element
 
@@ -47,7 +67,7 @@ TBUpdateObjects = ()->
     console.log("JS sessionId: " + streamId )
     id = e.id
     position = getPosition(id)
-    Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e)] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e)] )
   return
 TBGenerateDomHelper = ->
   domId = "PubSub" + Date.now()
@@ -59,7 +79,7 @@ TBGenerateDomHelper = ->
 
 # TB Object:
 #   Methods: 
-#     TB.addEventListener( type:String, listener:Function )
+#     TB.on( type:String, listener:Function )
 #     TB.initPublisher( apiKey:String [, replaceElementId:String] [, properties:Object] ):Publisher
 #     TB.initSession( sessionId:String [, production] ):Session 
 #     TB.removeEventListner( type:String, listener:Function )
@@ -68,38 +88,21 @@ TBGenerateDomHelper = ->
 window.TB =
   updateViews: ->
     TBUpdateObjects()
-  , addEventListener: (event, handler) ->
+  on: (event, handler) ->
     if(event=="exception")
       console.log("JS: TB Exception Handler added")
-      Cordova.exec(handler, TBError, "OpenTokPlugin", "exceptionHandler", [] )
-  , initSession: (sid) ->
+      Cordova.exec(handler, TBError, OTPlugin, "exceptionHandler", [] )
+  initSession: (sid) ->
     return new TBSession(sid)
-  , initPublisher: (one, two, three) ->
-    if( three? )
-      # apiKey, domId, properties
-      return new TBPublisher(one, two, three)
-    if( two? )
-      # apiKey, domId || apiKey, properties || domId, properties
-      if( typeof(two) == "object" )
-        objDiv = document.getElementById(one)
-        if objDiv?
-          return new TBPublisher("", one, two)
-        domId = TBGenerateDomHelper()
-        return new TBPublisher(one, domId, two)
-      else
-        return new TBPublisher(one, two, {})
-    # apiKey || domId
-    objDiv = document.getElementById(one)
-    if objDiv?
-      return new TBPublisher("", one, {})
-    else
-      domId = TBGenerateDomHelper()
-      return new TBPublisher(one, domId, {})
-  , setLogLevel: (a) ->
+  initPublisher: (one, two, three) ->
+    return new TBPublisher( one, two, three )
+  setLogLevel: (a) ->
     console.log("Log Level Set")
+  addEventListener: (event, handler) -> # deprecating soon
+    @on( event, handler )
 
 window.TBTesting = (handler) ->
-  Cordova.exec(handler, TBError, "OpenTokPlugin", "TBTesting", [] )
+  Cordova.exec(handler, TBError, OTPlugin, "TBTesting", [] )
 
 TBGetZIndex = (ele) ->
   while( ele? )
@@ -118,7 +121,8 @@ TBGetZIndex = (ele) ->
 #   Methods: 
 #     destroy() - not yet implemented
 class TBPublisher
-  constructor: (@key, @domId, @properties={}) ->
+  constructor: (one, two, three) ->
+    @sanitizeInputs( one,two, three )
     console.log("JS: Publish Called")
     width = 160
     height = 120
@@ -127,98 +131,143 @@ class TBPublisher
     publishVideo="true"
     zIndex = TBGetZIndex(document.getElementById(@domId))
     if(@properties?)
-      width = @properties.width ? 160
-      height = @properties.height ? 120
+      width = @properties.width ? DefaultWidth
+      height = @properties.height ? DefaultHeight
       name = @properties.name ? ""
       if(@properties.publishAudio? and @properties.publishAudio==false)
         publishAudio="false"
       if(@properties.publishVideo? and @properties.publishVideo==false)
         publishVideo="false"
-    @obj = replaceWithObject(@domId, "TBPublisher", {width:width, height:height})
-    position = getPosition(@obj.id)
+    position = getPosition(@domId)
+    console.log "first test publisher is getting created, position coordinates - top: #{position.top}, left: #{position.left}, width: #{position.width}, height: #{position.height}"
+    replaceWithVideoStream(@domId, PublisherStreamId, {width:width, height:height})
+    position = getPosition(@domId)
+    console.log "publisher id is #{@domId}"
+    console.log "publisher is getting created, position coordinates - top: #{position.top}, left: #{position.left}, width: #{position.width}, height: #{position.height}"
     TBUpdateObjects()
-    Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo, zIndex] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo, zIndex] )
+  sanitizeInputs: (one, two, three) ->
+    if( three? )
+      # all 3 required properties present: apiKey, domId, properties
+      # Check if dom exists
+      @apiKey = one
+      @domId = two
+      @properties = three
+    else if( two? )
+      # only 2 properties are present, possible inputs: apiKey, domId || apiKey, properties || domId, properties
+      if( typeof(two) == "object" )
+        # second input is property, so first input is either apiKey or domId
+        @properties = two
+        if document.getElementById(one)
+          @domId = one
+        else
+          @apiKey = one
+      else
+        # no property object is passed in
+        @apiKey = one
+        @domId = two
+    else if( one? )
+      # only 1 property is present, apiKey || domId || properties
+      if( typeof(one) == "object" )
+        @properties = one
+      else if document.getElementById(one)
+        @domId = one
+    @apiKey = if @apiKey? then @apiKey else ""
+    @properties = if( @properties and typeof( @properties == "object" )) then @properties else {}
+    # if domId exists but properties width or height is not specified, set properties
+    if( @domId and document.getElementById( @domId ) )
+      if !@properties.width or !@properties.height
+        console.log "domId exists but properties width or height is not specified"
+        console.log "domId exists but properties width or height is not specified"
+        console.log "domId exists but properties width or height is not specified"
+        console.log "domId exists but properties width or height is not specified"
+        console.log "domId exists but properties width or height is not specified"
+        console.log "domId exists but properties width or height is not specified"
+        console.log "domId exists but properties width or height is not specified"
+        console.log "domId exists but properties width or height is not specified"
+        console.log "domId exists but properties width or height is not specified"
+        console.log "domId exists but properties width or height is not specified"
+        console.log "domId exists but properties width or height is not specified"
+        console.log "domId exists but properties width or height is not specified"
+        console.log "domId exists but properties width or height is not specified"
+        position = getPosition( @domId )
+        console.log " width: #{position.width} and height: #{position.height} for domId #{@domId}, and top: #{position.top}, left: #{position.left}"
+        if position.width > 0 and position.height > 0
+          @properties.width = position.width
+          @properties.height = position.height
+    else
+      @domId = TBGenerateDomHelper()
+    @domId = if( @domId and document.getElementById( @domId ) ) then @domId else TBGenerateDomHelper()
   destroy: ->
-    Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "destroyPublisher", [] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "destroyPublisher", [] )
 
 
 class TBSession
   constructor: (@sessionId) ->
-    Cordova.exec(TBSuccess, TBSuccess, "OpenTokPlugin", "initSession", [@sessionId] )
-
+    Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [@sessionId] )
   cleanUpDom: ->
     objects = document.getElementsByClassName('OT_root')
     for e in objects
       e.parentNode.removeChild(e)
-
   sessionDisconnectedHandler: (event) ->
     #@cleanUpDom()
-
-  addEventListener: (event, handler) ->
+  on: (event, handler) ->
     console.log("JS: Add Event Listener Called")
-
     # Set Handlers based on Events
     # Events: sessionConnected, sessionDisconnected, streamCreated, streamDestroyed
-    if(event == 'sessionConnected')
-      # Parse information returned from iOS before calling handler
-      @sessionConnectedHandler = (event) =>
-        @connection = event.connection
-        # When user first connect, there are no streams in the session
-        return handler(event)
-    else if(event == 'streamDestroyed')
-      # Parse information returned from iOS before calling handler
-      @streamDisconnectedHandler = (response) ->
-        console.log "streamDestroyedHandler "
-        arr = response.split(' ')
-        stream = {connection:{connectionId:arr[0]}, streamId:arr[1]}
-        return handler({streams:[stream]})
-    else if(event == 'streamCreated')
-      # Parse information returned from iOS before calling handler
-      @streamCreatedHandler = (response) ->
-        arr = response.split(' ')
-        stream = {connection:{connectionId:arr[0]}, streamId:arr[1]}
-        return handler({streams:[stream]})
-
-      # ios: After setting up function, set up listener in ios
-      Cordova.exec(@streamCreatedHandler, TBSuccess, "OpenTokPlugin", "streamCreatedHandler", [] )
-    else if(event=='sessionDisconnected')
-      @sessionDisconnectedHandler = (event) =>
-        #@cleanUpDom()
-        return handler(event)
-
+    switch event
+      when "sessionConnected"
+        # Parse information returned from iOS before calling handler
+        @sessionConnectedHandler = (event) =>
+          console.log "session connected"
+          @connection = event.connection
+          # When user first connect, there are no streams in the session
+          return handler(event)
+      when 'streamCreated'
+        # Parse information returned from iOS before calling handler
+        @streamCreatedHandler = (response) ->
+          arr = response.split(' ')
+          stream = {connection:{connectionId:arr[0]}, streamId:arr[1]}
+          return handler({streams:[stream], stream: stream})
+        # ios: After setting up function, set up listener in ios
+        Cordova.exec(@streamCreatedHandler, TBSuccess, OTPlugin, "streamCreatedHandler", [] )
+      when 'streamDestroyed'
+        # Parse information returned from iOS before calling handler
+        @streamDisconnectedHandler = (response) ->
+          console.log "streamDestroyedHandler "
+          arr = response.split(' ')
+          stream = {connection:{connectionId:arr[0]}, streamId:arr[1]}
+          return handler({streams:[stream], stream: stream})
+      when 'sessionDisconnected'
+        @sessionDisconnectedHandler = (event) =>
+          #@cleanUpDom()
+          return handler(event)
   connect: (apiKey, token, properties={}) =>
     console.log("JS: Connect Called")
     @apiKey = apiKey
     @token = token
     # ios: Set up key/token, and call _session connectWithApiKey
-    Cordova.exec(@sessionConnectedHandler, TBError, "OpenTokPlugin", "connect", [@apiKey, @token] )
+    Cordova.exec(@sessionConnectedHandler, TBError, OTPlugin, "connect", [@apiKey, @token] )
 
     # Housekeeping Listeners: Session needs to be removed from DOM after being created
-    Cordova.exec(@streamDisconnectedHandler, TBError, "OpenTokPlugin", "streamDisconnectedHandler", [] )
-    Cordova.exec(@sessionDisconnectedHandler, TBError, "OpenTokPlugin", "sessionDisconnectedHandler", [] )
+    Cordova.exec(@streamDisconnectedHandler, TBError, OTPlugin, "streamDisconnectedHandler", [] )
+    Cordova.exec(@sessionDisconnectedHandler, TBError, OTPlugin, "sessionDisconnectedHandler", [] )
     return
-
   disconnect: () ->
-    Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "disconnect", [] )
-
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "disconnect", [] )
   publish: (divName, properties) ->
     @publisher = new TBPublisher(divName, properties, @)
     return @publisher
   publish: (publisher) ->
     @publisher = publisher
-    newId = "TBStreamConnection"+@connection.connectionId
-    @publisher.obj.id = newId
-    Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "publish", [] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", [] )
   unpublish:() ->
     console.log("JS: Unpublish")
-
-    elementId = "TBStreamConnection"+@connection.connectionId
-    element = document.getElementById(elementId)
+    element = document.getElementById( @publisher.domId )
     if(element)
       element.parentNode.removeChild(element)
       TBUpdateObjects()
-    return Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "unpublish", [] )
-
+    return Cordova.exec(TBSuccess, TBError, OTPlugin, "unpublish", [] )
   subscribe: (one, two, three) ->
     if( three? )
       # stream, domId, properties
@@ -237,22 +286,17 @@ class TBSession
     domId = TBGenerateDomHelper()
     subscriber = new TBSubscriber(one, domId, {})
     return subscriber
-
   unsubscribe: (subscriber) ->
     console.log("JS: Unsubscribe")
     elementId = subscriber.streamId
     element = document.getElementById( "TBStreamConnection#{elementId}" )
-
-
     console.log("JS: Unsubscribing")
     element = streamElements[ elementId ]
     if(element)
       element.parentNode.removeChild(element)
       delete( streamElements[ streamId ] )
       TBUpdateObjects()
-    return Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "unsubscribe", [subscriber.streamId] )
-
-
+    return Cordova.exec(TBSuccess, TBError, OTPlugin, "unsubscribe", [subscriber.streamId] )
   streamDisconnectedHandler: (streamId) ->
     console.log("JS: Stream Disconnected Handler Executed")
     element = streamElements[ streamId ]
@@ -261,6 +305,8 @@ class TBSession
       delete( streamElements[ streamId ] )
       TBUpdateObjects()
     return
+  addEventListener: (event, handler) -> # deprecating soon
+    @on( event, handler )
   
 TBSubscriber = (stream, divName, properties) ->
   console.log("JS: Subscribing")
@@ -270,12 +316,12 @@ TBSubscriber = (stream, divName, properties) ->
   subscribeToVideo="true"
   zIndex = TBGetZIndex(document.getElementById(divName))
   if(properties?)
-    width = properties.width ? 160
-    height = properties.height ? 120
+    width = properties.width ? DefaultWidth
+    height = properties.height ? DefaultHeight
     name = properties.name ? ""
     if(properties.subscribeToVideo? and properties.subscribeToVideo == false)
       subscribeToVideo="false"
-  obj = replaceWithObject(divName, stream.streamId, {width:width, height:height})
+  obj = replaceWithVideoStream(divName, stream.streamId, {width:width, height:height})
   position = getPosition(obj.id)
-  Cordova.exec(TBSuccess, TBError, "OpenTokPlugin", "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex] )
+  Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex] )
 
