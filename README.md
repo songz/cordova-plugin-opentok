@@ -3,28 +3,31 @@ PhoneGap Plugin for OpenTok iOS
 
 Weave video chat into your web (and now mobile!) application.
 
-## Step 1. Install and create a PhoneGap app
-**Make sure You have PhoneGap 3.2 Installed** If you haven't, check out PhoneGap's [Installation](http://phonegap.com/install/) Page.
+## Using Cordova CLI
+**Make sure You have Cordova 3.3 Installed** If you haven't, check out PhoneGap's [Installation](http://phonegap.com/install/) Page.  
+Clone this repo to get the source code for OpenTok's Cordova plugin
 
-1. Create a PhoneGap app by typing into Terminal:  
-`phonegap create my-app`  
+1. Create a Cordova app by typing into Terminal:  
+`cordova create my-app`  
 
-2. Go into your app directory and run your app:
+2. Install OpenTok plugin into your app:
 `cd my-app`  
-`phonegap run ios`
+`cordova plugin add path/to/Opentok's/CordovaPlugin/that/you/cloned`
 
+3a. For **Android Apps**, add Android platform into your cordova app
+`cordova platform add android`
 
-## Step 2. Install the OpenTok Plugin using plugman
-Make sure you have Plugman installed to manage plugins. If you haven't, check out Plugman's [Installation](http://docs.phonegap.com/en/3.2.0/plugin_ref_plugman.md.html) Page.  
+3b. For **iOS Apps**, add iOS platform into your cordova app
+`cordova platform add ios`
 
-1. Make sure you are in your project's root directory. 
-`cd my-app`
+4. Edit your code in the created `www` folder
 
-2. Install OpenTok's PhoneGap Plugin:  
-`plugman install --platform ios --project /<fullPath to your phonegap app>/platforms/ios --plugin https://github.com/opentok/PhoneGap-Plugin`
+5. To deploy your app to your android device:
+`cordova run android --device`
 
-3. Compile and run. Make sure you are running on your device because OpenTok needs to run on a device to be stable.  
-`phonegap run ios --device`
+6. To deploy your app to your iOS device:  
+> As of 1/17/2014, you cannot deploy to device with Cordova CLI for iOS apps. You need to first prepare you iOS app: `cordova prepare iOS`  
+> Next, open the project in xcode and run it on device: `open platforms/ios/HelloWorld.xcodeproj`
 
 
 ---
