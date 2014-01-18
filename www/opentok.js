@@ -78,7 +78,7 @@
     for (_i = 0, _len = objects.length; _i < _len; _i++) {
       e = objects[_i];
       console.log("JS: Object updated");
-      streamId = e.dataset.streamId;
+      streamId = e.dataset.streamid;
       console.log("JS sessionId: " + streamId);
       id = e.id;
       position = getPosition(id);

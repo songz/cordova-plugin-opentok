@@ -258,6 +258,9 @@
 }
 - (void)session:(OTSession*)mySession didReceiveStream:(OTStream*)stream{
     NSLog(@"iOS Received Stream");
+    if( [stream.connection.connectionId isEqualToString: mySession.connection.connectionId] ){
+        return;
+    }
 
     // Store stream in streamDictionary, keeps track of available streams
     [streamDictionary setObject:stream forKey:stream.streamId];

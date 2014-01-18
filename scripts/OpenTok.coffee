@@ -63,7 +63,7 @@ TBUpdateObjects = ()->
   objects = document.getElementsByClassName('OT_root')
   for e in objects
     console.log("JS: Object updated")
-    streamId = e.dataset.streamId
+    streamId = e.dataset.streamid
     console.log("JS sessionId: " + streamId )
     id = e.id
     position = getPosition(id)
