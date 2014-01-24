@@ -1,5 +1,6 @@
 package com.tokbox.opentok.phonegap;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import org.apache.cordova.CordovaInterface;
@@ -30,7 +31,6 @@ import com.opentok.android.Subscriber;
 
 public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Listener{
   protected Session mSession;
-  protected Publisher mPublisher;
   public static final String TAG = "OTPlugin";
   public boolean sessionConnected;
   public boolean publishCalled; // we need this because creating publisher before sessionConnected = crash
@@ -43,7 +43,64 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
   static CordovaInterface _cordova;
   static CordovaWebView _webView;
 
-  public class ListenPublisher implements Publisher.Listener{
+
+  public class RunnableUpdateViews implements Runnable{
+    public JSONArray mProperty;
+    public View mView;
+
+    @Override
+      public void run() {
+        try{
+          Log.i( TAG, "updating view in ui runnable" + mProperty.toString() );
+          Log.i( TAG, "updating view in ui runnable " + mView.toString() );
+          mView.setY( (float) mProperty.getInt(0) );
+          mView.setX( (float) mProperty.getInt(1) );
+          ViewGroup.LayoutParams params = mView.getLayoutParams();
+          params.height = mProperty.getInt(3);
+          params.width = mProperty.getInt(2);
+          mView.setLayoutParams(params);
+        }catch( Exception e ){
+          Log.i(TAG, "error when trying to retrieve properties while resizing properties");
+        }
+      }
+  }
+
+  public class RunnablePublisher extends RunnableUpdateViews implements Publisher.Listener{
+    //  property contains: [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex] )
+    public Publisher mPublisher;
+
+    public RunnablePublisher( JSONArray args ){
+      this.mProperty = args;
+
+      // prevent dialog box from showing because it causes crash
+      SharedPreferences prefs = cordova.getActivity().getApplicationContext().getSharedPreferences("permissions",
+          Context.MODE_PRIVATE);
+      Editor edit = prefs.edit();
+      edit.clear();
+      edit.putBoolean("opentok.publisher.accepted", true);
+      edit.commit();
+    }
+
+    public void setPropertyFromArray( JSONArray args ){
+      this.mProperty = args;
+    }
+
+    public void startPublishing(){
+      cordova.getActivity().runOnUiThread( this );
+    }
+
+    public void run() {
+      Log.i(TAG, "view running on UIVIEW!!!");
+      if( mPublisher == null ){
+        ViewGroup frame = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
+        mPublisher = Publisher.newInstance(cordova.getActivity().getApplicationContext(), this, null);
+        this.mView = mPublisher.getView();
+        frame.addView( this.mView );
+        mSession.publish(mPublisher);
+      }
+      super.run();
+    }
+
     @Override
       public void onPublisherStreamingStarted() {
 
@@ -63,9 +120,36 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
       public void onPublisherException(OpentokException e) {
 
       }
+
   }
 
-  public class ListenSubscriber implements Subscriber.Listener{
+  public class RunnableSubscriber extends RunnableUpdateViews implements Subscriber.Listener{
+    //  property contains: [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex] )
+    public Subscriber mSubscriber;
+    public Stream mStream;
+
+    public RunnableSubscriber( JSONArray args, Stream stream ){
+      this.mProperty = args;
+      mStream = stream;
+      cordova.getActivity().runOnUiThread( this );
+    }
+
+    public void setPropertyFromArray( JSONArray args ){
+      this.mProperty = args;
+    }
+
+    public void run() {
+      if( mSubscriber == null ){
+        mSubscriber = Subscriber.newInstance(cordova.getActivity(), mStream, this);
+        ViewGroup frame = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
+        this.mView = mSubscriber.getView();
+        frame.addView( this.mView );
+        mSession.subscribe(mSubscriber);
+        Log.i(TAG, "subscriber view is added to parent view!");
+      }
+      super.run();
+    }
+
     @Override
       public void onSubscriberException(Subscriber subscriber, OpentokException e) {
         Log.e(TAG, "subscriber exception: " + e.getMessage() + ", stream id: " + subscriber.getStream().getStreamId());
@@ -76,125 +160,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
       }
     @Override
       public void onSubscriberConnected(Subscriber subscriber) {
-
-        Log.i(TAG, "subscriber is connected!");
-      }
-  }
-
-  public class RunnablePublisher extends ListenPublisher implements Runnable{
-    //  property contains: [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex] )
-    public JSONArray property; 
-    public RunnablePublisher( JSONArray args ){
-      this.property = args;
-
-      // prevent dialog box from showing because it causes crash
-      SharedPreferences prefs = cordova.getActivity().getApplicationContext().getSharedPreferences("permissions",
-          Context.MODE_PRIVATE);
-      Editor edit = prefs.edit();
-      edit.clear();
-      edit.putBoolean("opentok.publisher.accepted", true);
-      edit.commit();
-    }
-
-    public void setPropertyFromArray( JSONArray args ){
-      this.property = args;
-    }
-
-    public void startPublishing(){
-      // Adding views
-      cordova.getActivity().runOnUiThread( this );
-    }
-
-    @Override
-      public void run() {
-        Log.i(TAG, "view running, possibly running on UIVIEW!!!");
-        if( mPublisher == null ){
-          ViewGroup frame = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
-          mPublisher = Publisher.newInstance(cordova.getActivity().getApplicationContext(), this, null);
-          View pubView = mPublisher.getView();
-          try{
-            Log.i( TAG, property.toString() );
-            pubView.setTranslationY( this.property.getInt(0));  
-            pubView.setTranslationX( this.property.getInt(1));
-            ViewGroup.LayoutParams rlp = new ViewGroup.LayoutParams( property.getInt(2), property.getInt(3) );
-            pubView.setLayoutParams( rlp );
-          }catch( Exception e ){
-            Log.i(TAG, "error when trying to retrieve publisher properties");
-          };
-          frame.addView( pubView );
-          mSession.publish(mPublisher);
-
-        }else{
-          Log.i(TAG, "view running, updating publisher view");
-          Log.i(TAG, "view running, updating publisher view " + this.property.toString() );
-          try{
-            mPublisher.getView().setY( (float)this.property.getInt(1) );
-            mPublisher.getView().setX( (float) this.property.getInt(2) );
-            ViewGroup.LayoutParams params = mPublisher.getView().getLayoutParams();
-            params.height = this.property.getInt(4);
-            params.width = this.property.getInt(3);
-            mPublisher.getView().setLayoutParams(params);
-          }catch( Exception e ){
-            Log.i(TAG, "error when trying to retrieve publisher properties while resizing properties");
-          }
-        }
-      }
-
-  }
-
-  public class RunnableSubscriber extends ListenSubscriber implements Runnable{
-    //  property contains: [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex] )
-    public JSONArray property;
-    public Subscriber mSubscriber;
-    public Stream mStream;
-
-    public RunnableSubscriber( JSONArray args, Stream stream ){
-      this.property = args;
-      mStream = stream;
-      cordova.getActivity().runOnUiThread( this );
-
-    }
-
-    public void setPropertyFromArray( JSONArray args ){
-      this.property = args;
-    }
-
-    @Override
-      public void run() {
-        if( mSubscriber == null ){
-
-          mSubscriber = Subscriber.newInstance(cordova.getActivity(), mStream, this);
-
-          ViewGroup frame = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
-
-          View subView = mSubscriber.getView();
-          try{
-            Log.i( TAG, property.toString() );
-            subView.setTranslationY( this.property.getInt(1));  
-            subView.setTranslationX( this.property.getInt(2));
-            ViewGroup.LayoutParams rlp = new ViewGroup.LayoutParams( property.getInt(3), property.getInt(4) );
-            subView.setLayoutParams( rlp );
-          }catch( Exception e ){
-            Log.i(TAG, "error when trying to retrieve subscriber properties");
-          };
-
-          frame.addView( subView );
-          mSession.subscribe(mSubscriber);
-          Log.i(TAG, "subscriber view is added to parent view!");
-        }else{
-          Log.i(TAG, "view running, updating publisher view");
-          Log.i(TAG, "view running, updating publisher view " + this.property.toString() );
-          try{
-            mSubscriber.getView().setY( (float)this.property.getInt(1) );
-            mSubscriber.getView().setX( (float) this.property.getInt(2) );
-            ViewGroup.LayoutParams params = mSubscriber.getView().getLayoutParams();
-            params.height = this.property.getInt(4);
-            params.width = this.property.getInt(3);
-            mSubscriber.getView().setLayoutParams(params);
-          }catch( Exception e ){
-            Log.i(TAG, "error when trying to retrieve publisher properties while resizing properties");
-          }
-        }
+        Log.i(TAG, "subscriber is connected");
       }
   }
 
@@ -225,6 +191,19 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
       super.initialize(cordova, webView);
     }
 
+  private JSONArray removeFirst(JSONArray args){
+    try{
+      ArrayList<Integer> list = new ArrayList<Integer>();
+      for( int i=1; i<5; i++){
+        list.add( args.getInt(i) );
+      }
+      return new JSONArray( list );
+    }catch(Exception e){
+      Log.i(TAG, "error thrown when trying to remove first element of args");
+      return null;
+    }
+  }
+
   @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
       Log.i( TAG, action );
@@ -250,6 +229,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
 
       }else if( action.equals( "publish" )){
         if( sessionConnected ){
+          Log.i( TAG, "publisher is publishing" );
           myPublisher.startPublishing();
         }
       }else if( action.equals( "unpublish" )){
@@ -260,18 +240,21 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
         Log.i( TAG, "subscribe command called");
         Log.i( TAG, "subscribe data: " + args.toString() );
         Stream stream = streamCollection.get( args.getString(0) );
+        JSONArray newargs = removeFirst( args );
 
-        RunnableSubscriber runsub = new RunnableSubscriber( args, stream ); 
+        Log.i( TAG, "removed first property: " + newargs.toString() );
+        RunnableSubscriber runsub = new RunnableSubscriber( newargs, stream ); 
         subscriberCollection.put(stream.getStreamId(), runsub);
       }else if( action.equals( "updateView" )){
-        Log.i( TAG, "updateView data: " + args.toString() );
-        if( args.getString(0).equals("TBPublisher") ){
-          myPublisher.setPropertyFromArray(args);
+        JSONArray newargs = removeFirst( args );
+        if( args.getString(0).equals("TBPublisher") && myPublisher != null ){
+          Log.i( TAG, "updating view for publisher" );
+          myPublisher.setPropertyFromArray(newargs);
           cordova.getActivity().runOnUiThread(myPublisher);
         }else{
           RunnableSubscriber runsub = subscriberCollection.get( args.getString(0) );
           if( runsub != null ){
-            runsub.setPropertyFromArray(args);
+            runsub.setPropertyFromArray( newargs );
             cordova.getActivity().runOnUiThread(runsub);
           }
         }
@@ -350,4 +333,3 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
     public void onSessionDroppedStream(Stream stream) {
     }
 }
-
