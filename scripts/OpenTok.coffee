@@ -16,6 +16,7 @@ streamElements = {} # keep track of DOM elements for each stream
 getPosition = (divName) ->
   # Get the position of element
   pubDiv = document.getElementById(divName)
+  if !pubDiv then return {}
   width = pubDiv.offsetWidth
   height = pubDiv.offsetHeight
   curtop = pubDiv.offsetTop
@@ -178,18 +179,6 @@ class TBPublisher
     if( @domId and document.getElementById( @domId ) )
       if !@properties.width or !@properties.height
         console.log "domId exists but properties width or height is not specified"
-        console.log "domId exists but properties width or height is not specified"
-        console.log "domId exists but properties width or height is not specified"
-        console.log "domId exists but properties width or height is not specified"
-        console.log "domId exists but properties width or height is not specified"
-        console.log "domId exists but properties width or height is not specified"
-        console.log "domId exists but properties width or height is not specified"
-        console.log "domId exists but properties width or height is not specified"
-        console.log "domId exists but properties width or height is not specified"
-        console.log "domId exists but properties width or height is not specified"
-        console.log "domId exists but properties width or height is not specified"
-        console.log "domId exists but properties width or height is not specified"
-        console.log "domId exists but properties width or height is not specified"
         position = getPosition( @domId )
         console.log " width: #{position.width} and height: #{position.height} for domId #{@domId}, and top: #{position.top}, left: #{position.left}"
         if position.width > 0 and position.height > 0
@@ -311,16 +300,22 @@ class TBSession
 TBSubscriber = (stream, divName, properties) ->
   console.log("JS: Subscribing")
   @streamId = stream.streamId
-  width = 160
-  height = 120
+  console.log( "creating a subscriber, replacing div #{divName}" )
+  divPosition = getPosition( divName )
+  console.log( "#{divName} properties:" )
+  console.log( divPosition )
+  width = divPosition.width ? DefaultWidth
+  height = divPosition.height ? DefaultHeight
+  console.log( "proposed width is #{width}, and height #{height}" )
   subscribeToVideo="true"
   zIndex = TBGetZIndex(document.getElementById(divName))
   if(properties?)
-    width = properties.width ? DefaultWidth
-    height = properties.height ? DefaultHeight
+    width = properties.width ? width
+    height = properties.height ? height
     name = properties.name ? ""
     if(properties.subscribeToVideo? and properties.subscribeToVideo == false)
       subscribeToVideo="false"
+  console.log( "setting width to #{width}, and height to #{height}" )
   obj = replaceWithVideoStream(divName, stream.streamId, {width:width, height:height})
   position = getPosition(obj.id)
   Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex] )

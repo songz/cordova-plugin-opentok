@@ -22,6 +22,9 @@
   getPosition = function(divName) {
     var curleft, curtop, height, pubDiv, width;
     pubDiv = document.getElementById(divName);
+    if (!pubDiv) {
+      return {};
+    }
     width = pubDiv.offsetWidth;
     height = pubDiv.offsetHeight;
     curtop = pubDiv.offsetTop;
@@ -200,18 +203,6 @@
       this.properties = this.properties && typeof (this.properties === "object") ? this.properties : {};
       if (this.domId && document.getElementById(this.domId)) {
         if (!this.properties.width || !this.properties.height) {
-          console.log("domId exists but properties width or height is not specified");
-          console.log("domId exists but properties width or height is not specified");
-          console.log("domId exists but properties width or height is not specified");
-          console.log("domId exists but properties width or height is not specified");
-          console.log("domId exists but properties width or height is not specified");
-          console.log("domId exists but properties width or height is not specified");
-          console.log("domId exists but properties width or height is not specified");
-          console.log("domId exists but properties width or height is not specified");
-          console.log("domId exists but properties width or height is not specified");
-          console.log("domId exists but properties width or height is not specified");
-          console.log("domId exists but properties width or height is not specified");
-          console.log("domId exists but properties width or height is not specified");
           console.log("domId exists but properties width or height is not specified");
           position = getPosition(this.domId);
           console.log(" width: " + position.width + " and height: " + position.height + " for domId " + this.domId + ", and top: " + position.top + ", left: " + position.left);
@@ -396,21 +387,27 @@
   })();
 
   TBSubscriber = function(stream, divName, properties) {
-    var height, name, obj, position, subscribeToVideo, width, zIndex, _ref, _ref1, _ref2;
+    var divPosition, height, name, obj, position, subscribeToVideo, width, zIndex, _ref, _ref1, _ref2, _ref3, _ref4;
     console.log("JS: Subscribing");
     this.streamId = stream.streamId;
-    width = 160;
-    height = 120;
+    console.log("creating a subscriber, replacing div " + divName);
+    divPosition = getPosition(divName);
+    console.log("" + divName + " properties:");
+    console.log(divPosition);
+    width = (_ref = divPosition.width) != null ? _ref : DefaultWidth;
+    height = (_ref1 = divPosition.height) != null ? _ref1 : DefaultHeight;
+    console.log("proposed width is " + width + ", and height " + height);
     subscribeToVideo = "true";
     zIndex = TBGetZIndex(document.getElementById(divName));
     if ((properties != null)) {
-      width = (_ref = properties.width) != null ? _ref : DefaultWidth;
-      height = (_ref1 = properties.height) != null ? _ref1 : DefaultHeight;
-      name = (_ref2 = properties.name) != null ? _ref2 : "";
+      width = (_ref2 = properties.width) != null ? _ref2 : width;
+      height = (_ref3 = properties.height) != null ? _ref3 : height;
+      name = (_ref4 = properties.name) != null ? _ref4 : "";
       if ((properties.subscribeToVideo != null) && properties.subscribeToVideo === false) {
         subscribeToVideo = "false";
       }
     }
+    console.log("setting width to " + width + ", and height to " + height);
     obj = replaceWithVideoStream(divName, stream.streamId, {
       width: width,
       height: height
