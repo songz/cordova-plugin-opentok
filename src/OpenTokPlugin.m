@@ -54,25 +54,25 @@
     BOOL bpubVideo = YES;
     
     // Get Parameters
-    int top = [[command.arguments objectAtIndex:0] intValue];
-    int left = [[command.arguments objectAtIndex:1] intValue];
-    int width = [[command.arguments objectAtIndex:2] intValue];
-    int height = [[command.arguments objectAtIndex:3] intValue];
+    int top = [[command.arguments objectAtIndex:1] intValue];
+    int left = [[command.arguments objectAtIndex:2] intValue];
+    int width = [[command.arguments objectAtIndex:3] intValue];
+    int height = [[command.arguments objectAtIndex:4] intValue];
     
-    NSString* name = [command.arguments objectAtIndex:4];
+    NSString* name = [command.arguments objectAtIndex:6];
     if ([name isEqualToString:@"TBNameHolder"]) {
         name = [[UIDevice currentDevice] name];
     }
     
-    NSString* publishAudio = [command.arguments objectAtIndex:5];
+    NSString* publishAudio = [command.arguments objectAtIndex:7];
     if ([publishAudio isEqualToString:@"false"]) {
         bpubAudio = NO;
     }
-    NSString* publishVideo = [command.arguments objectAtIndex:6];
+    NSString* publishVideo = [command.arguments objectAtIndex:8];
     if ([publishVideo isEqualToString:@"false"]) {
         bpubVideo = NO;
     }
-    int zIndex = [[command.arguments objectAtIndex:7] intValue];
+    int zIndex = [[command.arguments objectAtIndex:5] intValue];
     
     // Publish and set View
     _publisher = [[OTPublisher alloc] initWithDelegate:self name:name];
@@ -144,14 +144,14 @@
     // Get Parameters
     self.callbackID = command.callbackId;
     NSString* sid = [command.arguments objectAtIndex:0];
-   
+    
     
     int top = [[command.arguments objectAtIndex:1] intValue];
     int left = [[command.arguments objectAtIndex:2] intValue];
     int width = [[command.arguments objectAtIndex:3] intValue];
     int height = [[command.arguments objectAtIndex:4] intValue];
-    NSString* tmp = [command.arguments objectAtIndex:5];
-    int zIndex = [[command.arguments objectAtIndex:6] intValue];
+    int zIndex = [[command.arguments objectAtIndex:5] intValue];
+    NSString* tmp = [command.arguments objectAtIndex:6];
     
     // Acquire Stream, then create a subscriber object and put it into dictionary
     OTStream* myStream = [streamDictionary objectForKey:sid];
@@ -185,7 +185,7 @@
  ****/
 - (void)subscriberDidConnectToStream:(OTSubscriber*)sub{
     NSLog(@"iOS Connected To Stream");
-     
+    
 }
 
 - (void)subscriber:(OTSubscriber*)subscrib didFailWithError:(NSError*)error{
@@ -227,7 +227,7 @@
     for(id key in session.streams){
         OTStream* aStream = [session.streams objectForKey:key];
         [streamDictionary setObject:aStream forKey:aStream.streamId];
-
+        
         NSMutableDictionary* streamInfo = [[NSMutableDictionary alloc] init];
         [streamInfo setObject:aStream.streamId forKey:@"streamId"];
         
@@ -261,7 +261,7 @@
     if( [stream.connection.connectionId isEqualToString: mySession.connection.connectionId] ){
         return;
     }
-
+    
     // Store stream in streamDictionary, keeps track of available streams
     [streamDictionary setObject:stream forKey:stream.streamId];
     
@@ -293,7 +293,7 @@
     // Setting up event object
     NSMutableDictionary* event = [[NSMutableDictionary alloc] init];
     [event setObject:@"networkDisconnected" forKey:@"reason"];
-    [event setObject:@"sessionDisconnected" forKey:@"type"];    
+    [event setObject:@"sessionDisconnected" forKey:@"type"];
     
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:event];
     [pluginResult setKeepCallbackAsBool:YES];
@@ -333,7 +333,7 @@
         _publisher.view.frame = CGRectMake(left, top, width, height);
         _publisher.view.layer.zPosition = zIndex;
     }
-
+    
     // Pulls the subscriber object from dictionary to prepare it for update
     OTSubscriber* streamInfo = [subscriberDictionary objectForKey:sid];
     
@@ -392,10 +392,10 @@
  [self.commandDelegate sendPluginResult:pluginResult callbackId:self.callbackID]];
  }else{
  //Call  the Failure Javascript function
- [self.commandDelegate [pluginResult toErrorCallbackString:self.callbackID]];  
+ [self.commandDelegate [pluginResult toErrorCallbackString:self.callbackID]];
  }
  
-******/
+ ******/
 
 
 @end
