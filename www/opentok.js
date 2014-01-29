@@ -171,7 +171,7 @@
       console.log("publisher id is " + this.domId);
       console.log("publisher is getting created, position coordinates - top: " + position.top + ", left: " + position.left + ", width: " + position.width + ", height: " + position.height);
       TBUpdateObjects();
-      Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo, zIndex]);
+      Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", ["publisher", position.top, position.left, width, height, zIndex, name, publishAudio, publishVideo]);
     }
 
     TBPublisher.prototype.sanitizeInputs = function(one, two, three) {
@@ -392,8 +392,6 @@
     this.streamId = stream.streamId;
     console.log("creating a subscriber, replacing div " + divName);
     divPosition = getPosition(divName);
-    console.log("" + divName + " properties:");
-    console.log(divPosition);
     width = (_ref = divPosition.width) != null ? _ref : DefaultWidth;
     height = (_ref1 = divPosition.height) != null ? _ref1 : DefaultHeight;
     console.log("proposed width is " + width + ", and height " + height);
@@ -413,7 +411,7 @@
       height: height
     });
     position = getPosition(obj.id);
-    return Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex]);
+    return Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToVideo]);
   };
 
 }).call(this);

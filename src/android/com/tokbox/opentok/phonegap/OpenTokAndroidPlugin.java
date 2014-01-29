@@ -1,7 +1,11 @@
 package com.tokbox.opentok.phonegap;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 import org.apache.cordova.CordovaInterface;
 import org.apache.cordova.CordovaPlugin;
@@ -47,18 +51,53 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
   public class RunnableUpdateViews implements Runnable{
     public JSONArray mProperty;
     public View mView;
+    public ArrayList<RunnableUpdateViews> allStreamViews;
+
+
+    public class CustomComparator implements Comparator<RunnableUpdateViews> {
+      @Override
+        public int compare(RunnableUpdateViews object1, RunnableUpdateViews object2) {
+          return object2.getZIndex() - object1.getZIndex();
+        }
+    }
+
+    public void updateZIndices(){
+      allStreamViews =  new ArrayList<RunnableUpdateViews>();
+      for (Map.Entry<String, RunnableSubscriber> entry : subscriberCollection.entrySet() ) { 
+        allStreamViews.add( entry.getValue() ); 
+      }
+      allStreamViews.add( myPublisher );
+      Collections.sort( allStreamViews, new CustomComparator() );
+
+      for( RunnableUpdateViews viewContainer : allStreamViews ){
+        ViewGroup parent = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
+        if (null != parent) {
+          parent.removeView( viewContainer.mView );
+          parent.addView(viewContainer.mView );
+        }
+      }
+    }
+
+    public int getZIndex(){
+      try{
+        return mProperty.getInt(5); 
+      }catch( Exception e ) {
+        return 0;
+      }
+    }
 
     @Override
       public void run() {
         try{
           Log.i( TAG, "updating view in ui runnable" + mProperty.toString() );
           Log.i( TAG, "updating view in ui runnable " + mView.toString() );
-          mView.setY( (float) mProperty.getInt(0) );
-          mView.setX( (float) mProperty.getInt(1) );
+          mView.setY( (float) mProperty.getInt(1) );
+          mView.setX( (float) mProperty.getInt(2) );
           ViewGroup.LayoutParams params = mView.getLayoutParams();
-          params.height = mProperty.getInt(3);
-          params.width = mProperty.getInt(2);
+          params.height = mProperty.getInt(4);
+          params.width = mProperty.getInt(3);
           mView.setLayoutParams(params);
+          updateZIndices();
         }catch( Exception e ){
           Log.i(TAG, "error when trying to retrieve properties while resizing properties");
         }
@@ -240,21 +279,17 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
         Log.i( TAG, "subscribe command called");
         Log.i( TAG, "subscribe data: " + args.toString() );
         Stream stream = streamCollection.get( args.getString(0) );
-        JSONArray newargs = removeFirst( args );
-
-        Log.i( TAG, "removed first property: " + newargs.toString() );
-        RunnableSubscriber runsub = new RunnableSubscriber( newargs, stream ); 
+        RunnableSubscriber runsub = new RunnableSubscriber( args, stream ); 
         subscriberCollection.put(stream.getStreamId(), runsub);
       }else if( action.equals( "updateView" )){
-        JSONArray newargs = removeFirst( args );
         if( args.getString(0).equals("TBPublisher") && myPublisher != null ){
           Log.i( TAG, "updating view for publisher" );
-          myPublisher.setPropertyFromArray(newargs);
+          myPublisher.setPropertyFromArray(args);
           cordova.getActivity().runOnUiThread(myPublisher);
         }else{
           RunnableSubscriber runsub = subscriberCollection.get( args.getString(0) );
           if( runsub != null ){
-            runsub.setPropertyFromArray( newargs );
+            runsub.setPropertyFromArray( args );
             cordova.getActivity().runOnUiThread(runsub);
           }
         }

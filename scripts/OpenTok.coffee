@@ -10,6 +10,10 @@ DefaultHeight = 198
 
 streamElements = {} # keep track of DOM elements for each stream
 
+# Whenever updateViews are involved, parameters passed through will always have:
+# TBPublisher constructor, TBUpdateObjects, TBSubscriber constructor
+# [id, top, left, width, height, zIndex, ... ]
+
 #
 # Helper methods
 #
@@ -146,7 +150,7 @@ class TBPublisher
     console.log "publisher id is #{@domId}"
     console.log "publisher is getting created, position coordinates - top: #{position.top}, left: #{position.left}, width: #{position.width}, height: #{position.height}"
     TBUpdateObjects()
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [position.top, position.left, width, height, name, publishAudio, publishVideo, zIndex] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [ "publisher", position.top, position.left, width, height, zIndex, name, publishAudio, publishVideo] )
   sanitizeInputs: (one, two, three) ->
     if( three? )
       # all 3 required properties present: apiKey, domId, properties
@@ -302,8 +306,6 @@ TBSubscriber = (stream, divName, properties) ->
   @streamId = stream.streamId
   console.log( "creating a subscriber, replacing div #{divName}" )
   divPosition = getPosition( divName )
-  console.log( "#{divName} properties:" )
-  console.log( divPosition )
   width = divPosition.width ? DefaultWidth
   height = divPosition.height ? DefaultHeight
   console.log( "proposed width is #{width}, and height #{height}" )
@@ -318,5 +320,5 @@ TBSubscriber = (stream, divName, properties) ->
   console.log( "setting width to #{width}, and height to #{height}" )
   obj = replaceWithVideoStream(divName, stream.streamId, {width:width, height:height})
   position = getPosition(obj.id)
-  Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex] )
+  Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToVideo] )
 
