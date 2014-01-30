@@ -200,7 +200,7 @@ class TBSession
         # Parse information returned from iOS before calling handler
         @streamCreatedHandler = (response) ->
           arr = response.split(' ')
-          stream = {connection:{connectionId:arr[0]}, streamId:arr[1]}
+          stream = new TBStream( arr[0], arr[1] )
           return handler({streams:[stream], stream: stream})
         # ios: After setting up function, set up listener in ios
         Cordova.exec(@streamCreatedHandler, TBSuccess, OTPlugin, "streamCreatedHandler", [] )
@@ -209,7 +209,7 @@ class TBSession
         @streamDisconnectedHandler = (response) ->
           console.log "streamDestroyedHandler "
           arr = response.split(' ')
-          stream = {connection:{connectionId:arr[0]}, streamId:arr[1]}
+          stream = new TBStream( arr[0], arr[1] )
           return handler({streams:[stream], stream: stream})
       when 'sessionDisconnected'
         @sessionDisconnectedHandler = (event) =>
@@ -280,7 +280,7 @@ class TBSession
     return
   addEventListener: (event, handler) -> # deprecating soon
     @on( event, handler )
-  
+
 
 # Subscriber Object:
 #   Properties:
@@ -336,6 +336,33 @@ class TBSubscriber
     obj = replaceWithVideoStream(divName, stream.streamId, {width:width, height:height})
     position = getPosition(obj.id)
     Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToVideo] )
+
+
+# Stream Object:
+#   Properties:
+#     connection ( Connection ) - connection that corresponds to the connection publishing the stream
+#     creationTime ( Number ) - timestamp for the creation of the stream, calculated in milliseconds
+#     hasAudio ( Boolean ) 
+#     hasVideo( Boolean )
+#     videoDimensions( Object ) - width and height, numbers
+#     name( String ) - name of the stream
+class TBStream
+  constructor: ( connectionId, @streamId ) ->
+    @connection = new TBConnection( connectionId )
+    @creationTime = 0
+    @hasAudio = true
+    @hasVideo = true
+    @videoDimensions = {width: 0, height: 0}
+    @name = ""
+
+# Connection Object:
+#   Properties:
+#     id( String) - id of this connection
+#     creationTime( number ) - timestamp for creation of the connection ( in milliseconds )
+#     data ( string ) - string containing metadata describing the connection
+class TBConnection
+  constructor: (@connectionId) ->
+    return
 
 
 streamElements = {} # keep track of DOM elements for each stream
