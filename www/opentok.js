@@ -350,6 +350,75 @@
 
   })();
 
+  TBSubscriber = (function() {
+    TBSubscriber.prototype.getAudioVolume = function() {
+      return 0;
+    };
+
+    TBSubscriber.prototype.getImgData = function() {
+      return "";
+    };
+
+    TBSubscriber.prototype.getStyle = function() {
+      return {};
+    };
+
+    TBSubscriber.prototype.on = function(event, handler) {
+      return this;
+    };
+
+    TBSubscriber.prototype.removeEventListner = function(event, listener) {
+      return this;
+    };
+
+    TBSubscriber.prototype.setAudioVolume = function(value) {
+      return this;
+    };
+
+    TBSubscriber.prototype.setStyle = function(style, value) {
+      return this;
+    };
+
+    TBSubscriber.prototype.subscribeToAudio = function(value) {
+      return this;
+    };
+
+    TBSubscriber.prototype.subscribeToVideo = function(value) {
+      return this;
+    };
+
+    function TBSubscriber(stream, divName, properties) {
+      var divPosition, height, name, obj, position, subscribeToVideo, width, zIndex, _ref, _ref1, _ref2, _ref3, _ref4;
+      console.log("JS: Subscribing");
+      this.streamId = stream.streamId;
+      console.log("creating a subscriber, replacing div " + divName);
+      divPosition = getPosition(divName);
+      width = (_ref = divPosition.width) != null ? _ref : DefaultWidth;
+      height = (_ref1 = divPosition.height) != null ? _ref1 : DefaultHeight;
+      console.log("proposed width is " + width + ", and height " + height);
+      subscribeToVideo = "true";
+      zIndex = TBGetZIndex(document.getElementById(divName));
+      if ((properties != null)) {
+        width = (_ref2 = properties.width) != null ? _ref2 : width;
+        height = (_ref3 = properties.height) != null ? _ref3 : height;
+        name = (_ref4 = properties.name) != null ? _ref4 : "";
+        if ((properties.subscribeToVideo != null) && properties.subscribeToVideo === false) {
+          subscribeToVideo = "false";
+        }
+      }
+      console.log("setting width to " + width + ", and height to " + height);
+      obj = replaceWithVideoStream(divName, stream.streamId, {
+        width: width,
+        height: height
+      });
+      position = getPosition(obj.id);
+      Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToVideo]);
+    }
+
+    return TBSubscriber;
+
+  })();
+
   streamElements = {};
 
   getPosition = function(divName) {
@@ -446,34 +515,6 @@
       ele = ele.offsetParent;
     }
     return 0;
-  };
-
-  TBSubscriber = function(stream, divName, properties) {
-    var divPosition, height, name, obj, position, subscribeToVideo, width, zIndex, _ref, _ref1, _ref2, _ref3, _ref4;
-    console.log("JS: Subscribing");
-    this.streamId = stream.streamId;
-    console.log("creating a subscriber, replacing div " + divName);
-    divPosition = getPosition(divName);
-    width = (_ref = divPosition.width) != null ? _ref : DefaultWidth;
-    height = (_ref1 = divPosition.height) != null ? _ref1 : DefaultHeight;
-    console.log("proposed width is " + width + ", and height " + height);
-    subscribeToVideo = "true";
-    zIndex = TBGetZIndex(document.getElementById(divName));
-    if ((properties != null)) {
-      width = (_ref2 = properties.width) != null ? _ref2 : width;
-      height = (_ref3 = properties.height) != null ? _ref3 : height;
-      name = (_ref4 = properties.name) != null ? _ref4 : "";
-      if ((properties.subscribeToVideo != null) && properties.subscribeToVideo === false) {
-        subscribeToVideo = "false";
-      }
-    }
-    console.log("setting width to " + width + ", and height to " + height);
-    obj = replaceWithVideoStream(divName, stream.streamId, {
-      width: width,
-      height: height
-    });
-    position = getPosition(obj.id);
-    return Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToVideo]);
   };
 
 }).call(this);

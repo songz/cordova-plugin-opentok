@@ -282,6 +282,61 @@ class TBSession
     @on( event, handler )
   
 
+# Subscriber Object:
+#   Properties:
+#     id (string) - dom id of the subscriber
+#     stream (Stream) - stream to which you are subscribing
+#   Methods: 
+#     getAudioVolume()
+#     getImgData() : String
+#     getStyle() : Objects
+#     on( type, listener ) : objects
+#     removeEventListner( type, listener )
+#     setAudioVolume( value ) : subscriber
+#     setStyle( style, value ) : subscriber
+#     subscribeToAudio( value ) : subscriber
+#     subscribeToVideo( value ) : subscriber
+class TBSubscriber
+  getAudioVolume: ->
+    return 0
+  getImgData: ->
+    return ""
+  getStyle: ->
+    return {}
+  on: (event, handler) ->
+    return @
+  removeEventListner: (event, listener) ->
+    return @
+  setAudioVolume:(value) ->
+    return @
+  setStyle: (style, value) ->
+    return @
+  subscribeToAudio: (value) ->
+    return @
+  subscribeToVideo: (value) ->
+    return @
+
+  constructor: (stream, divName, properties) ->
+    console.log("JS: Subscribing")
+    @streamId = stream.streamId
+    console.log( "creating a subscriber, replacing div #{divName}" )
+    divPosition = getPosition( divName )
+    width = divPosition.width ? DefaultWidth
+    height = divPosition.height ? DefaultHeight
+    console.log( "proposed width is #{width}, and height #{height}" )
+    subscribeToVideo="true"
+    zIndex = TBGetZIndex(document.getElementById(divName))
+    if(properties?)
+      width = properties.width ? width
+      height = properties.height ? height
+      name = properties.name ? ""
+      if(properties.subscribeToVideo? and properties.subscribeToVideo == false)
+        subscribeToVideo="false"
+    console.log( "setting width to #{width}, and height to #{height}" )
+    obj = replaceWithVideoStream(divName, stream.streamId, {width:width, height:height})
+    position = getPosition(obj.id)
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToVideo] )
+
 
 streamElements = {} # keep track of DOM elements for each stream
 
@@ -368,25 +423,4 @@ TBGetZIndex = (ele) ->
       return val
     ele = ele.offsetParent
   return 0
-
-TBSubscriber = (stream, divName, properties) ->
-  console.log("JS: Subscribing")
-  @streamId = stream.streamId
-  console.log( "creating a subscriber, replacing div #{divName}" )
-  divPosition = getPosition( divName )
-  width = divPosition.width ? DefaultWidth
-  height = divPosition.height ? DefaultHeight
-  console.log( "proposed width is #{width}, and height #{height}" )
-  subscribeToVideo="true"
-  zIndex = TBGetZIndex(document.getElementById(divName))
-  if(properties?)
-    width = properties.width ? width
-    height = properties.height ? height
-    name = properties.name ? ""
-    if(properties.subscribeToVideo? and properties.subscribeToVideo == false)
-      subscribeToVideo="false"
-  console.log( "setting width to #{width}, and height to #{height}" )
-  obj = replaceWithVideoStream(divName, stream.streamId, {width:width, height:height})
-  position = getPosition(obj.id)
-  Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToVideo] )
 
