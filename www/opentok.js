@@ -17,6 +17,339 @@
 
   DefaultHeight = 198;
 
+  window.TB = {
+    addEventListener: function(event, handler) {
+      return this.on(event, handler);
+    },
+    checkSystemRequirements: function() {
+      return 1;
+    },
+    initPublisher: function(one, two, three) {
+      return new TBPublisher(one, two, three);
+    },
+    initSession: function(sid) {
+      return new TBSession(sid);
+    },
+    log: function(message) {
+      return console.debug(message);
+    },
+    on: function(event, handler) {
+      if (event === "exception") {
+        console.log("JS: TB Exception Handler added");
+        return Cordova.exec(handler, TBError, OTPlugin, "exceptionHandler", []);
+      }
+    },
+    removeEventListner: function(type, handler) {},
+    setLogLevel: function(a) {
+      return console.log("Log Level Set");
+    },
+    upgradeSystemRequirements: function() {
+      return {};
+    },
+    updateViews: function() {
+      return TBUpdateObjects();
+    }
+  };
+
+  TBPublisher = (function() {
+    function TBPublisher(one, two, three) {
+      var height, name, position, publishAudio, publishVideo, width, zIndex, _ref, _ref1, _ref2;
+      this.sanitizeInputs(one, two, three);
+      console.log("JS: Publish Called");
+      width = 160;
+      height = 120;
+      name = "TBNameHolder";
+      publishAudio = "true";
+      publishVideo = "true";
+      zIndex = TBGetZIndex(document.getElementById(this.domId));
+      if ((this.properties != null)) {
+        width = (_ref = this.properties.width) != null ? _ref : DefaultWidth;
+        height = (_ref1 = this.properties.height) != null ? _ref1 : DefaultHeight;
+        name = (_ref2 = this.properties.name) != null ? _ref2 : "";
+        if ((this.properties.publishAudio != null) && this.properties.publishAudio === false) {
+          publishAudio = "false";
+        }
+        if ((this.properties.publishVideo != null) && this.properties.publishVideo === false) {
+          publishVideo = "false";
+        }
+      }
+      position = getPosition(this.domId);
+      console.log("first test publisher is getting created, position coordinates - top: " + position.top + ", left: " + position.left + ", width: " + position.width + ", height: " + position.height);
+      replaceWithVideoStream(this.domId, PublisherStreamId, {
+        width: width,
+        height: height
+      });
+      position = getPosition(this.domId);
+      console.log("publisher id is " + this.domId);
+      console.log("publisher is getting created, position coordinates - top: " + position.top + ", left: " + position.left + ", width: " + position.width + ", height: " + position.height);
+      TBUpdateObjects();
+      Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", ["publisher", position.top, position.left, width, height, zIndex, name, publishAudio, publishVideo]);
+    }
+
+    TBPublisher.prototype.destroy = function() {
+      return Cordova.exec(TBSuccess, TBError, OTPlugin, "destroyPublisher", []);
+    };
+
+    TBPublisher.prototype.getImgData = function() {
+      return "";
+    };
+
+    TBPublisher.prototype.getStyle = function() {
+      return {};
+    };
+
+    TBPublisher.prototype.on = function(event, handler) {
+      return this;
+    };
+
+    TBPublisher.prototype.publishAudio = function(value) {
+      return this;
+    };
+
+    TBPublisher.prototype.publishVideo = function(value) {
+      return this;
+    };
+
+    TBPublisher.prototype.removeEventListner = function(event, handler) {
+      return this;
+    };
+
+    TBPublisher.prototype.setStyle = function(style, value) {
+      return this;
+    };
+
+    TBPublisher.prototype.sanitizeInputs = function(one, two, three) {
+      var position;
+      if ((three != null)) {
+        this.apiKey = one;
+        this.domId = two;
+        this.properties = three;
+      } else if ((two != null)) {
+        if (typeof two === "object") {
+          this.properties = two;
+          if (document.getElementById(one)) {
+            this.domId = one;
+          } else {
+            this.apiKey = one;
+          }
+        } else {
+          this.apiKey = one;
+          this.domId = two;
+        }
+      } else if ((one != null)) {
+        if (typeof one === "object") {
+          this.properties = one;
+        } else if (document.getElementById(one)) {
+          this.domId = one;
+        }
+      }
+      this.apiKey = this.apiKey != null ? this.apiKey : "";
+      this.properties = this.properties && typeof (this.properties === "object") ? this.properties : {};
+      if (this.domId && document.getElementById(this.domId)) {
+        if (!this.properties.width || !this.properties.height) {
+          console.log("domId exists but properties width or height is not specified");
+          position = getPosition(this.domId);
+          console.log(" width: " + position.width + " and height: " + position.height + " for domId " + this.domId + ", and top: " + position.top + ", left: " + position.left);
+          if (position.width > 0 && position.height > 0) {
+            this.properties.width = position.width;
+            this.properties.height = position.height;
+          }
+        }
+      } else {
+        this.domId = TBGenerateDomHelper();
+      }
+      return this.domId = this.domId && document.getElementById(this.domId) ? this.domId : TBGenerateDomHelper();
+    };
+
+    return TBPublisher;
+
+  })();
+
+  TBSession = (function() {
+    TBSession.prototype.connect = function(apiKey, token, properties) {
+      if (properties == null) {
+        properties = {};
+      }
+      console.log("JS: Connect Called");
+      this.apiKey = apiKey;
+      this.token = token;
+      Cordova.exec(this.sessionConnectedHandler, TBError, OTPlugin, "connect", [this.apiKey, this.token]);
+      Cordova.exec(this.streamDisconnectedHandler, TBError, OTPlugin, "streamDisconnectedHandler", []);
+      Cordova.exec(this.sessionDisconnectedHandler, TBError, OTPlugin, "sessionDisconnectedHandler", []);
+    };
+
+    TBSession.prototype.disconnect = function() {
+      return Cordova.exec(TBSuccess, TBError, OTPlugin, "disconnect", []);
+    };
+
+    TBSession.prototype.forceDisconnect = function(connection) {
+      return this;
+    };
+
+    TBSession.prototype.forceUnpublish = function(stream) {
+      return this;
+    };
+
+    TBSession.prototype.getPublisherForStream = function(stream) {
+      return this;
+    };
+
+    TBSession.prototype.getSubscribersForStream = function(stream) {
+      return this;
+    };
+
+    TBSession.prototype.on = function(event, handler) {
+      var _this = this;
+      console.log("JS: Add Event Listener Called");
+      switch (event) {
+        case "sessionConnected":
+          return this.sessionConnectedHandler = function(event) {
+            console.log("session connected");
+            _this.connection = event.connection;
+            return handler(event);
+          };
+        case 'streamCreated':
+          this.streamCreatedHandler = function(response) {
+            var arr, stream;
+            arr = response.split(' ');
+            stream = {
+              connection: {
+                connectionId: arr[0]
+              },
+              streamId: arr[1]
+            };
+            return handler({
+              streams: [stream],
+              stream: stream
+            });
+          };
+          return Cordova.exec(this.streamCreatedHandler, TBSuccess, OTPlugin, "streamCreatedHandler", []);
+        case 'streamDestroyed':
+          return this.streamDisconnectedHandler = function(response) {
+            var arr, stream;
+            console.log("streamDestroyedHandler ");
+            arr = response.split(' ');
+            stream = {
+              connection: {
+                connectionId: arr[0]
+              },
+              streamId: arr[1]
+            };
+            return handler({
+              streams: [stream],
+              stream: stream
+            });
+          };
+        case 'sessionDisconnected':
+          return this.sessionDisconnectedHandler = function(event) {
+            return handler(event);
+          };
+      }
+    };
+
+    TBSession.prototype.publish = function(divName, properties) {
+      this.publisher = new TBPublisher(divName, properties, this);
+      return this.publisher;
+    };
+
+    TBSession.prototype.publish = function(publisher) {
+      this.publisher = publisher;
+      return Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", []);
+    };
+
+    TBSession.prototype.removeEventListner = function(event, handler) {
+      return this;
+    };
+
+    TBSession.prototype.signal = function(signal, handler) {
+      return this;
+    };
+
+    TBSession.prototype.subscribe = function(one, two, three) {
+      var domId, subscriber;
+      if ((three != null)) {
+        subscriber = new TBSubscriber(one, two, three);
+        return subscriber;
+      }
+      if ((two != null)) {
+        if (typeof two === "object") {
+          domId = TBGenerateDomHelper();
+          subscriber = new TBSubscriber(one, domId, two);
+          return subscriber;
+        } else {
+          subscriber = new TBSubscriber(one, two, {});
+          return subscriber;
+        }
+      }
+      domId = TBGenerateDomHelper();
+      subscriber = new TBSubscriber(one, domId, {});
+      return subscriber;
+    };
+
+    TBSession.prototype.unpublish = function() {
+      var element;
+      console.log("JS: Unpublish");
+      element = document.getElementById(this.publisher.domId);
+      if (element) {
+        element.parentNode.removeChild(element);
+        TBUpdateObjects();
+      }
+      return Cordova.exec(TBSuccess, TBError, OTPlugin, "unpublish", []);
+    };
+
+    TBSession.prototype.unsubscribe = function(subscriber) {
+      var element, elementId;
+      console.log("JS: Unsubscribe");
+      elementId = subscriber.streamId;
+      element = document.getElementById("TBStreamConnection" + elementId);
+      console.log("JS: Unsubscribing");
+      element = streamElements[elementId];
+      if (element) {
+        element.parentNode.removeChild(element);
+        delete streamElements[streamId];
+        TBUpdateObjects();
+      }
+      return Cordova.exec(TBSuccess, TBError, OTPlugin, "unsubscribe", [subscriber.streamId]);
+    };
+
+    function TBSession(sessionId) {
+      this.sessionId = sessionId;
+      this.connect = __bind(this.connect, this);
+      Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [this.sessionId]);
+    }
+
+    TBSession.prototype.cleanUpDom = function() {
+      var e, objects, _i, _len, _results;
+      objects = document.getElementsByClassName('OT_root');
+      _results = [];
+      for (_i = 0, _len = objects.length; _i < _len; _i++) {
+        e = objects[_i];
+        _results.push(e.parentNode.removeChild(e));
+      }
+      return _results;
+    };
+
+    TBSession.prototype.sessionDisconnectedHandler = function(event) {};
+
+    TBSession.prototype.streamDisconnectedHandler = function(streamId) {
+      var element;
+      console.log("JS: Stream Disconnected Handler Executed");
+      element = streamElements[streamId];
+      if (element) {
+        element.parentNode.removeChild(element);
+        delete streamElements[streamId];
+        TBUpdateObjects();
+      }
+    };
+
+    TBSession.prototype.addEventListener = function(event, handler) {
+      return this.on(event, handler);
+    };
+
+    return TBSession;
+
+  })();
+
   streamElements = {};
 
   getPosition = function(divName) {
@@ -98,30 +431,6 @@
     return domId;
   };
 
-  window.TB = {
-    updateViews: function() {
-      return TBUpdateObjects();
-    },
-    on: function(event, handler) {
-      if (event === "exception") {
-        console.log("JS: TB Exception Handler added");
-        return Cordova.exec(handler, TBError, OTPlugin, "exceptionHandler", []);
-      }
-    },
-    initSession: function(sid) {
-      return new TBSession(sid);
-    },
-    initPublisher: function(one, two, three) {
-      return new TBPublisher(one, two, three);
-    },
-    setLogLevel: function(a) {
-      return console.log("Log Level Set");
-    },
-    addEventListener: function(event, handler) {
-      return this.on(event, handler);
-    }
-  };
-
   window.TBTesting = function(handler) {
     return Cordova.exec(handler, TBError, OTPlugin, "TBTesting", []);
   };
@@ -138,253 +447,6 @@
     }
     return 0;
   };
-
-  TBPublisher = (function() {
-    function TBPublisher(one, two, three) {
-      var height, name, position, publishAudio, publishVideo, width, zIndex, _ref, _ref1, _ref2;
-      this.sanitizeInputs(one, two, three);
-      console.log("JS: Publish Called");
-      width = 160;
-      height = 120;
-      name = "TBNameHolder";
-      publishAudio = "true";
-      publishVideo = "true";
-      zIndex = TBGetZIndex(document.getElementById(this.domId));
-      if ((this.properties != null)) {
-        width = (_ref = this.properties.width) != null ? _ref : DefaultWidth;
-        height = (_ref1 = this.properties.height) != null ? _ref1 : DefaultHeight;
-        name = (_ref2 = this.properties.name) != null ? _ref2 : "";
-        if ((this.properties.publishAudio != null) && this.properties.publishAudio === false) {
-          publishAudio = "false";
-        }
-        if ((this.properties.publishVideo != null) && this.properties.publishVideo === false) {
-          publishVideo = "false";
-        }
-      }
-      position = getPosition(this.domId);
-      console.log("first test publisher is getting created, position coordinates - top: " + position.top + ", left: " + position.left + ", width: " + position.width + ", height: " + position.height);
-      replaceWithVideoStream(this.domId, PublisherStreamId, {
-        width: width,
-        height: height
-      });
-      position = getPosition(this.domId);
-      console.log("publisher id is " + this.domId);
-      console.log("publisher is getting created, position coordinates - top: " + position.top + ", left: " + position.left + ", width: " + position.width + ", height: " + position.height);
-      TBUpdateObjects();
-      Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", ["publisher", position.top, position.left, width, height, zIndex, name, publishAudio, publishVideo]);
-    }
-
-    TBPublisher.prototype.sanitizeInputs = function(one, two, three) {
-      var position;
-      if ((three != null)) {
-        this.apiKey = one;
-        this.domId = two;
-        this.properties = three;
-      } else if ((two != null)) {
-        if (typeof two === "object") {
-          this.properties = two;
-          if (document.getElementById(one)) {
-            this.domId = one;
-          } else {
-            this.apiKey = one;
-          }
-        } else {
-          this.apiKey = one;
-          this.domId = two;
-        }
-      } else if ((one != null)) {
-        if (typeof one === "object") {
-          this.properties = one;
-        } else if (document.getElementById(one)) {
-          this.domId = one;
-        }
-      }
-      this.apiKey = this.apiKey != null ? this.apiKey : "";
-      this.properties = this.properties && typeof (this.properties === "object") ? this.properties : {};
-      if (this.domId && document.getElementById(this.domId)) {
-        if (!this.properties.width || !this.properties.height) {
-          console.log("domId exists but properties width or height is not specified");
-          position = getPosition(this.domId);
-          console.log(" width: " + position.width + " and height: " + position.height + " for domId " + this.domId + ", and top: " + position.top + ", left: " + position.left);
-          if (position.width > 0 && position.height > 0) {
-            this.properties.width = position.width;
-            this.properties.height = position.height;
-          }
-        }
-      } else {
-        this.domId = TBGenerateDomHelper();
-      }
-      return this.domId = this.domId && document.getElementById(this.domId) ? this.domId : TBGenerateDomHelper();
-    };
-
-    TBPublisher.prototype.destroy = function() {
-      return Cordova.exec(TBSuccess, TBError, OTPlugin, "destroyPublisher", []);
-    };
-
-    return TBPublisher;
-
-  })();
-
-  TBSession = (function() {
-    function TBSession(sessionId) {
-      this.sessionId = sessionId;
-      this.connect = __bind(this.connect, this);
-      Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [this.sessionId]);
-    }
-
-    TBSession.prototype.cleanUpDom = function() {
-      var e, objects, _i, _len, _results;
-      objects = document.getElementsByClassName('OT_root');
-      _results = [];
-      for (_i = 0, _len = objects.length; _i < _len; _i++) {
-        e = objects[_i];
-        _results.push(e.parentNode.removeChild(e));
-      }
-      return _results;
-    };
-
-    TBSession.prototype.sessionDisconnectedHandler = function(event) {};
-
-    TBSession.prototype.on = function(event, handler) {
-      var _this = this;
-      console.log("JS: Add Event Listener Called");
-      switch (event) {
-        case "sessionConnected":
-          return this.sessionConnectedHandler = function(event) {
-            console.log("session connected");
-            _this.connection = event.connection;
-            return handler(event);
-          };
-        case 'streamCreated':
-          this.streamCreatedHandler = function(response) {
-            var arr, stream;
-            arr = response.split(' ');
-            stream = {
-              connection: {
-                connectionId: arr[0]
-              },
-              streamId: arr[1]
-            };
-            return handler({
-              streams: [stream],
-              stream: stream
-            });
-          };
-          return Cordova.exec(this.streamCreatedHandler, TBSuccess, OTPlugin, "streamCreatedHandler", []);
-        case 'streamDestroyed':
-          return this.streamDisconnectedHandler = function(response) {
-            var arr, stream;
-            console.log("streamDestroyedHandler ");
-            arr = response.split(' ');
-            stream = {
-              connection: {
-                connectionId: arr[0]
-              },
-              streamId: arr[1]
-            };
-            return handler({
-              streams: [stream],
-              stream: stream
-            });
-          };
-        case 'sessionDisconnected':
-          return this.sessionDisconnectedHandler = function(event) {
-            return handler(event);
-          };
-      }
-    };
-
-    TBSession.prototype.connect = function(apiKey, token, properties) {
-      if (properties == null) {
-        properties = {};
-      }
-      console.log("JS: Connect Called");
-      this.apiKey = apiKey;
-      this.token = token;
-      Cordova.exec(this.sessionConnectedHandler, TBError, OTPlugin, "connect", [this.apiKey, this.token]);
-      Cordova.exec(this.streamDisconnectedHandler, TBError, OTPlugin, "streamDisconnectedHandler", []);
-      Cordova.exec(this.sessionDisconnectedHandler, TBError, OTPlugin, "sessionDisconnectedHandler", []);
-    };
-
-    TBSession.prototype.disconnect = function() {
-      return Cordova.exec(TBSuccess, TBError, OTPlugin, "disconnect", []);
-    };
-
-    TBSession.prototype.publish = function(divName, properties) {
-      this.publisher = new TBPublisher(divName, properties, this);
-      return this.publisher;
-    };
-
-    TBSession.prototype.publish = function(publisher) {
-      this.publisher = publisher;
-      return Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", []);
-    };
-
-    TBSession.prototype.unpublish = function() {
-      var element;
-      console.log("JS: Unpublish");
-      element = document.getElementById(this.publisher.domId);
-      if (element) {
-        element.parentNode.removeChild(element);
-        TBUpdateObjects();
-      }
-      return Cordova.exec(TBSuccess, TBError, OTPlugin, "unpublish", []);
-    };
-
-    TBSession.prototype.subscribe = function(one, two, three) {
-      var domId, subscriber;
-      if ((three != null)) {
-        subscriber = new TBSubscriber(one, two, three);
-        return subscriber;
-      }
-      if ((two != null)) {
-        if (typeof two === "object") {
-          domId = TBGenerateDomHelper();
-          subscriber = new TBSubscriber(one, domId, two);
-          return subscriber;
-        } else {
-          subscriber = new TBSubscriber(one, two, {});
-          return subscriber;
-        }
-      }
-      domId = TBGenerateDomHelper();
-      subscriber = new TBSubscriber(one, domId, {});
-      return subscriber;
-    };
-
-    TBSession.prototype.unsubscribe = function(subscriber) {
-      var element, elementId;
-      console.log("JS: Unsubscribe");
-      elementId = subscriber.streamId;
-      element = document.getElementById("TBStreamConnection" + elementId);
-      console.log("JS: Unsubscribing");
-      element = streamElements[elementId];
-      if (element) {
-        element.parentNode.removeChild(element);
-        delete streamElements[streamId];
-        TBUpdateObjects();
-      }
-      return Cordova.exec(TBSuccess, TBError, OTPlugin, "unsubscribe", [subscriber.streamId]);
-    };
-
-    TBSession.prototype.streamDisconnectedHandler = function(streamId) {
-      var element;
-      console.log("JS: Stream Disconnected Handler Executed");
-      element = streamElements[streamId];
-      if (element) {
-        element.parentNode.removeChild(element);
-        delete streamElements[streamId];
-        TBUpdateObjects();
-      }
-    };
-
-    TBSession.prototype.addEventListener = function(event, handler) {
-      return this.on(event, handler);
-    };
-
-    return TBSession;
-
-  })();
 
   TBSubscriber = function(stream, divName, properties) {
     var divPosition, height, name, obj, position, subscribeToVideo, width, zIndex, _ref, _ref1, _ref2, _ref3, _ref4;
