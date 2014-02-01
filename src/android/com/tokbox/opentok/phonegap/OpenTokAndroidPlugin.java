@@ -230,19 +230,6 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
       super.initialize(cordova, webView);
     }
 
-  private JSONArray removeFirst(JSONArray args){
-    try{
-      ArrayList<Integer> list = new ArrayList<Integer>();
-      for( int i=1; i<5; i++){
-        list.add( args.getInt(i) );
-      }
-      return new JSONArray( list );
-    }catch(Exception e){
-      Log.i(TAG, "error thrown when trying to remove first element of args");
-      return null;
-    }
-  }
-
   @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
       Log.i( TAG, action );

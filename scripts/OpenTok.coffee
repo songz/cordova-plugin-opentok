@@ -83,7 +83,7 @@ class TBPublisher
     console.log "publisher id is #{@domId}"
     console.log "publisher is getting created, position coordinates - top: #{position.top}, left: #{position.left}, width: #{position.width}, height: #{position.height}"
     TBUpdateObjects()
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [ "publisher", position.top, position.left, width, height, zIndex, name, publishAudio, publishVideo] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo] )
   destroy: ->
     Cordova.exec(TBSuccess, TBError, OTPlugin, "destroyPublisher", [] )
   getImgData: ->
@@ -201,7 +201,7 @@ class TBSession
         @streamCreatedHandler = (response) ->
           arr = response.split(' ')
           stream = new TBStream( arr[0], arr[1] )
-          return handler({streams:[stream], stream: stream})
+          return handler({streams:[stream.toJSON()], stream: stream.toJSON()})
         # ios: After setting up function, set up listener in ios
         Cordova.exec(@streamCreatedHandler, TBSuccess, OTPlugin, "streamCreatedHandler", [] )
       when 'streamDestroyed'
@@ -210,7 +210,7 @@ class TBSession
           console.log "streamDestroyedHandler "
           arr = response.split(' ')
           stream = new TBStream( arr[0], arr[1] )
-          return handler({streams:[stream], stream: stream})
+          return handler({streams:[stream.toJSON()], stream: stream.toJSON()})
       when 'sessionDisconnected'
         @sessionDisconnectedHandler = (event) =>
           #@cleanUpDom()
@@ -271,8 +271,10 @@ class TBSession
   sessionDisconnectedHandler: (event) ->
     #@cleanUpDom()
   streamDisconnectedHandler: (streamId) ->
-    console.log("JS: Stream Disconnected Handler Executed")
+    pdebug "stream disconnected handler", streamId
     element = streamElements[ streamId ]
+    pdebug "stream elements", streamElements
+    pdebug "stream element", element
     if(element)
       element.parentNode.removeChild(element)
       delete( streamElements[ streamId ] )
@@ -317,7 +319,7 @@ class TBSubscriber
     return @
 
   constructor: (stream, divName, properties) ->
-    console.log("JS: Subscribing")
+    pdebug "creating subscriber", properties
     @streamId = stream.streamId
     console.log( "creating a subscriber, replacing div #{divName}" )
     divPosition = getPosition( divName )
@@ -330,12 +332,16 @@ class TBSubscriber
       width = properties.width ? width
       height = properties.height ? height
       name = properties.name ? ""
+      subscribeToVideo = "true"
+      subscribeToAudio = "true"
       if(properties.subscribeToVideo? and properties.subscribeToVideo == false)
         subscribeToVideo="false"
+      if(properties.subscribeToAudio? and properties.subscribeToAudio == false)
+        subscribeToAudio="false"
     console.log( "setting width to #{width}, and height to #{height}" )
     obj = replaceWithVideoStream(divName, stream.streamId, {width:width, height:height})
     position = getPosition(obj.id)
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToVideo] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToAudio, subscribeToVideo] )
 
 
 # Stream Object:
@@ -354,6 +360,10 @@ class TBStream
     @hasVideo = true
     @videoDimensions = {width: 0, height: 0}
     @name = ""
+  toJSON: ->
+    return {
+      streamId: @streamId
+    }
 
 # Connection Object:
 #   Properties:
@@ -441,6 +451,8 @@ TBGenerateDomHelper = ->
 
 window.TBTesting = (handler) ->
   Cordova.exec(handler, TBError, OTPlugin, "TBTesting", [] )
+pdebug = (msg, data) ->
+  console.debug "JS Lib: #{msg} - ", data
 
 TBGetZIndex = (ele) ->
   while( ele? )

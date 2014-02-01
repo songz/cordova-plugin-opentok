@@ -54,25 +54,24 @@
     BOOL bpubVideo = YES;
     
     // Get Parameters
+    NSString* name = [command.arguments objectAtIndex:0];
+    if ([name isEqualToString:@"TBNameHolder"]) {
+        name = [[UIDevice currentDevice] name];
+    }
     int top = [[command.arguments objectAtIndex:1] intValue];
     int left = [[command.arguments objectAtIndex:2] intValue];
     int width = [[command.arguments objectAtIndex:3] intValue];
     int height = [[command.arguments objectAtIndex:4] intValue];
+    int zIndex = [[command.arguments objectAtIndex:5] intValue];
     
-    NSString* name = [command.arguments objectAtIndex:6];
-    if ([name isEqualToString:@"TBNameHolder"]) {
-        name = [[UIDevice currentDevice] name];
-    }
-    
-    NSString* publishAudio = [command.arguments objectAtIndex:7];
+    NSString* publishAudio = [command.arguments objectAtIndex:6];
     if ([publishAudio isEqualToString:@"false"]) {
         bpubAudio = NO;
     }
-    NSString* publishVideo = [command.arguments objectAtIndex:8];
+    NSString* publishVideo = [command.arguments objectAtIndex:7];
     if ([publishVideo isEqualToString:@"false"]) {
         bpubVideo = NO;
     }
-    int zIndex = [[command.arguments objectAtIndex:5] intValue];
     
     // Publish and set View
     _publisher = [[OTPublisher alloc] initWithDelegate:self name:name];
@@ -151,11 +150,18 @@
     int width = [[command.arguments objectAtIndex:3] intValue];
     int height = [[command.arguments objectAtIndex:4] intValue];
     int zIndex = [[command.arguments objectAtIndex:5] intValue];
-    NSString* tmp = [command.arguments objectAtIndex:6];
     
     // Acquire Stream, then create a subscriber object and put it into dictionary
     OTStream* myStream = [streamDictionary objectForKey:sid];
     OTSubscriber* sub = [[OTSubscriber alloc] initWithStream:myStream delegate:self];
+    
+    
+    if ([[command.arguments objectAtIndex:6] isEqualToString:@"false"]) {
+        [sub setSubscribeToAudio: NO];
+    }
+    if ([[command.arguments objectAtIndex:7] isEqualToString:@"false"]) {
+        [sub setSubscribeToVideo: NO];
+    }
     [subscriberDictionary setObject:sub forKey:myStream.streamId];
     
     [sub.view setFrame:CGRectMake(left, top, width, height)];
@@ -301,8 +307,9 @@
 }
 - (void)session:(OTSession*)session didDropStream:(OTStream*)stream{
     NSLog(@"iOS Drop Stream");
-    NSString* result = [[NSString alloc] initWithFormat:@"%@ %@", stream.connection.connectionId, stream.streamId];
-    CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: result];
+    //NSString* result = [[NSString alloc] initWithFormat:@"%@ %@", stream.connection.connectionId, stream.streamId];
+    //CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: result];
+    CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: stream.streamId];
     [callbackResult setKeepCallbackAsBool:YES];
     [self.commandDelegate sendPluginResult:callbackResult callbackId:self.streamDisconnectedId];
 }
