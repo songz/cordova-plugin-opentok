@@ -176,6 +176,10 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
     public void setPropertyFromArray( JSONArray args ){
       this.mProperty = args;
     }
+    
+    public void removeStreamView(){
+      mSubscriber.destroy();
+    }
 
     public void run() {
       if( mSubscriber == null ){
@@ -248,7 +252,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
         mSession.connect( args.getString(0), args.getString(1));
         myEventListeners.put("connect", callbackContext);
       }else if( action.equals( "streamDisconnectedHandler" )){
-
+        myEventListeners.put("streamDisconnectedHandler", callbackContext);
       }else if( action.equals( "sessionDisconnectedHandler" )){
 
       }else if( action.equals( "disconnect" )){
@@ -353,5 +357,27 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
 
   @Override
     public void onSessionDroppedStream(Stream stream) {
+      Log.i(TAG, "session dropped stream");
+      CallbackContext streamDisconnectedCallback = myEventListeners.get( "streamDisconnectedHandler" ); 
+      if( streamDisconnectedCallback != null ){
+        Log.i(TAG, "dropped stream callback found");
+
+
+        Log.i(TAG, "destroying corresponding subscriber");
+        RunnableSubscriber subscriber = subscriberCollection.get( stream.getStreamId() );
+        if( subscriber == null ){
+          Log.i(TAG, "stream does not exist in subscriber collection");
+          return;
+        }
+        subscriber.removeStreamView();
+        Log.i(TAG, "removed subscriber stream view");
+        subscriberCollection.remove( stream.getStreamId() );
+        
+        PluginResult myResult = new PluginResult(PluginResult.Status.OK, stream.getStreamId());
+        myResult.setKeepCallback(true);
+        streamDisconnectedCallback.sendPluginResult(myResult);
+        Log.i(TAG, "stream disconnected callback sent");
+        
+      }
     }
 }
