@@ -239,6 +239,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
   @Override
     public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
       Log.i( TAG, action );
+      // TB Methods
       if( action.equals("initPublisher")){
         myPublisher = new RunnablePublisher( args );
       }else if( action.equals( "destroyPublisher" )){
@@ -246,6 +247,26 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
       }else if( action.equals( "initSession" )){
         Log.i( TAG, "created new session with data: "+args.toString());
         mSession = Session.newInstance( this.cordova.getActivity().getApplicationContext() , args.getString(0), this );
+      
+      // publisher methods
+      }else if( action.equals( "publishAudio") ){
+        String val = args.getString(0);
+        boolean publishAudio = true;
+        if( val.equalsIgnoreCase("false") ){
+          publishAudio = false;
+        }
+        Log.i(TAG, "setting publishAudio");
+        myPublisher.mPublisher.setPublishAudio( publishAudio );
+      }else if( action.equals( "publishVideo") ){
+        String val = args.getString(0);
+        boolean publishVideo = true;
+        if( val.equalsIgnoreCase("false") ){
+          publishVideo = false;
+        }
+        Log.i(TAG, "setting publishVideo");
+        myPublisher.mPublisher.setPublishVideo( publishVideo );
+        
+      // session Methods
       }else if( action.equals( "streamCreatedHandler" )){
         Log.i( TAG, "Stream created handler");
         myEventListeners.put("streamCreated", callbackContext);

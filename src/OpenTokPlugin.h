@@ -24,8 +24,11 @@
 -(void)initSession:(CDVInvokedUrlCommand*)command;
 
 // Publisher
+- (void)publishAudio:(CDVInvokedUrlCommand*)command;
+- (void)publishVideo:(CDVInvokedUrlCommand*)command;
 - (void)destroy:(CDVInvokedUrlCommand*)command;
 
+// Session
 -(void)streamCreatedHandler:(CDVInvokedUrlCommand*)command;
 -(void)connect:(CDVInvokedUrlCommand*)command;
 -(void)disconnect:(CDVInvokedUrlCommand*)command;

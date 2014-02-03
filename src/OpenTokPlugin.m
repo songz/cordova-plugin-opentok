@@ -90,6 +90,24 @@
 
 /*** Publisher Methods
  ****/
+- (void)publishAudio:(CDVInvokedUrlCommand*)command{
+    NSString* publishAudio = [command.arguments objectAtIndex:0];
+    NSLog(@"iOS Altering Audio publishing state, %@", publishAudio);
+    BOOL pubAudio = YES;
+    if ([publishAudio isEqualToString:@"false"]) {
+        pubAudio = NO;
+    }
+    [_publisher setPublishAudio:pubAudio];
+}
+- (void)publishVideo:(CDVInvokedUrlCommand*)command{
+    NSString* publishVideo = [command.arguments objectAtIndex:0];
+    NSLog(@"iOS Altering Video publishing state, %@", publishVideo);
+    BOOL pubVideo = YES;
+    if ([publishVideo isEqualToString:@"false"]) {
+        pubVideo = NO;
+    }
+    [_publisher setPublishVideo:pubVideo];
+}
 - (void)destroy:(CDVInvokedUrlCommand*)command{
 }
 

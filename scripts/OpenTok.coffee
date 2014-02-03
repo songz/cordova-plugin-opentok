@@ -54,8 +54,8 @@ window.TB =
 #     getImgData() : String - not yet implemented
 #     getStyle() : Object - not yet implemented
 #     on( type, listener )
-#     publishAudio(value) : publisher - not yet implemented
-#     publishVideo(value) : publisher - not yet implemented
+#     publishAudio(Boolean) : publisher - change publishing state for Audio
+#     publishVideo(Boolean) : publisher - change publishing state for Video
 #     removeEventListner( type, listener ) : publisher - not yet implemented
 #     setStyle( style, value ) : publisher - not yet implemented
 class TBPublisher
@@ -92,15 +92,24 @@ class TBPublisher
     return {}
   on: ( event, handler ) ->
     return @
-  publishAudio: (value) ->
+  publishAudio: (state) ->
+    @publishMedia( "publishAudio", state )
     return @
-  publishVideo: (value) ->
+  publishVideo: (state) ->
+    @publishMedia( "publishVideo", state )
     return @
   removeEventListner: ( event, handler ) ->
     return @
   setStyle: (style, value ) ->
     return @
 
+  publishMedia: (media, state) ->
+    if media not in ["publishAudio", "publishVideo"] then return
+    publishState = "true"
+    if state? and ( state == false or state == "false" )
+      publishState = "false"
+    pdebug "setting publishstate", {media: media, publishState: publishState}
+    Cordova.exec(TBSuccess, TBError, OTPlugin, media, [publishState] )
   sanitizeInputs: (one, two, three) ->
     if( three? )
       # all 3 required properties present: apiKey, domId, properties

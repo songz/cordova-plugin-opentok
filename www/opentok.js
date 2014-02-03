@@ -102,11 +102,13 @@
       return this;
     };
 
-    TBPublisher.prototype.publishAudio = function(value) {
+    TBPublisher.prototype.publishAudio = function(state) {
+      this.publishMedia("publishAudio", state);
       return this;
     };
 
-    TBPublisher.prototype.publishVideo = function(value) {
+    TBPublisher.prototype.publishVideo = function(state) {
+      this.publishMedia("publishVideo", state);
       return this;
     };
 
@@ -116,6 +118,22 @@
 
     TBPublisher.prototype.setStyle = function(style, value) {
       return this;
+    };
+
+    TBPublisher.prototype.publishMedia = function(media, state) {
+      var publishState;
+      if (media !== "publishAudio" && media !== "publishVideo") {
+        return;
+      }
+      publishState = "true";
+      if ((state != null) && (state === false || state === "false")) {
+        publishState = "false";
+      }
+      pdebug("setting publishstate", {
+        media: media,
+        publishState: publishState
+      });
+      return Cordova.exec(TBSuccess, TBError, OTPlugin, media, [publishState]);
     };
 
     TBPublisher.prototype.sanitizeInputs = function(one, two, three) {
