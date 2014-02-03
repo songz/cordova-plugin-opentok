@@ -178,6 +178,8 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
     }
     
     public void removeStreamView(){
+      ViewGroup frame = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
+      frame.removeView( this.mView );
       mSubscriber.destroy();
     }
 
