@@ -18,9 +18,6 @@
   DefaultHeight = 198;
 
   window.TB = {
-    addEventListener: function(event, handler) {
-      return this.on(event, handler);
-    },
     checkSystemRequirements: function() {
       return 1;
     },
@@ -31,15 +28,15 @@
       return new TBSession(sid);
     },
     log: function(message) {
-      return console.debug(message);
+      return pdebug("TB LOG", message);
     },
+    off: function(event, handler) {},
     on: function(event, handler) {
       if (event === "exception") {
         console.log("JS: TB Exception Handler added");
         return Cordova.exec(handler, TBError, OTPlugin, "exceptionHandler", []);
       }
     },
-    removeEventListner: function(type, handler) {},
     setLogLevel: function(a) {
       return console.log("Log Level Set");
     },
@@ -48,6 +45,12 @@
     },
     updateViews: function() {
       return TBUpdateObjects();
+    },
+    addEventListener: function(event, handler) {
+      return this.on(event, handler);
+    },
+    removeEventListener: function(type, handler) {
+      return this.off(type, handler);
     }
   };
 
@@ -98,7 +101,17 @@
       return {};
     };
 
+    TBPublisher.prototype.off = function(event, handler) {
+      return this;
+    };
+
     TBPublisher.prototype.on = function(event, handler) {
+      if (event === "streamCreated") {
+        return this;
+      }
+      if (event === "streamDestroyed") {
+        return this;
+      }
       return this;
     };
 
@@ -109,10 +122,6 @@
 
     TBPublisher.prototype.publishVideo = function(state) {
       this.publishMedia("publishVideo", state);
-      return this;
-    };
-
-    TBPublisher.prototype.removeEventListner = function(event, handler) {
       return this;
     };
 
@@ -179,6 +188,11 @@
       return this.domId = this.domId && document.getElementById(this.domId) ? this.domId : TBGenerateDomHelper();
     };
 
+    TBPublisher.prototype.removeEventListener = function(event, handler) {
+      this.off(event, handler);
+      return this;
+    };
+
     return TBPublisher;
 
   })();
@@ -213,6 +227,10 @@
     };
 
     TBSession.prototype.getSubscribersForStream = function(stream) {
+      return this;
+    };
+
+    TBSession.prototype.off = function(event, handler) {
       return this;
     };
 
@@ -263,10 +281,6 @@
     TBSession.prototype.publish = function(publisher) {
       this.publisher = publisher;
       return Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", []);
-    };
-
-    TBSession.prototype.removeEventListner = function(event, handler) {
-      return this;
     };
 
     TBSession.prototype.signal = function(signal, handler) {
@@ -353,7 +367,13 @@
     };
 
     TBSession.prototype.addEventListener = function(event, handler) {
-      return this.on(event, handler);
+      this.on(event, handler);
+      return this;
+    };
+
+    TBSession.prototype.removeEventListener = function(event, handler) {
+      this.off(event, handler);
+      return this;
     };
 
     return TBSession;
@@ -373,11 +393,11 @@
       return {};
     };
 
-    TBSubscriber.prototype.on = function(event, handler) {
+    TBSubscriber.prototype.off = function(event, handler) {
       return this;
     };
 
-    TBSubscriber.prototype.removeEventListner = function(event, listener) {
+    TBSubscriber.prototype.on = function(event, handler) {
       return this;
     };
 
@@ -429,6 +449,10 @@
       position = getPosition(obj.id);
       Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToAudio, subscribeToVideo]);
     }
+
+    TBSubscriber.prototype.removeEventListener = function(event, listener) {
+      return this;
+    };
 
     return TBSubscriber;
 

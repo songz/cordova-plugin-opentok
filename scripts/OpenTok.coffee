@@ -14,14 +14,12 @@ DefaultHeight = 198
 #     TB.initPublisher( apiKey:String [, replaceElementId:String] [, properties:Object] ):Publisher
 #     TB.initSession( sessionId:String [, production] ):Session 
 #     TB.log( message )
+#     TB.off( type:String, listener:Function )
 #     TB.on( type:String, listener:Function )
-#     TB.removeEventListner( type:String, listener:Function )
 #  Methods that doesn't do anything:
 #     TB.setLogLevel(logLevel:String)
 #     TB.upgradeSystemRequirements()
 window.TB =
-  addEventListener: (event, handler) -> # deprecating soon
-    @on( event, handler )
   checkSystemRequirements: ->
     return 1
   initPublisher: (one, two, three) ->
@@ -29,19 +27,25 @@ window.TB =
   initSession: (sid) ->
     return new TBSession(sid)
   log: (message) ->
-    console.debug message
+    pdebug "TB LOG", message
+  off: (event, handler) ->
+    #todo
   on: (event, handler) ->
-    if(event=="exception")
+    if(event=="exception") # TB object only dispatches one type of event
       console.log("JS: TB Exception Handler added")
       Cordova.exec(handler, TBError, OTPlugin, "exceptionHandler", [] )
-  removeEventListner: (type, handler ) ->
-    #todo
   setLogLevel: (a) ->
     console.log("Log Level Set")
   upgradeSystemRequirements: ->
     return {}
   updateViews: ->
     TBUpdateObjects()
+
+  # deprecating
+  addEventListener: (event, handler) ->
+    @on( event, handler )
+  removeEventListener: (type, handler ) ->
+    @off( type, handler )
 
 # Publisher Object:
 #   Properties:
@@ -53,11 +57,12 @@ window.TB =
 #     destroy():Publisher - not yet implemented
 #     getImgData() : String - not yet implemented
 #     getStyle() : Object - not yet implemented
+#     off( type, listener )
 #     on( type, listener )
 #     publishAudio(Boolean) : publisher - change publishing state for Audio
 #     publishVideo(Boolean) : publisher - change publishing state for Video
-#     removeEventListner( type, listener ) : publisher - not yet implemented
 #     setStyle( style, value ) : publisher - not yet implemented
+#
 class TBPublisher
   constructor: (one, two, three) ->
     @sanitizeInputs( one,two, three )
@@ -90,15 +95,23 @@ class TBPublisher
     return ""
   getStyle: ->
     return {}
+  off: ( event, handler ) ->
+    #todo
+    return @
   on: ( event, handler ) ->
+    if(event=="streamCreated")
+      #todo
+      return @
+    if(event=="streamDestroyed")
+#     Todo: ability to retain the publisher in HTML DOM (for reuse) by calling event.preventDefault()
+      return @
+    # other events: accessAllowed, accessDenied, accessDialogClosed, accessDialogOpened
     return @
   publishAudio: (state) ->
     @publishMedia( "publishAudio", state )
     return @
   publishVideo: (state) ->
     @publishMedia( "publishVideo", state )
-    return @
-  removeEventListner: ( event, handler ) ->
     return @
   setStyle: (style, value ) ->
     return @
@@ -151,6 +164,11 @@ class TBPublisher
       @domId = TBGenerateDomHelper()
     @domId = if( @domId and document.getElementById( @domId ) ) then @domId else TBGenerateDomHelper()
 
+  # deprecating
+  removeEventListener: ( event, handler ) ->
+    @off( event, handler )
+    return @
+
 
 # Session Object:
 #   Properties:
@@ -164,9 +182,9 @@ class TBPublisher
 #     forceUnpublish( stream ) - forces publisher of the spicified stream to stop publishing the stream
 #     getPublisherForStream( stream ) - returns the local publisher object for a given stream
 #     getSubscribersForStream( stream ) - returns array of local subscriber objects for a given stream
+#     off( type, listener ) 
 #     on( type, listener ) 
 #     publish( publisher ) - starts publishing
-#     removeEventListner( type, listener )
 #     signal( signal, completionHandler)
 #     subscribe( stream, targetElement, properties ) : subscriber
 #     unpublish( publisher )
@@ -192,6 +210,8 @@ class TBSession
   getPublisherForStream: (stream) ->
     return @
   getSubscribersForStream: (stream) ->
+    return @
+  off: (event, handler) ->
     return @
   on: (event, handler) ->
     console.log("JS: Add Event Listener Called")
@@ -224,14 +244,13 @@ class TBSession
         @sessionDisconnectedHandler = (event) =>
           #@cleanUpDom()
           return handler(event)
+# todo - other events: connectionCreated, connectionDestroyed, signal?, streamPropertyChanged, signal:type?
   publish: (divName, properties) ->
     @publisher = new TBPublisher(divName, properties, @)
     return @publisher
   publish: (publisher) ->
     @publisher = publisher
     Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", [] )
-  removeEventListner: ( event, handler ) ->
-    return @
   signal: (signal, handler) ->
     return @
   subscribe: (one, two, three) ->
@@ -289,8 +308,14 @@ class TBSession
       delete( streamElements[ streamId ] )
       TBUpdateObjects()
     return
+
+  # deprecating
   addEventListener: (event, handler) -> # deprecating soon
     @on( event, handler )
+    return @
+  removeEventListener: ( event, handler ) ->
+    @off( event, handler )
+    return @
 
 
 # Subscriber Object:
@@ -301,8 +326,8 @@ class TBSession
 #     getAudioVolume()
 #     getImgData() : String
 #     getStyle() : Objects
+#     off( type, listener ) : objects
 #     on( type, listener ) : objects
-#     removeEventListner( type, listener )
 #     setAudioVolume( value ) : subscriber
 #     setStyle( style, value ) : subscriber
 #     subscribeToAudio( value ) : subscriber
@@ -314,9 +339,10 @@ class TBSubscriber
     return ""
   getStyle: ->
     return {}
-  on: (event, handler) ->
+  off: (event, handler) ->
     return @
-  removeEventListner: (event, listener) ->
+  on: (event, handler) ->
+# todo - videoDisabled
     return @
   setAudioVolume:(value) ->
     return @
@@ -351,6 +377,10 @@ class TBSubscriber
     obj = replaceWithVideoStream(divName, stream.streamId, {width:width, height:height})
     position = getPosition(obj.id)
     Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToAudio, subscribeToVideo] )
+
+  # deprecating
+  removeEventListener: (event, listener) ->
+    return @
 
 
 # Stream Object:
