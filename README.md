@@ -1,10 +1,10 @@
-PhoneGap Plugin for OpenTok iOS
+Cordova Plugin for OpenTok iOS
 ===
 
 Weave video chat into your web (and now mobile!) application.
 
 ## Using Cordova CLI
-**Make sure You have Cordova 3.3 Installed** If you haven't, check out PhoneGap's [Installation](http://phonegap.com/install/) Page.  
+**Make sure You have Cordova 3.3 Installed** If you haven't, view [Cordova instructions](http://cordova.apache.org/docs/en/3.3.0/guide_cli_index.md.html) Page.  
 Clone this repo to get the source code for OpenTok's Cordova plugin
 
 1. Create a Cordova app by typing into Terminal:  
@@ -12,7 +12,8 @@ Clone this repo to get the source code for OpenTok's Cordova plugin
 
 2. Install OpenTok plugin into your app:
 `cd my-app`  
-`cordova plugin add path/to/Opentok's/CordovaPlugin/that/you/cloned`
+`cordova plugin add path/to/Opentok's/CordovaPlugin/that/you/cloned`  
+> Plugin already exists? To remove OpenTokPlugin: `cordova plugin remove com.tokbox.opentok.phonegap.OpenTokPlugin`
 
 3a. For **Android Apps**, add Android platform into your cordova app
 `cordova platform add android`
@@ -38,12 +39,17 @@ All your editing will be done in your www folder.
 To use the opentok library, make sure you include **opentok.js** file in your HTML document.  
 ` <script type="text/javascript" charset="utf-8" src="opentok.js"></script>`
 
-All JavaScript code should be written in `deviceready` function in */js/index.js* folder because it is executed after all dependencies has loaded.
+All JavaScript code should be written in `deviceready` function in */js/index.js* because it is executed after all dependencies has loaded.
 
     deviceready: function() {
         // Do Your Stuff Here!
         app.report('deviceready');
     },
+
+To view and interact with elements on the browser console, use [weinre](http://people.apache.org/~pmuellr/weinre/docs/latest/). Here's a few things to take note of if you are using weinre on a local network:
+* make sure all devices are connected to the same network
+* make sure you bind weinre to 0.0.0.0 so your mobile devices: `weinre --boundHost 0.0.0.0`
+* when you include the js library from weinre, make sure to use your computer's ip address and not localhost!
 
 ---
 
@@ -54,7 +60,13 @@ Have Fun!
 
 ----
 
-## [Documentation for PhoneGap Plugin](/opentok/PhoneGap-Plugin/blob/master/docs/README.md)
+## [Documentation for Cordova Plugin](/opentok/PhoneGap-Plugin/blob/master/docs/README.md)
+
+----
+
+## Updates:
+### Feb 3 -
+* after installing plugin, the path to include opentok.js is no longer js/opentok.js
 
 ----
 
