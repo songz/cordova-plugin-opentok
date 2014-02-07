@@ -58,16 +58,15 @@
     function TBPublisher(one, two, three) {
       var height, name, position, publishAudio, publishVideo, width, zIndex, _ref, _ref1, _ref2;
       this.sanitizeInputs(one, two, three);
-      console.log("JS: Publish Called");
-      width = 160;
-      height = 120;
+      pdebug("creating publisher", {});
+      position = getPosition(this.domId);
       name = "TBNameHolder";
       publishAudio = "true";
       publishVideo = "true";
       zIndex = TBGetZIndex(document.getElementById(this.domId));
-      if ((this.properties != null)) {
-        width = (_ref = this.properties.width) != null ? _ref : DefaultWidth;
-        height = (_ref1 = this.properties.height) != null ? _ref1 : DefaultHeight;
+      if (this.properties != null) {
+        width = (_ref = this.properties.width) != null ? _ref : position.width;
+        height = (_ref1 = this.properties.height) != null ? _ref1 : position.height;
         name = (_ref2 = this.properties.name) != null ? _ref2 : "";
         if ((this.properties.publishAudio != null) && this.properties.publishAudio === false) {
           publishAudio = "false";
@@ -76,15 +75,15 @@
           publishVideo = "false";
         }
       }
-      position = getPosition(this.domId);
-      console.log("first test publisher is getting created, position coordinates - top: " + position.top + ", left: " + position.left + ", width: " + position.width + ", height: " + position.height);
+      if ((width == null) || width === 0 || (height == null) || height === 0) {
+        width = DefaultWidth;
+        height = DefaultHeight;
+      }
       replaceWithVideoStream(this.domId, PublisherStreamId, {
         width: width,
         height: height
       });
       position = getPosition(this.domId);
-      console.log("publisher id is " + this.domId);
-      console.log("publisher is getting created, position coordinates - top: " + position.top + ", left: " + position.left + ", width: " + position.width + ", height: " + position.height);
       TBUpdateObjects();
       Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo]);
     }
@@ -357,8 +356,6 @@
       var element;
       pdebug("stream disconnected handler", streamId);
       element = streamElements[streamId];
-      pdebug("stream elements", streamElements);
-      pdebug("stream element", element);
       if (element) {
         element.parentNode.removeChild(element);
         delete streamElements[streamId];
@@ -418,20 +415,17 @@
     };
 
     function TBSubscriber(stream, divName, properties) {
-      var divPosition, height, name, obj, position, subscribeToAudio, subscribeToVideo, width, zIndex, _ref, _ref1, _ref2, _ref3, _ref4;
+      var divPosition, height, name, obj, position, subscribeToAudio, subscribeToVideo, width, zIndex, _ref, _ref1, _ref2;
       pdebug("creating subscriber", properties);
       this.streamId = stream.streamId;
       console.log("creating a subscriber, replacing div " + divName);
       divPosition = getPosition(divName);
-      width = (_ref = divPosition.width) != null ? _ref : DefaultWidth;
-      height = (_ref1 = divPosition.height) != null ? _ref1 : DefaultHeight;
-      console.log("proposed width is " + width + ", and height " + height);
       subscribeToVideo = "true";
       zIndex = TBGetZIndex(document.getElementById(divName));
       if ((properties != null)) {
-        width = (_ref2 = properties.width) != null ? _ref2 : width;
-        height = (_ref3 = properties.height) != null ? _ref3 : height;
-        name = (_ref4 = properties.name) != null ? _ref4 : "";
+        width = (_ref = properties.width) != null ? _ref : divPosition.width;
+        height = (_ref1 = properties.height) != null ? _ref1 : divPosition.height;
+        name = (_ref2 = properties.name) != null ? _ref2 : "";
         subscribeToVideo = "true";
         subscribeToAudio = "true";
         if ((properties.subscribeToVideo != null) && properties.subscribeToVideo === false) {
@@ -440,6 +434,10 @@
         if ((properties.subscribeToAudio != null) && properties.subscribeToAudio === false) {
           subscribeToAudio = "false";
         }
+      }
+      if ((width == null) || width === 0 || (height == null) || height === 0) {
+        width = DefaultWidth;
+        height = DefaultHeight;
       }
       console.log("setting width to " + width + ", and height to " + height);
       obj = replaceWithVideoStream(divName, stream.streamId, {
@@ -573,14 +571,6 @@
     return domId;
   };
 
-  window.TBTesting = function(handler) {
-    return Cordova.exec(handler, TBError, OTPlugin, "TBTesting", []);
-  };
-
-  pdebug = function(msg, data) {
-    return console.debug("JS Lib: " + msg + " - ", data);
-  };
-
   TBGetZIndex = function(ele) {
     var val;
     while ((ele != null)) {
@@ -592,6 +582,10 @@
       ele = ele.offsetParent;
     }
     return 0;
+  };
+
+  pdebug = function(msg, data) {
+    return console.log("JS Lib: " + msg + " - ", data);
   };
 
 }).call(this);

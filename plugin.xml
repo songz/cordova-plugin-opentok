@@ -9,7 +9,7 @@
     <keywords>opentok,tokbox</keywords>
 
     <platform name="android">
-      <asset src="www/opentok.js" target="js/opentok.js" />
+      <asset src="www/opentok.js" target="opentok.js" />
 
       <source-file src="src/android/com/tokbox/opentok/phonegap/OpenTokAndroidPlugin.java"
         target-dir="src/com/tokbox/opentok/phonegap/" />
@@ -38,7 +38,7 @@
 
     <!-- ios -->
     <platform name="ios">
-      <asset src="www/opentok.js" target="js/opentok.js" />
+      <asset src="www/opentok.js" target="opentok.js" />
 
       <header-file src="src/OpenTokPlugin.h" />
       <source-file src="src/OpenTokPlugin.m" />

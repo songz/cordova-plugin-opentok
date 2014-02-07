@@ -66,27 +66,26 @@ window.TB =
 class TBPublisher
   constructor: (one, two, three) ->
     @sanitizeInputs( one,two, three )
-    console.log("JS: Publish Called")
-    width = 160
-    height = 120
+    pdebug "creating publisher", {}
+    position = getPosition(@domId)
     name="TBNameHolder"
     publishAudio="true"
     publishVideo="true"
     zIndex = TBGetZIndex(document.getElementById(@domId))
-    if(@properties?)
-      width = @properties.width ? DefaultWidth
-      height = @properties.height ? DefaultHeight
+
+    if @properties?
+      width = @properties.width ? position.width
+      height = @properties.height ? position.height
       name = @properties.name ? ""
       if(@properties.publishAudio? and @properties.publishAudio==false)
         publishAudio="false"
       if(@properties.publishVideo? and @properties.publishVideo==false)
         publishVideo="false"
-    position = getPosition(@domId)
-    console.log "first test publisher is getting created, position coordinates - top: #{position.top}, left: #{position.left}, width: #{position.width}, height: #{position.height}"
+    if (not width?) or width == 0 or (not height?) or height==0
+      width = DefaultWidth
+      height = DefaultHeight
     replaceWithVideoStream(@domId, PublisherStreamId, {width:width, height:height})
     position = getPosition(@domId)
-    console.log "publisher id is #{@domId}"
-    console.log "publisher is getting created, position coordinates - top: #{position.top}, left: #{position.left}, width: #{position.width}, height: #{position.height}"
     TBUpdateObjects()
     Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo] )
   destroy: ->
@@ -301,8 +300,6 @@ class TBSession
   streamDisconnectedHandler: (streamId) ->
     pdebug "stream disconnected handler", streamId
     element = streamElements[ streamId ]
-    pdebug "stream elements", streamElements
-    pdebug "stream element", element
     if(element)
       element.parentNode.removeChild(element)
       delete( streamElements[ streamId ] )
@@ -358,14 +355,11 @@ class TBSubscriber
     @streamId = stream.streamId
     console.log( "creating a subscriber, replacing div #{divName}" )
     divPosition = getPosition( divName )
-    width = divPosition.width ? DefaultWidth
-    height = divPosition.height ? DefaultHeight
-    console.log( "proposed width is #{width}, and height #{height}" )
     subscribeToVideo="true"
     zIndex = TBGetZIndex(document.getElementById(divName))
     if(properties?)
-      width = properties.width ? width
-      height = properties.height ? height
+      width = properties.width ? divPosition.width
+      height = properties.height ? divPosition.height
       name = properties.name ? ""
       subscribeToVideo = "true"
       subscribeToAudio = "true"
@@ -373,6 +367,9 @@ class TBSubscriber
         subscribeToVideo="false"
       if(properties.subscribeToAudio? and properties.subscribeToAudio == false)
         subscribeToAudio="false"
+    if (not width?) or width == 0 or (not height?) or height==0
+      width = DefaultWidth
+      height = DefaultHeight
     console.log( "setting width to #{width}, and height to #{height}" )
     obj = replaceWithVideoStream(divName, stream.streamId, {width:width, height:height})
     position = getPosition(obj.id)
@@ -487,12 +484,6 @@ TBGenerateDomHelper = ->
   document.body.appendChild(div)
   return domId
 
-
-window.TBTesting = (handler) ->
-  Cordova.exec(handler, TBError, OTPlugin, "TBTesting", [] )
-pdebug = (msg, data) ->
-  console.debug "JS Lib: #{msg} - ", data
-
 TBGetZIndex = (ele) ->
   while( ele? )
     val = document.defaultView.getComputedStyle(ele,null).getPropertyValue('z-index')
@@ -502,3 +493,5 @@ TBGetZIndex = (ele) ->
     ele = ele.offsetParent
   return 0
 
+pdebug = (msg, data) ->
+  console.log "JS Lib: #{msg} - ", data
