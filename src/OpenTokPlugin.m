@@ -277,9 +277,6 @@
 }
 - (void)session:(OTSession*)mySession didReceiveStream:(OTStream*)stream{
     NSLog(@"iOS Received Stream");
-    if( [stream.connection.connectionId isEqualToString: mySession.connection.connectionId] ){
-        return;
-    }
     
     // Store stream in streamDictionary, keeps track of available streams
     [streamDictionary setObject:stream forKey:stream.streamId];
@@ -290,6 +287,9 @@
     [callbackResult setKeepCallbackAsBool:YES];
     //[self.commandDelegate [callbackResult toSuccessCallbackString:self.streamCreatedId];
     NSString* streamCreatedCallback = [callbackList objectForKey:@"sessStreamCreated"];
+    if( [stream.connection.connectionId isEqualToString: mySession.connection.connectionId] ){
+        streamCreatedCallback = [callbackList objectForKey:@"pubStreamCreated"];
+    }
     [self.commandDelegate sendPluginResult:callbackResult callbackId:streamCreatedCallback];
 }
 - (void)session:(OTSession*)session didFailWithError:(NSError*)error {
@@ -327,6 +327,9 @@
     CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: stream.streamId];
     [callbackResult setKeepCallbackAsBool:YES];
     NSString* streamDropCallback = [callbackList objectForKey:@"sessStreamDestroyed"];
+    if( [stream.connection.connectionId isEqualToString: session.connection.connectionId] ){
+        streamDropCallback = [callbackList objectForKey:@"pubStreamDestroyed"];
+    }
     [self.commandDelegate sendPluginResult:callbackResult callbackId:streamDropCallback];
 }
 

@@ -86,8 +86,23 @@ class TBPublisher
       height = DefaultHeight
     replaceWithVideoStream(@domId, PublisherStreamId, {width:width, height:height})
     position = getPosition(@domId)
+    @userHandlers = {}
     TBUpdateObjects()
+    Cordova.exec(@streamCreatedHandler, TBSuccess, OTPlugin, "addEvent", ["pubStreamCreated"] )
+    Cordova.exec(@streamDestroyedHandler, TBError, OTPlugin, "addEvent", ["pubStreamDestroyed"] )
     Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo] )
+  streamCreatedHandler: (response) =>
+    pdebug "publisher streamCreatedHandler", response
+    arr = response.split(' ')
+    stream = new TBStream( arr[0], arr[1] )
+    for e in @userHandlers["streamCreated"]
+      e( {streams:[stream.toJSON()], stream: stream.toJSON()} )
+    return @
+  streamDestroyedHandler: (response) =>
+    for e in @userHandlers["streamDestroyed"]
+      e( {streams:[stream.toJSON()], stream: stream.toJSON()} )
+    return @
+
   destroy: ->
     Cordova.exec(TBSuccess, TBError, OTPlugin, "destroyPublisher", [] )
   getImgData: ->
@@ -98,13 +113,11 @@ class TBPublisher
     #todo
     return @
   on: ( event, handler ) ->
-    if(event=="streamCreated")
-      #todo
-      return @
-    if(event=="streamDestroyed")
-#     Todo: ability to retain the publisher in HTML DOM (for reuse) by calling event.preventDefault()
-      return @
-    # other events: accessAllowed, accessDenied, accessDialogClosed, accessDialogOpened
+    pdebug "adding event handlers", @userHandlers
+    if @userHandlers[event]?
+      @userHandlers[event].push( handler )
+    else
+      @userHandlers[event] = [handler]
     return @
   publishAudio: (state) ->
     @publishMedia( "publishAudio", state )

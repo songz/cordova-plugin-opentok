@@ -354,10 +354,6 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
   @Override
     public void onSessionReceivedStream(Stream stream) {
       Log.i(TAG, "stream received");
-      if( stream.getConnection().getConnectionId().equalsIgnoreCase( mSession.getConnection().getConnectionId() )){
-        return;
-      }
-
       //        JSONArray message = new JSONArray();
       //        message.put( stream.getConnection().getConnectionId() );
       //        message.put( stream.getStreamId() );
@@ -370,7 +366,11 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
       //myEventListeners.get("streamCreated").( message );
       PluginResult myResult = new PluginResult(PluginResult.Status.OK, message);
       myResult.setKeepCallback(true);
-      myEventListeners.get("sessStreamCreated").sendPluginResult(myResult);
+      if( stream.getConnection().getConnectionId().equalsIgnoreCase( mSession.getConnection().getConnectionId() )){
+        myEventListeners.get("pubStreamCreated").sendPluginResult(myResult);
+      }else{
+        myEventListeners.get("sessStreamCreated").sendPluginResult(myResult);
+      }
     }
 
   @Override
@@ -393,6 +393,9 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
         
         PluginResult myResult = new PluginResult(PluginResult.Status.OK, stream.getStreamId());
         myResult.setKeepCallback(true);
+        if( stream.getConnection().getConnectionId().equalsIgnoreCase( mSession.getConnection().getConnectionId() )){
+          streamDisconnectedCallback = myEventListeners.get( "pubStreamDestroyed" ); 
+        }
         streamDisconnectedCallback.sendPluginResult(myResult);
         Log.i(TAG, "stream disconnected callback sent");
         

@@ -56,6 +56,8 @@
 
   TBPublisher = (function() {
     function TBPublisher(one, two, three) {
+      this.streamDestroyedHandler = __bind(this.streamDestroyedHandler, this);
+      this.streamCreatedHandler = __bind(this.streamCreatedHandler, this);
       var height, name, position, publishAudio, publishVideo, width, zIndex, _ref, _ref1, _ref2;
       this.sanitizeInputs(one, two, three);
       pdebug("creating publisher", {});
@@ -84,9 +86,41 @@
         height: height
       });
       position = getPosition(this.domId);
+      this.userHandlers = {};
       TBUpdateObjects();
+      Cordova.exec(this.streamCreatedHandler, TBSuccess, OTPlugin, "addEvent", ["pubStreamCreated"]);
+      Cordova.exec(this.streamDestroyedHandler, TBError, OTPlugin, "addEvent", ["pubStreamDestroyed"]);
       Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo]);
     }
+
+    TBPublisher.prototype.streamCreatedHandler = function(response) {
+      var arr, e, stream, _i, _len, _ref;
+      pdebug("publisher streamCreatedHandler", response);
+      arr = response.split(' ');
+      stream = new TBStream(arr[0], arr[1]);
+      _ref = this.userHandlers["streamCreated"];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        e = _ref[_i];
+        e({
+          streams: [stream.toJSON()],
+          stream: stream.toJSON()
+        });
+      }
+      return this;
+    };
+
+    TBPublisher.prototype.streamDestroyedHandler = function(response) {
+      var e, _i, _len, _ref;
+      _ref = this.userHandlers["streamDestroyed"];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        e = _ref[_i];
+        e({
+          streams: [stream.toJSON()],
+          stream: stream.toJSON()
+        });
+      }
+      return this;
+    };
 
     TBPublisher.prototype.destroy = function() {
       return Cordova.exec(TBSuccess, TBError, OTPlugin, "destroyPublisher", []);
@@ -105,11 +139,11 @@
     };
 
     TBPublisher.prototype.on = function(event, handler) {
-      if (event === "streamCreated") {
-        return this;
-      }
-      if (event === "streamDestroyed") {
-        return this;
+      pdebug("adding event handlers", this.userHandlers);
+      if (this.userHandlers[event] != null) {
+        this.userHandlers[event].push(handler);
+      } else {
+        this.userHandlers[event] = [handler];
       }
       return this;
     };
