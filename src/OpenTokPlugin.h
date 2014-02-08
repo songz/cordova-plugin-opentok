@@ -12,13 +12,10 @@
 
 @interface OpenTokPlugin : CDVPlugin <OTSessionDelegate, OTPublisherDelegate, OTSubscriberDelegate>
 
-@property(nonatomic, copy) NSString* callbackID;
-@property(nonatomic, copy) NSString* streamCreatedId;
-@property(nonatomic, copy) NSString* streamDisconnectedId;
-@property(nonatomic, copy) NSString* sessionDisconnectedId;
 @property(nonatomic, copy) NSString* exceptionId;
 
 // Tokbox Library Functions
+- (void)addEvent:(CDVInvokedUrlCommand*)command;
 // TB
 - (void)initPublisher:(CDVInvokedUrlCommand*)command;
 -(void)initSession:(CDVInvokedUrlCommand*)command;
@@ -29,7 +26,6 @@
 - (void)destroy:(CDVInvokedUrlCommand*)command;
 
 // Session
--(void)streamCreatedHandler:(CDVInvokedUrlCommand*)command;
 -(void)connect:(CDVInvokedUrlCommand*)command;
 -(void)disconnect:(CDVInvokedUrlCommand*)command;
 - (void)publish:(CDVInvokedUrlCommand*)command;
@@ -37,9 +33,6 @@
 - (void)subscribe:(CDVInvokedUrlCommand*)command;
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command;
 
-// Listeners
--(void)streamDisconnectedHandler:(CDVInvokedUrlCommand*)command;
--(void)sessionDisconnectedHandler:(CDVInvokedUrlCommand*)command;
 -(void)exceptionHandler:(CDVInvokedUrlCommand*)command;
 
 // HouseKeeping
