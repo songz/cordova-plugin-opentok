@@ -189,16 +189,19 @@ class TBPublisher
 #     unpublish( publisher )
 #     unsubscribe( subscriber )
 class TBSession
-  connect: (apiKey, token, properties={}) =>
-    console.log("JS: Connect Called")
+  connect: (apiKey, token, properties={}) ->
+    pdebug "connect", properties
     @apiKey = apiKey
     @token = token
-    # ios: Set up key/token, and call _session connectWithApiKey
-    Cordova.exec(@sessionConnectedHandler, TBError, OTPlugin, "connect", [@apiKey, @token] )
-
-    # Housekeeping Listeners: Session needs to be removed from DOM after being created
-    Cordova.exec(@streamDisconnectedHandler, TBError, OTPlugin, "streamDisconnectedHandler", [] )
-    Cordova.exec(@sessionDisconnectedHandler, TBError, OTPlugin, "sessionDisconnectedHandler", [] )
+    Cordova.exec(@connectionCreatedHandler, TBError, OTPlugin, "addEvent", ["sessConnectionCreated"] )
+    Cordova.exec(@connectionDestroyedHandler, TBError, OTPlugin, "addEvent", ["sessConnectionDestroyed"] )
+    Cordova.exec(@sessionConnectedHandler, TBError, OTPlugin, "addEvent", ["sessSessionConnected"] )
+    Cordova.exec(@sessionDisconnectedHandler, TBError, OTPlugin, "addEvent", ["sessSessionDisconnected"] )
+    Cordova.exec(@streamCreatedHandler, TBSuccess, OTPlugin, "addEvent", ["sessStreamCreated"] )
+    Cordova.exec(@streamDestroyedHandler, TBError, OTPlugin, "addEvent", ["sessStreamDestroyed"] )
+    Cordova.exec(@streamPropertyChanged, TBError, OTPlugin, "addEvent", ["sessStreamPropertyChanged"] )
+    Cordova.exec(@signalReceived, TBError, OTPlugin, "addEvent", ["signalReceived"] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "connect", [@apiKey, @token] )
     return
   disconnect: () ->
     Cordova.exec(TBSuccess, TBError, OTPlugin, "disconnect", [] )
@@ -213,36 +216,12 @@ class TBSession
   off: (event, handler) ->
     return @
   on: (event, handler) ->
-    console.log("JS: Add Event Listener Called")
     # Set Handlers based on Events
-    # Events: sessionConnected, sessionDisconnected, streamCreated, streamDestroyed
-    switch event
-      when "sessionConnected"
-        # Parse information returned from iOS before calling handler
-        @sessionConnectedHandler = (event) =>
-          console.log "session connected"
-          @connection = event.connection
-          # When user first connect, there are no streams in the session
-          return handler(event)
-      when 'streamCreated'
-        # Parse information returned from iOS before calling handler
-        @streamCreatedHandler = (response) ->
-          arr = response.split(' ')
-          stream = new TBStream( arr[0], arr[1] )
-          return handler({streams:[stream.toJSON()], stream: stream.toJSON()})
-        # ios: After setting up function, set up listener in ios
-        Cordova.exec(@streamCreatedHandler, TBSuccess, OTPlugin, "streamCreatedHandler", [] )
-      when 'streamDestroyed'
-        # Parse information returned from iOS before calling handler
-        @streamDisconnectedHandler = (response) ->
-          console.log "streamDestroyedHandler "
-          arr = response.split(' ')
-          stream = new TBStream( arr[0], arr[1] )
-          return handler({streams:[stream.toJSON()], stream: stream.toJSON()})
-      when 'sessionDisconnected'
-        @sessionDisconnectedHandler = (event) =>
-          #@cleanUpDom()
-          return handler(event)
+    pdebug "adding event handlers", @userHandlers
+    if @userHandlers[event]?
+      @userHandlers[event].push( handler )
+    else
+      @userHandlers[event] = [handler]
 # todo - other events: connectionCreated, connectionDestroyed, signal?, streamPropertyChanged, signal:type?
   publish: (divName, properties) ->
     @publisher = new TBPublisher(divName, properties, @)
@@ -290,21 +269,46 @@ class TBSession
     return Cordova.exec(TBSuccess, TBError, OTPlugin, "unsubscribe", [subscriber.streamId] )
 
   constructor: (@sessionId) ->
+    @userHandlers = {}
     Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [@sessionId] )
   cleanUpDom: ->
     objects = document.getElementsByClassName('OT_root')
     for e in objects
       e.parentNode.removeChild(e)
-  sessionDisconnectedHandler: (event) ->
-    #@cleanUpDom()
-  streamDisconnectedHandler: (streamId) ->
-    pdebug "stream disconnected handler", streamId
+
+  # event listeners
+  streamDestroyedHandler: (streamId) ->
+    pdebug "streamDestroyedHandler", streamId
     element = streamElements[ streamId ]
     if(element)
       element.parentNode.removeChild(element)
       delete( streamElements[ streamId ] )
       TBUpdateObjects()
-    return
+    for e in @userHandlers["streamDestroyed"]
+      e(event)
+    return @
+  sessionConnectedHandler: (event) =>
+    pdebug "sessionConnectedHandler", event
+    pdebug "what is apiKey: #{@apiKey}", {}
+    pdebug "what is token: #{@token}", {}
+    pdebug "what is userHandlers", @userHandlers
+    @connection = event.connection
+    for e in @userHandlers["sessionConnected"]
+      e(event)
+    return @
+  streamCreatedHandler: (response) =>
+    pdebug "streamCreatedHandler", response
+    arr = response.split(' ')
+    stream = new TBStream( arr[0], arr[1] )
+    for e in @userHandlers["streamCreated"]
+      e( {streams:[stream.toJSON()], stream: stream.toJSON()} )
+    return @
+  sessionDisconnectedHandler: (event) =>
+    #@cleanUpDom()
+    for e in @userHandlers["sessionDisconnected"]
+      e( event )
+    return @
+
 
   # deprecating
   addEventListener: (event, handler) -> # deprecating soon

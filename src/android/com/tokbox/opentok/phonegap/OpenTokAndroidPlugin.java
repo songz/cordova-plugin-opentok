@@ -267,17 +267,12 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
         myPublisher.mPublisher.setPublishVideo( publishVideo );
         
       // session Methods
-      }else if( action.equals( "streamCreatedHandler" )){
-        Log.i( TAG, "Stream created handler");
-        myEventListeners.put("streamCreated", callbackContext);
+      }else if( action.equals( "addEvent" )){
+        Log.i( TAG, "adding new event - " + args.getString(0));
+        myEventListeners.put( args.getString(0), callbackContext);
       }else if( action.equals( "connect" )){
         Log.i( TAG, "connect command called");
         mSession.connect( args.getString(0), args.getString(1));
-        myEventListeners.put("connect", callbackContext);
-      }else if( action.equals( "streamDisconnectedHandler" )){
-        myEventListeners.put("streamDisconnectedHandler", callbackContext);
-      }else if( action.equals( "sessionDisconnectedHandler" )){
-
       }else if( action.equals( "disconnect" )){
 
       }else if( action.equals( "publish" )){
@@ -334,7 +329,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
         message.put("connection", connection);
       }catch (JSONException e) {}
 
-      myEventListeners.get("connect").success( message );
+      myEventListeners.get("sessSessionConnected").success( message );
     }
   public void onSessionDisconnected() {
     Log.i(TAG, "session disconnected.");
@@ -375,13 +370,13 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
       //myEventListeners.get("streamCreated").( message );
       PluginResult myResult = new PluginResult(PluginResult.Status.OK, message);
       myResult.setKeepCallback(true);
-      myEventListeners.get("streamCreated").sendPluginResult(myResult);
+      myEventListeners.get("sessStreamCreated").sendPluginResult(myResult);
     }
 
   @Override
     public void onSessionDroppedStream(Stream stream) {
       Log.i(TAG, "session dropped stream");
-      CallbackContext streamDisconnectedCallback = myEventListeners.get( "streamDisconnectedHandler" ); 
+      CallbackContext streamDisconnectedCallback = myEventListeners.get( "sessStreamDestroyed" ); 
       if( streamDisconnectedCallback != null ){
         Log.i(TAG, "dropped stream callback found");
 

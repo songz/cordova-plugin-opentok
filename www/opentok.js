@@ -201,12 +201,18 @@
       if (properties == null) {
         properties = {};
       }
-      console.log("JS: Connect Called");
+      pdebug("connect", properties);
       this.apiKey = apiKey;
       this.token = token;
-      Cordova.exec(this.sessionConnectedHandler, TBError, OTPlugin, "connect", [this.apiKey, this.token]);
-      Cordova.exec(this.streamDisconnectedHandler, TBError, OTPlugin, "streamDisconnectedHandler", []);
-      Cordova.exec(this.sessionDisconnectedHandler, TBError, OTPlugin, "sessionDisconnectedHandler", []);
+      Cordova.exec(this.connectionCreatedHandler, TBError, OTPlugin, "addEvent", ["sessConnectionCreated"]);
+      Cordova.exec(this.connectionDestroyedHandler, TBError, OTPlugin, "addEvent", ["sessConnectionDestroyed"]);
+      Cordova.exec(this.sessionConnectedHandler, TBError, OTPlugin, "addEvent", ["sessSessionConnected"]);
+      Cordova.exec(this.sessionDisconnectedHandler, TBError, OTPlugin, "addEvent", ["sessSessionDisconnected"]);
+      Cordova.exec(this.streamCreatedHandler, TBSuccess, OTPlugin, "addEvent", ["sessStreamCreated"]);
+      Cordova.exec(this.streamDestroyedHandler, TBError, OTPlugin, "addEvent", ["sessStreamDestroyed"]);
+      Cordova.exec(this.streamPropertyChanged, TBError, OTPlugin, "addEvent", ["sessStreamPropertyChanged"]);
+      Cordova.exec(this.signalReceived, TBError, OTPlugin, "addEvent", ["signalReceived"]);
+      Cordova.exec(TBSuccess, TBError, OTPlugin, "connect", [this.apiKey, this.token]);
     };
 
     TBSession.prototype.disconnect = function() {
@@ -234,41 +240,11 @@
     };
 
     TBSession.prototype.on = function(event, handler) {
-      var _this = this;
-      console.log("JS: Add Event Listener Called");
-      switch (event) {
-        case "sessionConnected":
-          return this.sessionConnectedHandler = function(event) {
-            console.log("session connected");
-            _this.connection = event.connection;
-            return handler(event);
-          };
-        case 'streamCreated':
-          this.streamCreatedHandler = function(response) {
-            var arr, stream;
-            arr = response.split(' ');
-            stream = new TBStream(arr[0], arr[1]);
-            return handler({
-              streams: [stream.toJSON()],
-              stream: stream.toJSON()
-            });
-          };
-          return Cordova.exec(this.streamCreatedHandler, TBSuccess, OTPlugin, "streamCreatedHandler", []);
-        case 'streamDestroyed':
-          return this.streamDisconnectedHandler = function(response) {
-            var arr, stream;
-            console.log("streamDestroyedHandler ");
-            arr = response.split(' ');
-            stream = new TBStream(arr[0], arr[1]);
-            return handler({
-              streams: [stream.toJSON()],
-              stream: stream.toJSON()
-            });
-          };
-        case 'sessionDisconnected':
-          return this.sessionDisconnectedHandler = function(event) {
-            return handler(event);
-          };
+      pdebug("adding event handlers", this.userHandlers);
+      if (this.userHandlers[event] != null) {
+        return this.userHandlers[event].push(handler);
+      } else {
+        return this.userHandlers[event] = [handler];
       }
     };
 
@@ -335,7 +311,10 @@
 
     function TBSession(sessionId) {
       this.sessionId = sessionId;
-      this.connect = __bind(this.connect, this);
+      this.sessionDisconnectedHandler = __bind(this.sessionDisconnectedHandler, this);
+      this.streamCreatedHandler = __bind(this.streamCreatedHandler, this);
+      this.sessionConnectedHandler = __bind(this.sessionConnectedHandler, this);
+      this.userHandlers = {};
       Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [this.sessionId]);
     }
 
@@ -350,17 +329,62 @@
       return _results;
     };
 
-    TBSession.prototype.sessionDisconnectedHandler = function(event) {};
-
-    TBSession.prototype.streamDisconnectedHandler = function(streamId) {
-      var element;
-      pdebug("stream disconnected handler", streamId);
+    TBSession.prototype.streamDestroyedHandler = function(streamId) {
+      var e, element, _i, _len, _ref;
+      pdebug("streamDestroyedHandler", streamId);
       element = streamElements[streamId];
       if (element) {
         element.parentNode.removeChild(element);
         delete streamElements[streamId];
         TBUpdateObjects();
       }
+      _ref = this.userHandlers["streamDestroyed"];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        e = _ref[_i];
+        e(event);
+      }
+      return this;
+    };
+
+    TBSession.prototype.sessionConnectedHandler = function(event) {
+      var e, _i, _len, _ref;
+      pdebug("sessionConnectedHandler", event);
+      pdebug("what is apiKey: " + this.apiKey, {});
+      pdebug("what is token: " + this.token, {});
+      pdebug("what is userHandlers", this.userHandlers);
+      this.connection = event.connection;
+      _ref = this.userHandlers["sessionConnected"];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        e = _ref[_i];
+        e(event);
+      }
+      return this;
+    };
+
+    TBSession.prototype.streamCreatedHandler = function(response) {
+      var arr, e, stream, _i, _len, _ref;
+      pdebug("streamCreatedHandler", response);
+      arr = response.split(' ');
+      stream = new TBStream(arr[0], arr[1]);
+      _ref = this.userHandlers["streamCreated"];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        e = _ref[_i];
+        e({
+          streams: [stream.toJSON()],
+          stream: stream.toJSON()
+        });
+      }
+      return this;
+    };
+
+    TBSession.prototype.sessionDisconnectedHandler = function(event) {
+      var e, _i, _len, _ref;
+      _ref = this.userHandlers["sessionDisconnected"];
+      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        e = _ref[_i];
+        e(event);
+      }
+      return this;
     };
 
     TBSession.prototype.addEventListener = function(event, handler) {
