@@ -228,13 +228,17 @@ class TBSession
     return @
   off: (event, handler) ->
     return @
-  on: (event, handler) ->
+  on: (one, two, three) =>
     # Set Handlers based on Events
     pdebug "adding event handlers", @userHandlers
-    if @userHandlers[event]?
-      @userHandlers[event].push( handler )
-    else
-      @userHandlers[event] = [handler]
+    if typeof( one ) == "object"
+      for k,v of one
+        @addEventHandlers( k, v )
+      return
+    if typeof( one ) == "string"
+      for e in one.split( ' ' )
+        @addEventHandlers( e, two )
+      return
 # todo - other events: connectionCreated, connectionDestroyed, signal?, streamPropertyChanged, signal:type?
   publish: (divName, properties) ->
     @publisher = new TBPublisher(divName, properties, @)
@@ -288,6 +292,13 @@ class TBSession
     objects = document.getElementsByClassName('OT_root')
     for e in objects
       e.parentNode.removeChild(e)
+  addEventHandlers: (event, handler) =>
+    pdebug "adding Event", event
+    if @userHandlers[event]?
+      @userHandlers[event].push( handler )
+    else
+      @userHandlers[event] = [handler]
+
 
   # event listeners
   streamDestroyedHandler: (streamId) ->
@@ -321,7 +332,6 @@ class TBSession
     for e in @userHandlers["sessionDisconnected"]
       e( event )
     return @
-
 
   # deprecating
   addEventListener: (event, handler) -> # deprecating soon

@@ -273,12 +273,22 @@
       return this;
     };
 
-    TBSession.prototype.on = function(event, handler) {
+    TBSession.prototype.on = function(one, two, three) {
+      var e, k, v, _i, _len, _ref;
       pdebug("adding event handlers", this.userHandlers);
-      if (this.userHandlers[event] != null) {
-        return this.userHandlers[event].push(handler);
-      } else {
-        return this.userHandlers[event] = [handler];
+      if (typeof one === "object") {
+        for (k in one) {
+          v = one[k];
+          this.addEventHandlers(k, v);
+        }
+        return;
+      }
+      if (typeof one === "string") {
+        _ref = one.split(' ');
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          e = _ref[_i];
+          this.addEventHandlers(e, two);
+        }
       }
     };
 
@@ -348,6 +358,8 @@
       this.sessionDisconnectedHandler = __bind(this.sessionDisconnectedHandler, this);
       this.streamCreatedHandler = __bind(this.streamCreatedHandler, this);
       this.sessionConnectedHandler = __bind(this.sessionConnectedHandler, this);
+      this.addEventHandlers = __bind(this.addEventHandlers, this);
+      this.on = __bind(this.on, this);
       this.userHandlers = {};
       Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [this.sessionId]);
     }
@@ -361,6 +373,15 @@
         _results.push(e.parentNode.removeChild(e));
       }
       return _results;
+    };
+
+    TBSession.prototype.addEventHandlers = function(event, handler) {
+      pdebug("adding Event", event);
+      if (this.userHandlers[event] != null) {
+        return this.userHandlers[event].push(handler);
+      } else {
+        return this.userHandlers[event] = [handler];
+      }
     };
 
     TBSession.prototype.streamDestroyedHandler = function(streamId) {
