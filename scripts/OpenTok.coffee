@@ -110,6 +110,11 @@ class TBPublisher
   getStyle: ->
     return {}
   off: ( event, handler ) ->
+    pdebug "removing event #{event}", @userHandlers
+    if @userHandlers[event]?
+      @userHandlers[event] = @userHandlers[event].filter ( item, index ) ->
+        return item != handler
+    pdebug "removed handlers, resulting handlers:", @userHandlers
     #todo
     return @
   on: ( event, handler ) ->
@@ -226,8 +231,14 @@ class TBSession
     return @
   getSubscribersForStream: (stream) ->
     return @
-  off: (event, handler) ->
-    return @
+  off: (one, two, three) ->
+    if typeof( one ) == "object"
+      for k,v of one
+        @removeEventHandler( k, v )
+      return
+    if typeof( one ) == "string"
+      for e in one.split( ' ' )
+        @removeEventHandler( e, two )
   on: (one, two, three) =>
     # Set Handlers based on Events
     pdebug "adding event handlers", @userHandlers
@@ -298,6 +309,15 @@ class TBSession
       @userHandlers[event].push( handler )
     else
       @userHandlers[event] = [handler]
+  removeEventHandler: (event, handler) =>
+    pdebug "removing event #{event}", @userHandlers
+    if not handler?
+      delete @userHandlers[event]
+    else
+      if @userHandlers[event]?
+        @userHandlers[event] = @userHandlers[event].filter ( item, index ) ->
+          return item != handler
+    return @
 
 
   # event listeners

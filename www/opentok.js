@@ -135,6 +135,13 @@
     };
 
     TBPublisher.prototype.off = function(event, handler) {
+      pdebug("removing event " + event, this.userHandlers);
+      if (this.userHandlers[event] != null) {
+        this.userHandlers[event] = this.userHandlers[event].filter(function(item, index) {
+          return item !== handler;
+        });
+      }
+      pdebug("removed handlers, resulting handlers:", this.userHandlers);
       return this;
     };
 
@@ -269,8 +276,24 @@
       return this;
     };
 
-    TBSession.prototype.off = function(event, handler) {
-      return this;
+    TBSession.prototype.off = function(one, two, three) {
+      var e, k, v, _i, _len, _ref, _results;
+      if (typeof one === "object") {
+        for (k in one) {
+          v = one[k];
+          this.removeEventHandler(k, v);
+        }
+        return;
+      }
+      if (typeof one === "string") {
+        _ref = one.split(' ');
+        _results = [];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          e = _ref[_i];
+          _results.push(this.removeEventHandler(e, two));
+        }
+        return _results;
+      }
     };
 
     TBSession.prototype.on = function(one, two, three) {
@@ -358,6 +381,7 @@
       this.sessionDisconnectedHandler = __bind(this.sessionDisconnectedHandler, this);
       this.streamCreatedHandler = __bind(this.streamCreatedHandler, this);
       this.sessionConnectedHandler = __bind(this.sessionConnectedHandler, this);
+      this.removeEventHandler = __bind(this.removeEventHandler, this);
       this.addEventHandlers = __bind(this.addEventHandlers, this);
       this.on = __bind(this.on, this);
       this.userHandlers = {};
@@ -382,6 +406,20 @@
       } else {
         return this.userHandlers[event] = [handler];
       }
+    };
+
+    TBSession.prototype.removeEventHandler = function(event, handler) {
+      pdebug("removing event " + event, this.userHandlers);
+      if (handler == null) {
+        delete this.userHandlers[event];
+      } else {
+        if (this.userHandlers[event] != null) {
+          this.userHandlers[event] = this.userHandlers[event].filter(function(item, index) {
+            return item !== handler;
+          });
+        }
+      }
+      return this;
     };
 
     TBSession.prototype.streamDestroyedHandler = function(streamId) {
