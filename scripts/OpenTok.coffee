@@ -72,12 +72,14 @@ class TBPublisher
     name="TBNameHolder"
     publishAudio="true"
     publishVideo="true"
+    cameraName = "front"
     zIndex = TBGetZIndex(document.getElementById(@domId))
 
     if @properties?
       width = @properties.width ? position.width
       height = @properties.height ? position.height
       name = @properties.name ? "TBNameHolder"
+      cameraName = @properties.cameraName ? "front"
       if(@properties.publishAudio? and @properties.publishAudio==false)
         publishAudio="false"
       if(@properties.publishVideo? and @properties.publishVideo==false)
@@ -91,7 +93,7 @@ class TBPublisher
     TBUpdateObjects()
     Cordova.exec(@streamCreatedHandler, TBSuccess, OTPlugin, "addEvent", ["pubStreamCreated"] )
     Cordova.exec(@streamDestroyedHandler, TBError, OTPlugin, "addEvent", ["pubStreamDestroyed"] )
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName] )
   streamCreatedHandler: (response) =>
     pdebug "publisher streamCreatedHandler", response
     arr = response.split( StringSplitter )

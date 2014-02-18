@@ -60,18 +60,20 @@
     function TBPublisher(one, two, three) {
       this.streamDestroyedHandler = __bind(this.streamDestroyedHandler, this);
       this.streamCreatedHandler = __bind(this.streamCreatedHandler, this);
-      var height, name, position, publishAudio, publishVideo, width, zIndex, _ref, _ref1, _ref2;
+      var cameraName, height, name, position, publishAudio, publishVideo, width, zIndex, _ref, _ref1, _ref2, _ref3;
       this.sanitizeInputs(one, two, three);
       pdebug("creating publisher", {});
       position = getPosition(this.domId);
       name = "TBNameHolder";
       publishAudio = "true";
       publishVideo = "true";
+      cameraName = "front";
       zIndex = TBGetZIndex(document.getElementById(this.domId));
       if (this.properties != null) {
         width = (_ref = this.properties.width) != null ? _ref : position.width;
         height = (_ref1 = this.properties.height) != null ? _ref1 : position.height;
         name = (_ref2 = this.properties.name) != null ? _ref2 : "TBNameHolder";
+        cameraName = (_ref3 = this.properties.cameraName) != null ? _ref3 : "front";
         if ((this.properties.publishAudio != null) && this.properties.publishAudio === false) {
           publishAudio = "false";
         }
@@ -92,7 +94,7 @@
       TBUpdateObjects();
       Cordova.exec(this.streamCreatedHandler, TBSuccess, OTPlugin, "addEvent", ["pubStreamCreated"]);
       Cordova.exec(this.streamDestroyedHandler, TBError, OTPlugin, "addEvent", ["pubStreamDestroyed"]);
-      Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo]);
+      Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName]);
     }
 
     TBPublisher.prototype.streamCreatedHandler = function(response) {

@@ -133,6 +133,13 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
       if( mPublisher == null ){
         ViewGroup frame = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
         mPublisher = Publisher.newInstance(cordova.getActivity().getApplicationContext(), this, null);
+        try{
+          if( this.mProperty.getString(8) != null && !(this.mProperty.getString(8).equalsIgnoreCase("front") ) ){
+            mPublisher.swapCamera();
+          }
+        }catch( Exception e ){
+          Log.i(TAG, "error when trying to retrieve cameraName property");
+        }
         this.mView = mPublisher.getView();
         frame.addView( this.mView );
         mSession.publish(mPublisher);
