@@ -357,9 +357,15 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
       //        JSONArray message = new JSONArray();
       //        message.put( stream.getConnection().getConnectionId() );
       //        message.put( stream.getStreamId() );
-      String message = stream.getConnection().getConnectionId() + " " +stream.getStreamId() ; 
+      String message = stream.getConnection().getConnectionId() + "$2#9$" 
+          +stream.getStreamId() + "$2#9$"
+          +stream.getName() + "$2#9$" 
+          + (stream.hasAudio() ? "T" : "F") + "$2#9$"
+          + (stream.hasVideo() ? "T" : "F") + "$2#9$"
+          + stream.getCreationTime() + "$2#9$" ;
 
       Log.i(TAG, "stream array ready, returning: " + message.toString() );
+      Log.i(TAG, "stream name: " + stream.getName() );
 
       streamCollection.put(stream.getStreamId(), stream);
       //        myEventListeners.get("streamCreated").success( message );
