@@ -85,6 +85,10 @@
     if (zIndex>0) {
         _publisher.view.layer.zPosition = zIndex;
     }
+    NSString* cameraPosition = [command.arguments objectAtIndex:8];
+    if ([cameraPosition isEqualToString:@"back"]) {
+        _publisher.cameraPosition = AVCaptureDevicePositionBack;
+    }
     
     // Return to Javascript
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
