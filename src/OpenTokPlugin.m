@@ -282,7 +282,7 @@
     [streamDictionary setObject:stream forKey:stream.streamId];
     
     // Set up result, trigger JS event handler
-    NSString* result = [[NSString alloc] initWithFormat:@"%@ %@", stream.connection.connectionId, stream.streamId];
+    NSString* result = [[NSString alloc] initWithFormat:@"%@$2#9$%@$2#9$%@$2#9$%@$2#9$%@$2#9$%@", stream.connection.connectionId, stream.streamId, stream.name, (stream.hasAudio ? @"T" : @"F"), (stream.hasVideo ? @"T" : @"F"), stream.creationTime];
     CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: result];
     [callbackResult setKeepCallbackAsBool:YES];
     //[self.commandDelegate [callbackResult toSuccessCallbackString:self.streamCreatedId];

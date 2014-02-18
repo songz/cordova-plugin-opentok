@@ -4,6 +4,7 @@ PublisherStreamId = "TBPublisher"
 PublisherTypeClass = "OT_publisher"
 SubscriberTypeClass = "OT_subscriber"
 VideoContainerClass = "OT_video-container"
+StringSplitter = "$2#9$"
 
 DefaultWidth = 264
 DefaultHeight = 198
@@ -76,7 +77,7 @@ class TBPublisher
     if @properties?
       width = @properties.width ? position.width
       height = @properties.height ? position.height
-      name = @properties.name ? ""
+      name = @properties.name ? "TBNameHolder"
       if(@properties.publishAudio? and @properties.publishAudio==false)
         publishAudio="false"
       if(@properties.publishVideo? and @properties.publishVideo==false)
@@ -93,8 +94,8 @@ class TBPublisher
     Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo] )
   streamCreatedHandler: (response) =>
     pdebug "publisher streamCreatedHandler", response
-    arr = response.split(' ')
-    stream = new TBStream( arr[0], arr[1] )
+    arr = response.split( StringSplitter )
+    stream = new TBStream( arr )
     for e in @userHandlers["streamCreated"]
       e( {streams:[stream.toJSON()], stream: stream.toJSON()} )
     return @
@@ -342,8 +343,8 @@ class TBSession
     return @
   streamCreatedHandler: (response) =>
     pdebug "streamCreatedHandler", response
-    arr = response.split(' ')
-    stream = new TBStream( arr[0], arr[1] )
+    arr = response.split( StringSplitter )
+    stream = new TBStream( arr )
     for e in @userHandlers["streamCreated"]
       e( {streams:[stream.toJSON()], stream: stream.toJSON()} )
     return @
@@ -436,16 +437,23 @@ class TBSubscriber
 #     videoDimensions( Object ) - width and height, numbers
 #     name( String ) - name of the stream
 class TBStream
-  constructor: ( connectionId, @streamId ) ->
-    @connection = new TBConnection( connectionId )
-    @creationTime = 0
-    @hasAudio = true
-    @hasVideo = true
+  constructor: ( props ) ->
+    pdebug "stream object being created with data:", props
+    @connection = new TBConnection( props[0] )
+    @streamId = props[1]
+    @name = props[2]
+    @hasAudio = if props[3]== "T" then true else false
+    @hasVideo = if props[4]== "T" then true else false
+    @creationTime = props[5]
     @videoDimensions = {width: 0, height: 0}
-    @name = ""
   toJSON: ->
     return {
       streamId: @streamId
+      name: @name
+      hasAudio: @hasAudio
+      hasVideo: @hasVideo
+      creationTime: @creationTime
+      connection: @connection.toJSON()
     }
 
 # Connection Object:
@@ -456,6 +464,10 @@ class TBStream
 class TBConnection
   constructor: (@connectionId) ->
     return
+  toJSON: ->
+    return {
+      connectionId: @connectionId
+    }
 
 
 streamElements = {} # keep track of DOM elements for each stream
