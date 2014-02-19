@@ -1,4 +1,4 @@
-package com.tokbox.opentok.phonegap;
+package com.tokbox.opentok.cordova;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -221,7 +221,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
       _cordova = cordova;
       _webView = webView;
       Log.d(TAG, "Initialize Plugin");
-      // By default, get a pointer to mainView and add mainView to the viewList as it always exists (hold phonegap's view)
+      // By default, get a pointer to mainView and add mainView to the viewList as it always exists (hold cordova's view)
       if (!viewList.has("mainView")) {
         // Cordova view is not in the viewList so add it.
         try {
@@ -406,8 +406,10 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
         
         PluginResult myResult = new PluginResult(PluginResult.Status.OK, stream.getStreamId());
         myResult.setKeepCallback(true);
-        if( stream.getConnection().getConnectionId().equalsIgnoreCase( mSession.getConnection().getConnectionId() )){
-          streamDisconnectedCallback = myEventListeners.get( "pubStreamDestroyed" ); 
+        if( stream.getConnection() != null ){
+          if( stream.getConnection().getConnectionId().equalsIgnoreCase( mSession.getConnection().getConnectionId() )){
+            streamDisconnectedCallback = myEventListeners.get( "pubStreamDestroyed" ); 
+          }
         }
         streamDisconnectedCallback.sendPluginResult(myResult);
         Log.i(TAG, "stream disconnected callback sent");

@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-    id="com.tokbox.opentok.phonegap.OpenTokPlugin"
+    id="com.tokbox.opentok.cordova.OpenTokPlugin"
     version="1.0.2">
 
-    <name>OpenTok PhoneGap Plugin</name>
-    <description>Add live video streaming to your PhoneGap Application</description>
+    <name>OpenTok Cordova Plugin</name>
+    <description>Add live video streaming to your Cordova Application</description>
     <license>Apache 2.0</license>
     <keywords>opentok,tokbox</keywords>
 
     <platform name="android">
       <asset src="www/opentok.js" target="opentok.js" />
 
-      <source-file src="src/android/com/tokbox/opentok/phonegap/OpenTokAndroidPlugin.java"
-        target-dir="src/com/tokbox/opentok/phonegap/" />
+      <source-file src="src/android/com/tokbox/opentok/cordova/OpenTokAndroidPlugin.java"
+        target-dir="src/com/tokbox/opentok/cordova/" />
 
       <config-file target="AndroidManifest.xml" parent="/manifest">
         <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="19" />
@@ -30,7 +30,7 @@
 
       <config-file target="config.xml" parent="/*">
         <feature name="OpenTokPlugin">
-          <param name="android-package" value="com.tokbox.opentok.phonegap.OpenTokAndroidPlugin"/>
+          <param name="android-package" value="com.tokbox.opentok.cordova.OpenTokAndroidPlugin"/>
         </feature>
       </config-file>
       
