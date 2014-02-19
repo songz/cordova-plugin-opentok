@@ -385,6 +385,7 @@
       this.sessionDisconnectedHandler = __bind(this.sessionDisconnectedHandler, this);
       this.streamCreatedHandler = __bind(this.streamCreatedHandler, this);
       this.sessionConnectedHandler = __bind(this.sessionConnectedHandler, this);
+      this.streamDestroyedHandler = __bind(this.streamDestroyedHandler, this);
       this.removeEventHandler = __bind(this.removeEventHandler, this);
       this.addEventHandlers = __bind(this.addEventHandlers, this);
       this.on = __bind(this.on, this);
@@ -435,10 +436,12 @@
         delete streamElements[streamId];
         TBUpdateObjects();
       }
-      _ref = this.userHandlers["streamDestroyed"];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        e = _ref[_i];
-        e(event);
+      if (this.userHandlers["streamDestroyed"]) {
+        _ref = this.userHandlers["streamDestroyed"];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          e = _ref[_i];
+          e(event);
+        }
       }
       return this;
     };

@@ -324,15 +324,16 @@ class TBSession
 
 
   # event listeners
-  streamDestroyedHandler: (streamId) ->
+  streamDestroyedHandler: (streamId) =>
     pdebug "streamDestroyedHandler", streamId
     element = streamElements[ streamId ]
     if(element)
       element.parentNode.removeChild(element)
       delete( streamElements[ streamId ] )
       TBUpdateObjects()
-    for e in @userHandlers["streamDestroyed"]
-      e(event)
+    if @userHandlers["streamDestroyed"]
+      for e in @userHandlers["streamDestroyed"]
+        e(event)
     return @
   sessionConnectedHandler: (event) =>
     pdebug "sessionConnectedHandler", event
