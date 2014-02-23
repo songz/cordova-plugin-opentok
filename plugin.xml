@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
-    id="com.tokbox.opentok.cordova.OpenTokPlugin"
+    id="com.tokbox.cordova.opentok"
     version="1.0.2">
 
     <name>OpenTok Cordova Plugin</name>
@@ -11,8 +11,8 @@
     <platform name="android">
       <asset src="www/opentok.js" target="opentok.js" />
 
-      <source-file src="src/android/com/tokbox/opentok/cordova/OpenTokAndroidPlugin.java"
-        target-dir="src/com/tokbox/opentok/cordova/" />
+      <source-file src="src/android/com/tokbox/cordova/OpenTokAndroidPlugin.java"
+        target-dir="src/com/tokbox/cordova/" />
 
       <config-file target="AndroidManifest.xml" parent="/manifest">
         <uses-sdk android:minSdkVersion="11" android:targetSdkVersion="19" />
@@ -30,7 +30,7 @@
 
       <config-file target="config.xml" parent="/*">
         <feature name="OpenTokPlugin">
-          <param name="android-package" value="com.tokbox.opentok.cordova.OpenTokAndroidPlugin"/>
+          <param name="android-package" value="com.tokbox.cordova.OpenTokAndroidPlugin"/>
         </feature>
       </config-file>
       

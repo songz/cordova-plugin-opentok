@@ -1,4 +1,4 @@
-package com.tokbox.opentok.cordova;
+package com.tokbox.cordova;
 
 import java.util.ArrayList;
 import java.util.Collections;
