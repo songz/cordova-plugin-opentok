@@ -213,6 +213,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
     @Override
       public void onSubscriberConnected(Subscriber subscriber) {
         Log.i(TAG, "subscriber is connected");
+        this.run();
       }
   }
 
