@@ -56,7 +56,7 @@ To view and interact with elements on the browser console, use [weinre](http://p
 ## Sample code
 Located in `example/www`. To see the interop between mobile and web, simply deploy to your device and visit https://opentokrtc.com/cordova on your browser. 
 
-All of the code resides in `example/www/index.html` and `example/www/js/index.js`  
+All of the code resides in `example/www/index.html` and `example/www/js/index.js`. You need `example/www/js/jquery.js` to get your example to run.  
 
 Have Fun!
 
