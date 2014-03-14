@@ -18,8 +18,9 @@ Clone this repo to get the source code for OpenTok's Cordova plugin
 3a. For **Android Apps**, add Android platform into your cordova app
 `cordova platform add android`
 
-3b. For **iOS Apps**, add iOS platform into your cordova app
-`cordova platform add ios`
+3b. For **iOS Apps**, add iOS platform into your cordova app  
+`cordova platform add ios`  
+  iOS deloyment, as of March 14, needs additional setup. See [FAQ/Troubleshoot](https://github.com/songz/cordova-plugin-opentok#faq-troubleshoot-guide).
 
 4. Edit your code in the created `www` folder
 
@@ -72,6 +73,17 @@ Have Fun!
   * If you have the previous version, please remove it: `cordova plugin remove com.tokbox.opentok.cordova.OpenTokPlugin` 
 
 ----
+
+## FAQ TROUBLESHOOT GUIDE:
+* Xcode 5.1 and Cordova iOS not working
+  * [Solution at Cordova](http://shazronatadobe.wordpress.com/2014/03/12/xcode-5-1-and-cordova-ios/)
+* Building ios project gives **Apple Mach-O Linker Errors** that looks like this: ![Building ios project, linker errors](https://f.cloud.github.com/assets/5085574/2421687/5c826df2-ab85-11e3-9a6a-7e8994b37b62.png)
+  * Solution: Go to project settings and change 'Build Active Architecture Only' to NO. ![change build active architecture in project settings](https://f.cloud.github.com/assets/686933/2426659/c6b957a0-abc9-11e3-9ade-cf74e64e9e0c.png)
+* The provided sample code works, but how do I use my own credentials?
+  * Replace data.apiKey, data.sid, data.token with your own apiKey, sessionId, token, respectively.
+* How do I generate a sessionId or a Token? 
+  * You can generate sessionId and its corresponding tokens manually from your [dashboard](https://dashboard.tokbox.com/)  
+  * [Tutorials on how to generate sessionId and Token programmatically](http://www.tokbox.com/blog/getting-started-demo-apps/)
 
 License
 ===
