@@ -4,7 +4,7 @@ Cordova Plugin for OpenTok iOS
 Weave video chat into your web (and now mobile!) application.
 
 ## Using Cordova CLI
-**Make sure You have Cordova 3.3 Installed** If you haven't, view [Cordova instructions](http://cordova.apache.org/docs/en/3.3.0/guide_cli_index.md.html) Page.  
+**Make sure You have Cordova 3.4 Installed** If you haven't, view [Cordova instructions](http://cordova.apache.org/docs/en/3.4.0/guide_cli_index.md.html) Page.  
 Clone this repo to get the source code for OpenTok's Cordova plugin
 
 1. Create a Cordova app by typing into Terminal:  
@@ -12,8 +12,8 @@ Clone this repo to get the source code for OpenTok's Cordova plugin
 
 2. Install OpenTok plugin into your app:
 `cd my-app`  
-`cordova plugin add path/to/Opentok's/CordovaPlugin/that/you/cloned`  
-> Plugin already exists? To remove OpenTokPlugin: `cordova plugin remove com.tokbox.opentok.cordova.OpenTokPlugin`
+`cordova plugin add https://github.com/songz/cordova-plugin-opentok/`  
+> Plugin already exists? To remove OpenTokPlugin: `cordova plugin remove com.tokbox.cordova.opentok`
 
 3a. For **Android Apps**, add Android platform into your cordova app
 `cordova platform add android`
@@ -43,7 +43,6 @@ All JavaScript code should be written in `deviceready` function in */js/index.js
 
     deviceready: function() {
         // Do Your Stuff Here!
-        app.report('deviceready');
     },
 
 To view and interact with elements on the browser console, use [weinre](http://people.apache.org/~pmuellr/weinre/docs/latest/). Here's a few things to take note of if you are using weinre on a local network:
@@ -54,9 +53,9 @@ To view and interact with elements on the browser console, use [weinre](http://p
 ---
 
 ## Sample code
-Located in `example/www`. To see the interop between mobile and web, simply deploy to your device and visit https://opentokrtc.com/cordova on your browser. 
+Located in `example/www`. To see the interop between mobile and web, simply deploy to your device and visit `https://opentokrtc.com/cordova` on your browser. 
 
-All of the code resides in `example/www/index.html` and `example/www/js/index.js`. You need `example/www/js/jquery.js` to get your example to run.  
+All of the code resides in `example/www/index.html` and `example/www/js/index.js`.  
 
 Have Fun!
 
@@ -67,18 +66,17 @@ Have Fun!
 ----
 
 ## Updates:
-### Feb 19 -
-* Renamed namespace to com.tokbox.opentok.cordova.OpenTokPlugin
-> * If you have the previous version, please remove it: `cordova plugin remove com.tokbox.opentok.phonegap.OpenTokPlugin`
-### Feb 3 -
-* after installing plugin, the path to include opentok.js is no longer js/opentok.js
+### March 14 -
+* Removed jquery dependency on sample code  
+* Renamed namespace to `com.tokbox.cordova.opentok`  
+  * If you have the previous version, please remove it: `cordova plugin remove com.tokbox.opentok.cordova.OpenTokPlugin` 
 
 ----
 
 License
 ===
 
-Copyright (c) 2012 TokBox, Inc.
+Copyright (c) 2014 TokBox, Inc.
 
 Permission is hereby granted, free of charge, to any person obtaining a copy of this software and associated documentation files (the "Software"), to deal in the Software without restriction, including without limitation the rights to use, copy, modify, merge, publish, distribute, sublicense, and/or sell copies of the Software, and to permit persons to whom the Software is furnished to do so, subject to the following conditions:
 
