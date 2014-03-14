@@ -34,7 +34,18 @@ var app = {
   // The scope of 'this' is the event. In order to call the 'receivedEvent'
   // function, we must explicity call 'app.receivedEvent(...);'
   onDeviceReady: function() {
-    $.get("https://opentokrtc.com/cordova.json", function( data ){
+
+      // Getting OpenTokRTC's room's credentials. 
+      // To use your own room in opentokrtc, change cordova to room of your choice
+      //   -> ie: https://opentokrtc.com/myroom.json
+      // To use your own credentials
+      //  replace data.apiKey, data.sid, and data.token with your own 
+      var xmlhttp=new XMLHttpRequest();
+      xmlhttp.open("GET", "https://opentokrtc.com/cordova.json", false);
+      xmlhttp.send();
+      var data = JSON.parse( xmlhttp.response );
+
+      // Very simple OpenTok Code
       var publisher = TB.initPublisher(data.apiKey,'myPublisherDiv');
 
       var session = TB.initSession( data.sid ); 
@@ -50,7 +61,7 @@ var app = {
         }
       });
       session.connect( data.apiKey, data.token );
-    });
+
   },
   // Update DOM on a Received Event
   receivedEvent: function(id) {
