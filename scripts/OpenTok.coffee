@@ -327,6 +327,11 @@ class TBSession
   streamDestroyedHandler: (streamId) =>
     pdebug "streamDestroyedHandler", streamId
     element = streamElements[ streamId ]
+    stream = {streamId: streamId}
+    event = {
+      stream: stream,
+      streams: [stream]
+    }
     if(element)
       element.parentNode.removeChild(element)
       delete( streamElements[ streamId ] )
