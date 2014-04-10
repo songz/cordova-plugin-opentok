@@ -67,6 +67,8 @@ Have Fun!
 ----
 
 ## Updates:
+### April 10 - 
+* Upgraded to v2.2 for Android SDK and iOS SDK. Solves orientation and performance issues.
 ### March 14 -
 * Removed jquery dependency on sample code  
 * Renamed namespace to `com.tokbox.cordova.opentok`  
@@ -78,7 +80,9 @@ Have Fun!
 * Xcode 5.1 and Cordova iOS not working
   * [Solution at Cordova](http://shazronatadobe.wordpress.com/2014/03/12/xcode-5-1-and-cordova-ios/)
 * Building ios project gives **Apple Mach-O Linker Errors** that looks like this: ![Building ios project, linker errors](https://f.cloud.github.com/assets/5085574/2421687/5c826df2-ab85-11e3-9a6a-7e8994b37b62.png)
-  * Solution: Go to project settings and change 'Build Active Architecture Only' to NO. ![change build active architecture in project settings](https://f.cloud.github.com/assets/686933/2426659/c6b957a0-abc9-11e3-9ade-cf74e64e9e0c.png)
+  * Solution: 
+    * Go to project settings and change 'Build Active Architecture Only' to NO. 
+    * In the project settings, remove armv7s and arm64 from Valid Architectures   ![change build active architecture in project settings](https://cloud.githubusercontent.com/assets/686933/2671191/a30032de-c0d7-11e3-9b27-bd2ccfa7459c.png)
 * The provided sample code works, but how do I use my own credentials?
   * Replace data.apiKey, data.sid, data.token with your own apiKey, sessionId, token, respectively.
 * How do I generate a sessionId or a Token? 
