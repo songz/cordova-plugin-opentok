@@ -1,17 +1,14 @@
 //
-//  opentok_ios_sdk.h
-//  opentok-ios-sdk
+//  OpenTok.h
+//  OpenTok iOS SDK
 //
-//  Created by Charley Robinson on 10/21/11.
-//  Copyright (c) 2011 Tokbox, Inc. All rights reserved.
+//  Copyright (c) 2013 TokBox, Inc. All rights reserved.
 //
 
-@class OTPublisher, OTSession, OTSubscriber, OTConnection, OTStream, OTError, OTVideoView;
+#import <Foundation/Foundation.h>
+#import <UIKit/UIKit.h>
 
-#import "OTPublisher.h"
-#import "OTSession.h"
-#import "OTSubscriber.h"
-#import "OTStream.h"
-#import "OTConnection.h"
-#import "OTError.h"
-#import "OTVideoView.h"
+#import <OpenTok/OpenTokObjC.h>
+#import <OpenTok/OTPublisher.h>
+#import <OpenTok/OTSubscriber.h>
+#import <OpenTok/OTVideoView.h>

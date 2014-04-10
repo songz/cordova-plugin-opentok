@@ -10,7 +10,7 @@
 #import <UIKit/UIKit.h>
 #import <Opentok/Opentok.h>
 
-@interface OpenTokPlugin : CDVPlugin <OTSessionDelegate, OTPublisherDelegate, OTSubscriberDelegate>
+@interface OpenTokPlugin : CDVPlugin <OTSessionDelegate, OTPublisherDelegate, OTSubscriberKitDelegate>
 
 @property(nonatomic, copy) NSString* exceptionId;
 
@@ -44,5 +44,3 @@
 - (void)TBTesting:(CDVInvokedUrlCommand*)command;
 
 @end
-
-

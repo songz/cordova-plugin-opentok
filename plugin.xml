@@ -42,7 +42,6 @@
 
       <header-file src="src/ios/OpenTokPlugin.h" />
       <source-file src="src/ios/OpenTokPlugin.m" />
-      <resource-file src="src/ios/Opentok.framework/Resources/opentok.bundle" />
 
       <framework src="src/ios/Opentok.framework" custom="true" />
       <framework src="Foundation.framework" />
@@ -59,6 +58,8 @@
       <framework src="CoreTelephony.framework" />
       <framework src="libstdc++.6.0.9.dylib" />
       <framework src="libz.dylib" />
+      <framework src="libsqlite3.dylib" />
+      <framework src="libxml2.dylib" />
 
       <!-- Adopts project's config.xml to include the OpenTokPlugin and domain whitelists -->
       <config-file target="config.xml" parent="/*/plugins">

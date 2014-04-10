@@ -1,20 +1,18 @@
 //
 //  OTStream.h
-//  opentok-ios-sdk
 //
-//  Created by Charley Robinson on 11/2/11.
-//  Copyright (c) 2011 Tokbox, Inc. All rights reserved.
+//  Copyright (c) 2013 Tokbox, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <QuartzCore/QuartzCore.h>
 
-@class OTSession, OTConnection, Participant;
+@class OTSession, OTConnection;
 
 /**
  * An OTStream object represents a stream of multimedia, which may
  * contain video and/or audio data.
- * 
+ *
  * Use OTStream instances to initialize <OTSubscriber> interfaces. Do not
  * attempt to initialize an OTStream directly.
  */
@@ -27,7 +25,7 @@
  * You can compare this to to the <[OTSession connection]> property to see if the stream
  * is being published by the local device.
  */
-@property(readonly, strong) OTConnection* connection;
+@property(readonly) OTConnection* connection;
 
 /**
  * The session (an <OTSession> object) the stream is bound to.
@@ -37,7 +35,7 @@
 /**
  * The unique ID of the stream.
  */
-@property(readonly, strong) NSString* streamId;
+@property(readonly) NSString* streamId;
 
 /**
  * The type of the stream. This value can be `"basic"` or `"archive"`.
@@ -50,7 +48,7 @@
 /**
  * The timestamp for the creation of the stream on the OpenTok media server.
  */
-@property(readonly, strong) NSDate *creationTime;
+@property(readonly) NSDate *creationTime;
 
 /**
  * The name of the stream. In the OpenTok iOS SDK, you can specify a published stream's name
@@ -74,7 +72,7 @@
 
 /**
  * The current dimensions of the video media track on this stream. This property can change if a stream published from an
- * iOS device resizes, based on a change in the device orientation. When this occurs, the [OTSubscriberDelegate stream:didChangeVideoDimensions:] 
+ * iOS device resizes, based on a change in the device orientation. When this occurs, the [OTSubscriberKitDelegate stream:didChangeVideoDimensions:]
  * message is sent (for an OTSubscriber subscribing to the stream).
  *
  * This property is available for WebRTC only.

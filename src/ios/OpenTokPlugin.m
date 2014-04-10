@@ -45,7 +45,7 @@
     NSString* sessionId = [command.arguments objectAtIndex:0];
     
     // Create Session
-    _session = [[OTSession alloc] initWithSessionId:sessionId delegate:self];
+    _session = [[OTSession alloc] initWithApiKey:@"44443122" sessionId:sessionId delegate:self];
     
     // Initialize Dictionary, contains DOM info for every stream
     subscriberDictionary = [[NSMutableDictionary alloc] init];
@@ -161,7 +161,7 @@
     NSString* tbKey = [command.arguments objectAtIndex:0];
     NSString* tbToken = [command.arguments objectAtIndex:1];
     
-    [_session connectWithApiKey:tbKey token:tbToken];
+    [_session connectWithToken:tbToken error:nil];
 }
 
 // Called by session.disconnect()
@@ -202,7 +202,7 @@
     // Acquire Stream, then create a subscriber object and put it into dictionary
     OTStream* myStream = [streamDictionary objectForKey:sid];
     OTSubscriber* sub = [[OTSubscriber alloc] initWithStream:myStream delegate:self];
-    
+    [_session subscribe:sub error:nil];
     
     if ([[command.arguments objectAtIndex:6] isEqualToString:@"false"]) {
         [sub setSubscribeToAudio: NO];
@@ -223,14 +223,14 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
-// Called by session.subscribe(streamId, top, left)
+// Called by session.unsubscribe(streamId, top, left)
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command{
     NSLog(@"iOS unSubscribing to stream");
     //Get Parameters
     NSString* sid = [command.arguments objectAtIndex:0];
     OTSubscriber * subscriber = [subscriberDictionary objectForKey:sid];
-    [subscriber close];
-    subscriber = nil;
+    [_session unsubscribe:subscriber error:nil];
+    [subscriber.view removeFromSuperview];
     [subscriberDictionary removeObjectForKey:sid];
 }
 
@@ -240,11 +240,12 @@
 #pragma mark Subscriber Delegates
 /*** Subscriber Methods
  ****/
-- (void)subscriberDidConnectToStream:(OTSubscriber*)sub{
+- (void)subscriberDidConnectToStream:(OTSubscriberKit*)sub{
     NSLog(@"iOS Connected To Stream");
     
 }
-- (void)subscriber:(OTSubscriber*)subscrib didFailWithError:(NSError*)error{
+- (void)subscriber:(OTSubscriber*)subscrib didFailWithError:(OTError*)error{
+    NSLog(@"subscriber didFailWithError %@", error);
     CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: subscrib.stream.connection.connectionId];
     [callbackResult setKeepCallbackAsBool:YES];
     //    [self.commandDelegate [callbackResult toSuccessCallbackString:self.streamDisconnectedId]];
@@ -263,7 +264,7 @@
         connectionStatus = @"OTSessionConnectionStatusConnected";
     }else if (session.sessionConnectionStatus==OTSessionConnectionStatusConnecting) {
         connectionStatus = @"OTSessionConnectionStatusConnecting";
-    }else if (session.sessionConnectionStatus==OTSessionConnectionStatusDisconnected) {
+    }else if (session.sessionConnectionStatus==OTSessionConnectionStatusDisconnecting) {
         connectionStatus = @"OTSessionConnectionStatusDisconnected";
     }else{
         connectionStatus = @"OTSessionConnectionStatusFailed";
@@ -312,7 +313,19 @@
     NSString* sessionConnectCallback = [callbackList objectForKey:@"sessSessionConnected"];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:sessionConnectCallback];
 }
-- (void)session:(OTSession*)mySession didReceiveStream:(OTStream*)stream{
+
+- (void)  session:(OTSession *)session
+connectionCreated:(OTConnection *)connection
+{
+    NSLog(@"session connectionCreated (%@)", connection.connectionId);
+}
+
+- (void)    session:(OTSession *)session
+connectionDestroyed:(OTConnection *)connection
+{
+    NSLog(@"session connectionDestroyed (%@)", connection.connectionId);
+}
+- (void)session:(OTSession*)mySession streamCreated:(OTStream*)stream{
     NSLog(@"iOS Received Stream");
     
     // Store stream in streamDictionary, keeps track of available streams
@@ -329,7 +342,27 @@
     }
     [self.commandDelegate sendPluginResult:callbackResult callbackId:streamCreatedCallback];
 }
-- (void)session:(OTSession*)session didFailWithError:(NSError*)error {
+- (void)session:(OTSession*)session streamDestroyed:(OTStream *)stream{
+    NSLog(@"iOS Drop Stream");
+    //NSString* result = [[NSString alloc] initWithFormat:@"%@ %@", stream.connection.connectionId, stream.streamId];
+    //CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: result];
+    
+    OTSubscriber * subscriber = [subscriberDictionary objectForKey:stream.streamId];
+    if (subscriber) {
+        NSLog(@"subscriber found, unsubscribing");
+        [_session unsubscribe:subscriber error:nil];
+        [subscriber.view removeFromSuperview];
+        [subscriberDictionary removeObjectForKey:stream.streamId];
+    }
+    CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: stream.streamId];
+    [callbackResult setKeepCallbackAsBool:YES];
+    NSString* streamDropCallback = [callbackList objectForKey:@"sessStreamDestroyed"];
+    if( [stream.connection.connectionId isEqualToString: session.connection.connectionId] ){
+        streamDropCallback = [callbackList objectForKey:@"pubStreamDestroyed"];
+    }
+    [self.commandDelegate sendPluginResult:callbackResult callbackId:streamDropCallback];
+}
+- (void)session:(OTSession*)session didFailWithError:(OTError*)error {
     NSLog(@"Error: Session did not Connect");
     NSLog(@"Error: %@", error);
     NSNumber* code = [NSNumber numberWithInt:[error code]];
@@ -357,21 +390,17 @@
     NSString* sessionDisconnectedCallback = [callbackList objectForKey:@"sessSessionDisconnected"];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:sessionDisconnectedCallback];
 }
-- (void)session:(OTSession*)session didDropStream:(OTStream*)stream{
-    NSLog(@"iOS Drop Stream");
-    //NSString* result = [[NSString alloc] initWithFormat:@"%@ %@", stream.connection.connectionId, stream.streamId];
-    //CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: result];
-    CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: stream.streamId];
-    [callbackResult setKeepCallbackAsBool:YES];
-    NSString* streamDropCallback = [callbackList objectForKey:@"sessStreamDestroyed"];
-    if( [stream.connection.connectionId isEqualToString: session.connection.connectionId] ){
-        streamDropCallback = [callbackList objectForKey:@"pubStreamDestroyed"];
-    }
-    [self.commandDelegate sendPluginResult:callbackResult callbackId:streamDropCallback];
-}
 
 
 #pragma mark Publisher Delegates
+- (void)publisher:(OTPublisherKit *)publisher
+    streamCreated:(OTStream *)stream
+{
+}
+- (void)publisher:(OTPublisherKit*)publisher
+  streamDestroyed:(OTStream *)stream
+{
+}
 - (void)publisher:(OTPublisher*)publisher didFailWithError:(NSError*) error {
     NSLog(@"iOS Publisher didFailWithError");
     NSMutableDictionary* err = [[NSMutableDictionary alloc] init];
@@ -401,3 +430,4 @@
 
 
 @end
+

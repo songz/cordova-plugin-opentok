@@ -1,9 +1,7 @@
 //
 //  OTConnection.h
-//  opentok-ios-sdk
 //
-//  Created by Don Holly on 12/8/11.
-//  Copyright (c) 2011 TokBox, Inc. All rights reserved.
+//  Copyright (c) 2013 TokBox, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -27,13 +25,7 @@
  * The time at which the Connection was created on the OpenTok server.
  */
 @property(readonly) NSDate* creationTime;
-/**
-**
- * A string containing metadata describing the connection. When you generate a user token string,
- * pass the connection data string to the `generate_token()` method of the OpenTok server-side
- * library. For testing, you can also generate a token and define connection data the
- * [OpenTok dashboard](https://dashboard.tokbox.com/projects). For more information, see the
- * [Token Creation Overview](http://tokbox.com/opentok/tutorials/create-token/).
- */
-@property (readonly) NSString* data;
+
+@property(readonly) NSString* data;
+
 @end
