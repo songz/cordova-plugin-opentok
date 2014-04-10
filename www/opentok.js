@@ -26,8 +26,11 @@
     initPublisher: function(one, two, three) {
       return new TBPublisher(one, two, three);
     },
-    initSession: function(sid) {
-      return new TBSession(sid);
+    initSession: function(apiKey, sessionId) {
+      if (sessionId == null) {
+        this.showError("OT.initSession takes 2 parameters, your API Key and Session ID");
+      }
+      return new TBSession(apiKey, sessionId);
     },
     log: function(message) {
       return pdebug("TB LOG", message);
@@ -47,6 +50,9 @@
     },
     updateViews: function() {
       return TBUpdateObjects();
+    },
+    showError: function(a) {
+      return alert(a);
     },
     addEventListener: function(event, handler) {
       return this.on(event, handler);
@@ -242,13 +248,15 @@
   })();
 
   TBSession = (function() {
-    TBSession.prototype.connect = function(apiKey, token, properties) {
-      if (properties == null) {
-        properties = {};
-      }
-      pdebug("connect", properties);
-      this.apiKey = apiKey;
+    TBSession.prototype.connect = function(token, connectCompletionCallback) {
       this.token = token;
+      if (typeof connectCompletionCallback !== "function" && (connectCompletionCallback != null)) {
+        TB.showError("Session.connect() takes a token and an optional completionHandler");
+        return;
+      }
+      if ((connectCompletionCallback != null)) {
+        this.addEventHandlers("sessionConnected", connectCompletionCallback);
+      }
       Cordova.exec(this.connectionCreatedHandler, TBError, OTPlugin, "addEvent", ["sessConnectionCreated"]);
       Cordova.exec(this.connectionDestroyedHandler, TBError, OTPlugin, "addEvent", ["sessConnectionDestroyed"]);
       Cordova.exec(this.sessionConnectedHandler, TBError, OTPlugin, "addEvent", ["sessSessionConnected"]);
@@ -257,7 +265,7 @@
       Cordova.exec(this.streamDestroyedHandler, TBError, OTPlugin, "addEvent", ["sessStreamDestroyed"]);
       Cordova.exec(this.streamPropertyChanged, TBError, OTPlugin, "addEvent", ["sessStreamPropertyChanged"]);
       Cordova.exec(this.signalReceived, TBError, OTPlugin, "addEvent", ["signalReceived"]);
-      Cordova.exec(TBSuccess, TBError, OTPlugin, "connect", [this.apiKey, this.token]);
+      Cordova.exec(TBSuccess, TBError, OTPlugin, "connect", [this.token]);
     };
 
     TBSession.prototype.disconnect = function() {
@@ -380,7 +388,8 @@
       return Cordova.exec(TBSuccess, TBError, OTPlugin, "unsubscribe", [subscriber.streamId]);
     };
 
-    function TBSession(sessionId) {
+    function TBSession(apiKey, sessionId) {
+      this.apiKey = apiKey;
       this.sessionId = sessionId;
       this.sessionDisconnectedHandler = __bind(this.sessionDisconnectedHandler, this);
       this.streamCreatedHandler = __bind(this.streamCreatedHandler, this);
@@ -390,7 +399,7 @@
       this.addEventHandlers = __bind(this.addEventHandlers, this);
       this.on = __bind(this.on, this);
       this.userHandlers = {};
-      Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [this.sessionId]);
+      Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [this.apiKey, this.sessionId]);
     }
 
     TBSession.prototype.cleanUpDom = function() {

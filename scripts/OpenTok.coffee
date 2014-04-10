@@ -13,20 +13,22 @@ DefaultHeight = 198
 #   Methods: 
 #     TB.checkSystemRequirements() :number
 #     TB.initPublisher( apiKey:String [, replaceElementId:String] [, properties:Object] ):Publisher
-#     TB.initSession( sessionId:String [, production] ):Session 
+#     TB.initSession( apiKey, sessionId ):Session 
 #     TB.log( message )
 #     TB.off( type:String, listener:Function )
 #     TB.on( type:String, listener:Function )
 #  Methods that doesn't do anything:
 #     TB.setLogLevel(logLevel:String)
 #     TB.upgradeSystemRequirements()
+
 window.TB =
   checkSystemRequirements: ->
     return 1
   initPublisher: (one, two, three) ->
     return new TBPublisher( one, two, three )
-  initSession: (sid) ->
-    return new TBSession(sid)
+  initSession: (apiKey, sessionId ) ->
+    if( not sessionId? ) then @showError( "OT.initSession takes 2 parameters, your API Key and Session ID" )
+    return new TBSession(apiKey, sessionId)
   log: (message) ->
     pdebug "TB LOG", message
   off: (event, handler) ->
@@ -43,6 +45,8 @@ window.TB =
     TBUpdateObjects()
 
   # deprecating
+  showError: (a) ->
+    alert(a)
   addEventListener: (event, handler) ->
     @on( event, handler )
   removeEventListener: (type, handler ) ->
@@ -196,7 +200,7 @@ class TBPublisher
 #     connection ( Connection ) - connection property is only available once session object dispatches sessionConnected event
 #     sessionId ( String ) - session Id for this session
 #   Methods: 
-#     connect( apiKey, token )
+#     connect( token, completionHandler )
 #     disconnect()
 #     forceDisconnect( connection ) - forces a remote connection to leave the session
 #     forceUnpublish( stream ) - forces publisher of the spicified stream to stop publishing the stream
@@ -210,10 +214,11 @@ class TBPublisher
 #     unpublish( publisher )
 #     unsubscribe( subscriber )
 class TBSession
-  connect: (apiKey, token, properties={}) ->
-    pdebug "connect", properties
-    @apiKey = apiKey
-    @token = token
+  connect: (@token, connectCompletionCallback) ->
+    if( typeof(connectCompletionCallback) != "function" and connectCompletionCallback? )
+      TB.showError( "Session.connect() takes a token and an optional completionHandler" )
+      return
+    if( connectCompletionCallback? ) then @addEventHandlers( "sessionConnected", connectCompletionCallback )
     Cordova.exec(@connectionCreatedHandler, TBError, OTPlugin, "addEvent", ["sessConnectionCreated"] )
     Cordova.exec(@connectionDestroyedHandler, TBError, OTPlugin, "addEvent", ["sessConnectionDestroyed"] )
     Cordova.exec(@sessionConnectedHandler, TBError, OTPlugin, "addEvent", ["sessSessionConnected"] )
@@ -222,7 +227,7 @@ class TBSession
     Cordova.exec(@streamDestroyedHandler, TBError, OTPlugin, "addEvent", ["sessStreamDestroyed"] )
     Cordova.exec(@streamPropertyChanged, TBError, OTPlugin, "addEvent", ["sessStreamPropertyChanged"] )
     Cordova.exec(@signalReceived, TBError, OTPlugin, "addEvent", ["signalReceived"] )
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "connect", [@apiKey, @token] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "connect", [@token] )
     return
   disconnect: () ->
     Cordova.exec(TBSuccess, TBError, OTPlugin, "disconnect", [] )
@@ -299,9 +304,9 @@ class TBSession
       TBUpdateObjects()
     return Cordova.exec(TBSuccess, TBError, OTPlugin, "unsubscribe", [subscriber.streamId] )
 
-  constructor: (@sessionId) ->
+  constructor: (@apiKey, @sessionId) ->
     @userHandlers = {}
-    Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [@sessionId] )
+    Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [@apiKey, @sessionId] )
   cleanUpDom: ->
     objects = document.getElementsByClassName('OT_root')
     for e in objects

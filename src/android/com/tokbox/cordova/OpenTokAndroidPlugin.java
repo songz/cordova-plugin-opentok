@@ -34,6 +34,8 @@ import com.opentok.android.SubscriberKit;
 
 
 public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Listener{
+  private String apiKey;
+  private String sessionId;
   protected Session mSession;
   public static final String TAG = "OTPlugin";
   public boolean sessionConnected;
@@ -278,7 +280,8 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
 
       }else if( action.equals( "initSession" )){
         Log.i( TAG, "created new session with data: "+args.toString());
-        mSession = new Session(this.cordova.getActivity().getApplicationContext(), args.getString(0), this );
+        apiKey = args.getString(0);
+        mSession = new Session(this.cordova.getActivity().getApplicationContext(), args.getString(1), this );
       
       // publisher methods
       }else if( action.equals( "publishAudio") ){
@@ -304,7 +307,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
         myEventListeners.put( args.getString(0), callbackContext);
       }else if( action.equals( "connect" )){
         Log.i( TAG, "connect command called");
-        mSession.connect( args.getString(0), args.getString(1));
+        mSession.connect( apiKey, args.getString(0));
       }else if( action.equals( "disconnect" )){
 
       }else if( action.equals( "publish" )){

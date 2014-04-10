@@ -45,14 +45,11 @@ var app = {
       xmlhttp.send();
       var data = JSON.parse( xmlhttp.response );
 
-      // Very simple OpenTok Code
+      // Very simple OpenTok Code for group video chat
       var publisher = TB.initPublisher(data.apiKey,'myPublisherDiv');
 
-      var session = TB.initSession( data.sid ); 
+      var session = TB.initSession( data.apiKey, data.sid ); 
       session.on({
-        'sessionConnected': function( event ){
-          session.publish( publisher );
-        },
         'streamCreated': function( event ){
             var div = document.createElement('div');
             div.setAttribute('id', 'stream' + event.stream.streamId);
@@ -60,7 +57,9 @@ var app = {
             session.subscribe( event.stream, div.id, {subscribeToAudio: false} );
         }
       });
-      session.connect( data.apiKey, data.token );
+      session.connect(data.token, function(){
+        session.publish( publisher );
+      });
 
   },
   // Update DOM on a Received Event

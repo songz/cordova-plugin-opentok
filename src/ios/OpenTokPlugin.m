@@ -42,10 +42,11 @@
 // Called by TB.initsession()
 -(void)initSession:(CDVInvokedUrlCommand*)command{
     // Get Parameters
-    NSString* sessionId = [command.arguments objectAtIndex:0];
+    NSString* apiKey = [command.arguments objectAtIndex:0];
+    NSString* sessionId = [command.arguments objectAtIndex:1];
     
     // Create Session
-    _session = [[OTSession alloc] initWithApiKey:@"44443122" sessionId:sessionId delegate:self];
+    _session = [[OTSession alloc] initWithApiKey: apiKey sessionId:sessionId delegate:self];
     
     // Initialize Dictionary, contains DOM info for every stream
     subscriberDictionary = [[NSMutableDictionary alloc] init];
@@ -158,9 +159,7 @@
     NSLog(@"iOS Connecting to Session");
     
     // Get Parameters
-    NSString* tbKey = [command.arguments objectAtIndex:0];
-    NSString* tbToken = [command.arguments objectAtIndex:1];
-    
+    NSString* tbToken = [command.arguments objectAtIndex:0];
     [_session connectWithToken:tbToken error:nil];
 }
 
