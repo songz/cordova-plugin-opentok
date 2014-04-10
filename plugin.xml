@@ -3,7 +3,7 @@
     id="com.tokbox.cordova.opentok"
     version="1.0.2">
 
-    <name>OpenTok Cordova Plugin</name>
+    <name>OpenTokCordovaPlugin</name>
     <description>Add live video streaming to your Cordova Application</description>
     <license>Apache 2.0</license>
     <keywords>opentok,tokbox</keywords>
@@ -40,8 +40,8 @@
     <platform name="ios">
       <asset src="www/opentok.js" target="opentok.js" />
 
-      <header-file src="src/OpenTokPlugin.h" />
-      <source-file src="src/OpenTokPlugin.m" />
+      <header-file src="src/ios/OpenTokPlugin.h" />
+      <source-file src="src/ios/OpenTokPlugin.m" />
       <resource-file src="src/ios/Opentok.framework/Resources/opentok.bundle" />
 
       <framework src="src/ios/Opentok.framework" custom="true" />

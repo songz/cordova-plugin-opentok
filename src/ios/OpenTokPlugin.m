@@ -7,7 +7,6 @@
 
 #import "OpentokPlugin.h"
 
-
 @implementation OpenTokPlugin{
     OTSession* _session;
     OTPublisher* _publisher;
@@ -19,6 +18,8 @@
 
 @synthesize exceptionId;
 
+#pragma mark -
+#pragma mark Cordova Methods
 -(void) pluginInitialize{
     callbackList = [[NSMutableDictionary alloc] init];
 }
@@ -26,6 +27,11 @@
     NSString* event = [command.arguments objectAtIndex:0];
     [callbackList setObject:command.callbackId forKey: event];
 }
+
+
+#pragma mark -
+#pragma mark Cordova JS - iOS bindings
+#pragma mark TB Methods
 /*** TB Methods
  ****/
 // Called by TB.addEventListener('exception', fun...)
@@ -94,9 +100,37 @@
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
     [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
+// Helper function to update Views
+- (void)updateView:(CDVInvokedUrlCommand*)command{
+    NSString* callback = command.callbackId;
+    NSString* sid = [command.arguments objectAtIndex:0];
+    int top = [[command.arguments objectAtIndex:1] intValue];
+    int left = [[command.arguments objectAtIndex:2] intValue];
+    int width = [[command.arguments objectAtIndex:3] intValue];
+    int height = [[command.arguments objectAtIndex:4] intValue];
+    int zIndex = [[command.arguments objectAtIndex:5] intValue];
+    if ([sid isEqualToString:@"TBPublisher"]) {
+        NSLog(@"The Width is: %d", width);
+        _publisher.view.frame = CGRectMake(left, top, width, height);
+        _publisher.view.layer.zPosition = zIndex;
+    }
+    
+    // Pulls the subscriber object from dictionary to prepare it for update
+    OTSubscriber* streamInfo = [subscriberDictionary objectForKey:sid];
+    
+    if (streamInfo) {
+        // Reposition the video feeds!
+        streamInfo.view.frame = CGRectMake(left, top, width, height);
+        streamInfo.view.layer.zPosition = zIndex;
+    }
+    
+    CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [callbackResult setKeepCallbackAsBool:YES];
+    //[self.commandDelegate sendPluginResult:callbackResult toSuccessCallbackString:command.callbackId];
+    [self.commandDelegate sendPluginResult:callbackResult callbackId:command.callbackId];
+}
 
-/*** Publisher Methods
- ****/
+#pragma mark Publisher Methods
 - (void)publishAudio:(CDVInvokedUrlCommand*)command{
     NSString* publishAudio = [command.arguments objectAtIndex:0];
     NSLog(@"iOS Altering Audio publishing state, %@", publishAudio);
@@ -119,9 +153,7 @@
 }
 
 
-/*** Session Methods
- ****/
-// Called by session.connect(key, token)
+#pragma mark Session Methods
 - (void)connect:(CDVInvokedUrlCommand *)command{
     NSLog(@"iOS Connecting to Session");
     
@@ -203,13 +235,15 @@
 }
 
 
+#pragma mark -
+#pragma mark Delegates
+#pragma mark Subscriber Delegates
 /*** Subscriber Methods
  ****/
 - (void)subscriberDidConnectToStream:(OTSubscriber*)sub{
     NSLog(@"iOS Connected To Stream");
     
 }
-
 - (void)subscriber:(OTSubscriber*)subscrib didFailWithError:(NSError*)error{
     CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: subscrib.stream.connection.connectionId];
     [callbackResult setKeepCallbackAsBool:YES];
@@ -217,8 +251,7 @@
 }
 
 
-
-// OTSession Connection Delegates
+#pragma mark Session Delegates
 - (void)sessionDidConnect:(OTSession*)session{
     NSLog(@"iOS Connected to Session");
     
@@ -338,40 +371,7 @@
 }
 
 
-// Helper function to update Views
-- (void)updateView:(CDVInvokedUrlCommand*)command{
-    NSString* callback = command.callbackId;
-    NSString* sid = [command.arguments objectAtIndex:0];
-    int top = [[command.arguments objectAtIndex:1] intValue];
-    int left = [[command.arguments objectAtIndex:2] intValue];
-    int width = [[command.arguments objectAtIndex:3] intValue];
-    int height = [[command.arguments objectAtIndex:4] intValue];
-    int zIndex = [[command.arguments objectAtIndex:5] intValue];
-    if ([sid isEqualToString:@"TBPublisher"]) {
-        NSLog(@"The Width is: %d", width);
-        _publisher.view.frame = CGRectMake(left, top, width, height);
-        _publisher.view.layer.zPosition = zIndex;
-    }
-    
-    // Pulls the subscriber object from dictionary to prepare it for update
-    OTSubscriber* streamInfo = [subscriberDictionary objectForKey:sid];
-    
-    if (streamInfo) {
-        // Reposition the video feeds!
-        streamInfo.view.frame = CGRectMake(left, top, width, height);
-        streamInfo.view.layer.zPosition = zIndex;
-    }
-    
-    CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
-    [callbackResult setKeepCallbackAsBool:YES];
-    //[self.commandDelegate sendPluginResult:callbackResult toSuccessCallbackString:command.callbackId];
-    [self.commandDelegate sendPluginResult:callbackResult callbackId:command.callbackId];
-}
-
-
-
-/***** Errors
- ****/
+#pragma mark Publisher Delegates
 - (void)publisher:(OTPublisher*)publisher didFailWithError:(NSError*) error {
     NSLog(@"iOS Publisher didFailWithError");
     NSMutableDictionary* err = [[NSMutableDictionary alloc] init];
@@ -382,23 +382,6 @@
     [self.commandDelegate sendPluginResult:pluginResult callbackId:self.exceptionId];
 }
 
-/**** End of Errors
- ****/
-
-
-
-- (void)TBTesting:(CDVInvokedUrlCommand*)command{
-    if (!self.exceptionId) {
-        self.exceptionId = command.callbackId;
-    }
-    
-    NSMutableDictionary* err = [[NSMutableDictionary alloc] init];
-    [err setObject:@"HMMM Test Error!" forKey:@"message"];
-    
-    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary: err];
-    [pluginResult setKeepCallbackAsBool:YES];
-    [self.commandDelegate sendPluginResult:pluginResult callbackId:self.exceptionId];
-}
 
 
 /***** Notes

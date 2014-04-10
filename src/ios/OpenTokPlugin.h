@@ -16,9 +16,12 @@
 
 // Tokbox Library Functions
 - (void)addEvent:(CDVInvokedUrlCommand*)command;
+
 // TB
 - (void)initPublisher:(CDVInvokedUrlCommand*)command;
 -(void)initSession:(CDVInvokedUrlCommand*)command;
+-(void)exceptionHandler:(CDVInvokedUrlCommand*)command;
+- (void)updateView:(CDVInvokedUrlCommand*)command;
 
 // Publisher
 - (void)publishAudio:(CDVInvokedUrlCommand*)command;
@@ -33,10 +36,8 @@
 - (void)subscribe:(CDVInvokedUrlCommand*)command;
 - (void)unsubscribe:(CDVInvokedUrlCommand*)command;
 
--(void)exceptionHandler:(CDVInvokedUrlCommand*)command;
 
 // HouseKeeping
-- (void)updateView:(CDVInvokedUrlCommand*)command;
 
 
 
