@@ -165,13 +165,13 @@
 
 // Called by session.disconnect()
 - (void)disconnect:(CDVInvokedUrlCommand*)command{
-    [_session disconnect];
+    [_session disconnect:nil];
 }
 
 // Called by session.publish(top, left)
 - (void)publish:(CDVInvokedUrlCommand*)command{
     NSLog(@"iOS Publish stream to session");
-    [_session publish:_publisher];
+    [_session publish:_publisher error:nil];
     
     // Return to Javascript
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -181,7 +181,7 @@
 // Called by session.unpublish(...)
 - (void)unpublish:(CDVInvokedUrlCommand*)command{
     NSLog(@"iOS Unpublishing publisher");
-    [_session unpublish:_publisher];
+    [_session unpublish:_publisher error:nil];
 }
 
 // Called by session.subscribe(streamId, top, left)
@@ -383,6 +383,14 @@ connectionDestroyed:(OTConnection *)connection
     NSMutableDictionary* event = [[NSMutableDictionary alloc] init];
     [event setObject:@"networkDisconnected" forKey:@"reason"];
     [event setObject:@"sessionDisconnected" forKey:@"type"];
+    for ( id key in subscriberDictionary ) {
+        OTSubscriber* aStream = [subscriberDictionary objectForKey:key];
+        [aStream.view removeFromSuperview];
+        [subscriberDictionary removeObjectForKey:key];
+    }
+    if( _publisher ){
+      [_publisher.view removeFromSuperview];
+    }
     
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:event];
     [pluginResult setKeepCallbackAsBool:YES];
@@ -429,4 +437,5 @@ connectionDestroyed:(OTConnection *)connection
 
 
 @end
+
 

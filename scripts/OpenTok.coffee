@@ -309,8 +309,11 @@ class TBSession
     Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [@apiKey, @sessionId] )
   cleanUpDom: ->
     objects = document.getElementsByClassName('OT_root')
-    for e in objects
-      e.parentNode.removeChild(e)
+    while( objects.length > 0 )
+      e = objects[0]
+      if e and e.parentNode and e.parentNode.removeChild
+        e.parentNode.removeChild(e)
+      objects = document.getElementsByClassName('OT_root')
   addEventHandlers: (event, handler) =>
     pdebug "adding Event", event
     if @userHandlers[event]?
@@ -362,7 +365,8 @@ class TBSession
       e( {streams:[stream.toJSON()], stream: stream.toJSON()} )
     return @
   sessionDisconnectedHandler: (event) =>
-    #@cleanUpDom()
+    pdebug "sessionDisconnectedHandler", event
+    @cleanUpDom()
     for e in @userHandlers["sessionDisconnected"]
       e( event )
     return @

@@ -68,7 +68,9 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
       for (Map.Entry<String, RunnableSubscriber> entry : subscriberCollection.entrySet() ) { 
         allStreamViews.add( entry.getValue() ); 
       }
-      allStreamViews.add( myPublisher );
+      if( myPublisher != null ){
+        allStreamViews.add( myPublisher ); 
+      }
       Collections.sort( allStreamViews, new CustomComparator() );
 
       for( RunnableUpdateViews viewContainer : allStreamViews ){
@@ -219,7 +221,6 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
     @Override
     public void disconnected(SubscriberKit arg0) {
       // TODO Auto-generated method stub
-      
     }
 
     @Override
@@ -309,7 +310,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
         Log.i( TAG, "connect command called");
         mSession.connect( apiKey, args.getString(0));
       }else if( action.equals( "disconnect" )){
-
+        mSession.disconnect();
       }else if( action.equals( "publish" )){
         if( sessionConnected ){
           Log.i( TAG, "publisher is publishing" );
@@ -394,8 +395,17 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
   @Override
   public void disconnected(Session arg0) {
     // TODO Auto-generated method stub
+    ViewGroup parent = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
+    for (Map.Entry<String, RunnableSubscriber> entry : subscriberCollection.entrySet() ) { 
+      if (null != parent) {
+        parent.removeView( entry.getValue().mView  );
+      }
+    }
+    if( myPublisher != null ){
+      parent.removeView( myPublisher.mView  );
+    }
 
-    Log.i(TAG, "session disconnected.");
+    myEventListeners.get("sessSessionDisconnected").success();
   }
 
   @Override
@@ -500,4 +510,5 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
     
   }
 }
+
 
