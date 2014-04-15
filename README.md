@@ -67,6 +67,10 @@ Have Fun!
 ----
 
 ## Updates:
+### April 15 - 
+* fix [issue 22](https://github.com/songz/cordova-plugin-opentok/issues/22) for sessionConnected callback  
+* fix [issue 6](https://github.com/songz/cordova-plugin-opentok/issues/6) add connectionCreated and Destroyed events  
+* Reorganized event passing between JS and native SDKs  
 ### April 10 - 
 * Upgraded to v2.2 for Android SDK and iOS SDK. Solves orientation and performance issues.
 ### March 14 -
