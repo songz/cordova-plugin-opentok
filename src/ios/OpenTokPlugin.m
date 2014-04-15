@@ -335,14 +335,8 @@
 }
 - (void)session:(OTSession*)mySession streamCreated:(OTStream*)stream{
     NSLog(@"iOS Received Stream");
-    
-    // Store stream in streamDictionary, keeps track of available streams
     [streamDictionary setObject:stream forKey:stream.streamId];
-    
-    NSMutableDictionary* data = [[NSMutableDictionary alloc] init];
-    NSMutableDictionary* streamData = [self createDataFromStream: stream];
-    [data setObject: streamData forKey: @"stream"];
-    [self triggerJSEvent: @"sessionEvents" withType: @"streamCreated" withData: data];
+    [self triggerStreamCreated: stream withEventType: @"sessionEvents"];
 }
 - (void)session:(OTSession*)session streamDestroyed:(OTStream *)stream{
     NSLog(@"iOS Drop Stream");
@@ -354,11 +348,7 @@
         [subscriber.view removeFromSuperview];
         [subscriberDictionary removeObjectForKey:stream.streamId];
     }
-  
-    NSMutableDictionary* data = [[NSMutableDictionary alloc] init];
-    NSMutableDictionary* streamData = [self createDataFromStream: stream];
-    [data setObject: streamData forKey: @"stream"];
-    [self triggerJSEvent: @"sessionEvents" withType: @"streamDestroyed" withData: data];
+    [self triggerStreamDestroyed: stream withEventType: @"sessionEvents"];
 }
 - (void)session:(OTSession*)session didFailWithError:(OTError*)error {
     NSLog(@"Error: Session did not Connect");
@@ -396,13 +386,12 @@
 
 
 #pragma mark Publisher Delegates
-- (void)publisher:(OTPublisherKit *)publisher
-    streamCreated:(OTStream *)stream
-{
+- (void)publisher:(OTPublisherKit *)publisher streamCreated:(OTStream *)stream{
+    [streamDictionary setObject:stream forKey:stream.streamId];
+    [self triggerStreamCreated: stream withEventType: @"publisherEvents"];
 }
-- (void)publisher:(OTPublisherKit*)publisher
-  streamDestroyed:(OTStream *)stream
-{
+- (void)publisher:(OTPublisherKit*)publisher streamDestroyed:(OTStream *)stream{
+    [self triggerStreamDestroyed: stream withEventType: @"publisherEvents"];
 }
 - (void)publisher:(OTPublisher*)publisher didFailWithError:(NSError*) error {
     NSLog(@"iOS Publisher didFailWithError");
@@ -416,6 +405,18 @@
 
 #pragma mark -
 #pragma mark Helper Methods
+- (void)triggerStreamCreated: (OTStream*) stream withEventType: (NSString*) eventType{
+    NSMutableDictionary* data = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary* streamData = [self createDataFromStream: stream];
+    [data setObject: streamData forKey: @"stream"];
+    [self triggerJSEvent: eventType withType: @"streamCreated" withData: data];
+}
+- (void)triggerStreamDestroyed: (OTStream*) stream withEventType: (NSString*) eventType{
+    NSMutableDictionary* data = [[NSMutableDictionary alloc] init];
+    NSMutableDictionary* streamData = [self createDataFromStream: stream];
+    [data setObject: streamData forKey: @"stream"];
+    [self triggerJSEvent: eventType withType: @"streamDestroyed" withData: data];
+}
 - (NSMutableDictionary*)createDataFromConnection:(OTConnection*)connection{
     NSLog(@"iOS creating data from stream: %@", connection);
     NSMutableDictionary* connectionData = [[NSMutableDictionary alloc] init];
@@ -468,3 +469,4 @@
 
 
 @end
+

@@ -64,8 +64,12 @@
 
   TBPublisher = (function() {
     function TBPublisher(one, two, three) {
-      this.streamDestroyedHandler = __bind(this.streamDestroyedHandler, this);
-      this.streamCreatedHandler = __bind(this.streamCreatedHandler, this);
+      this.addEventHandlers = __bind(this.addEventHandlers, this);
+      this.on = __bind(this.on, this);
+      this.streamDestroyed = __bind(this.streamDestroyed, this);
+      this.streamCreated = __bind(this.streamCreated, this);
+      this.eventReceived = __bind(this.eventReceived, this);
+      this.setSession = __bind(this.setSession, this);
       var cameraName, height, name, position, publishAudio, publishVideo, width, zIndex, _ref, _ref1, _ref2, _ref3;
       this.sanitizeInputs(one, two, three);
       pdebug("creating publisher", {});
@@ -98,36 +102,54 @@
       position = getPosition(this.domId);
       this.userHandlers = {};
       TBUpdateObjects();
-      Cordova.exec(this.streamCreatedHandler, TBSuccess, OTPlugin, "addEvent", ["pubStreamCreated"]);
-      Cordova.exec(this.streamDestroyedHandler, TBError, OTPlugin, "addEvent", ["pubStreamDestroyed"]);
       Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName]);
+      Cordova.exec(this.eventReceived, TBSuccess, OTPlugin, "addEvent", ["publisherEvents"]);
     }
 
-    TBPublisher.prototype.streamCreatedHandler = function(response) {
-      var arr, e, stream, _i, _len, _ref;
-      pdebug("publisher streamCreatedHandler", response);
-      arr = response.split(StringSplitter);
-      stream = new TBStream({}, "");
-      _ref = this.userHandlers["streamCreated"];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        e = _ref[_i];
-        e({
-          streams: [stream.toJSON()],
-          stream: stream.toJSON()
-        });
+    TBPublisher.prototype.setSession = function(session) {
+      return this.session = session;
+    };
+
+    TBPublisher.prototype.eventReceived = function(response) {
+      pdebug("publisher event received", response);
+      return this[response.eventType](response.data);
+    };
+
+    TBPublisher.prototype.streamCreated = function(event) {
+      var e, streamEvent, _i, _len, _ref;
+      pdebug("publisher streamCreatedHandler", event);
+      pdebug("publisher streamCreatedHandler", this.session);
+      pdebug("publisher streamCreatedHandler", this.session.sessionConnection);
+      this.stream = new TBStream(event.stream, this.session.sessionConnection);
+      streamEvent = new TBEvent({
+        stream: this.stream
+      });
+      pdebug("publisher userHandlers", this.userHandlers);
+      pdebug("publisher userHandlers", this.userHandlers['streamCreated']);
+      if (this.userHandlers["streamCreated"]) {
+        _ref = this.userHandlers["streamCreated"];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          e = _ref[_i];
+          e(streamEvent);
+        }
       }
+      pdebug("omg done", streamEvent);
       return this;
     };
 
-    TBPublisher.prototype.streamDestroyedHandler = function(response) {
-      var e, _i, _len, _ref;
-      _ref = this.userHandlers["streamDestroyed"];
-      for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        e = _ref[_i];
-        e({
-          streams: [stream.toJSON()],
-          stream: stream.toJSON()
-        });
+    TBPublisher.prototype.streamDestroyed = function(event) {
+      var e, streamEvent, _i, _len, _ref;
+      pdebug("publisher streamDestroyed event", event);
+      streamEvent = new TBEvent({
+        stream: this.stream,
+        reason: "clientDisconnected"
+      });
+      if (this.userHandlers["streamDestroyed"]) {
+        _ref = this.userHandlers["streamDestroyed"];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          e = _ref[_i];
+          e(streamEvent);
+        }
       }
       return this;
     };
@@ -155,14 +177,23 @@
       return this;
     };
 
-    TBPublisher.prototype.on = function(event, handler) {
+    TBPublisher.prototype.on = function(one, two, three) {
+      var e, k, v, _i, _len, _ref;
       pdebug("adding event handlers", this.userHandlers);
-      if (this.userHandlers[event] != null) {
-        this.userHandlers[event].push(handler);
-      } else {
-        this.userHandlers[event] = [handler];
+      if (typeof one === "object") {
+        for (k in one) {
+          v = one[k];
+          this.addEventHandlers(k, v);
+        }
+        return;
       }
-      return this;
+      if (typeof one === "string") {
+        _ref = one.split(' ');
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          e = _ref[_i];
+          this.addEventHandlers(e, two);
+        }
+      }
     };
 
     TBPublisher.prototype.publishAudio = function(state) {
@@ -177,6 +208,15 @@
 
     TBPublisher.prototype.setStyle = function(style, value) {
       return this;
+    };
+
+    TBPublisher.prototype.addEventHandlers = function(event, handler) {
+      pdebug("adding Event", event);
+      if (this.userHandlers[event] != null) {
+        return this.userHandlers[event].push(handler);
+      } else {
+        return this.userHandlers[event] = [handler];
+      }
     };
 
     TBPublisher.prototype.publishMedia = function(media, state) {
@@ -321,12 +361,14 @@
     };
 
     TBSession.prototype.publish = function(divName, properties) {
-      this.publisher = new TBPublisher(divName, properties, this);
+      this.publisher = new TBPublisher(divName, properties);
+      this.publisher.setSession(this);
       return this.publisher;
     };
 
     TBSession.prototype.publish = function(publisher) {
       this.publisher = publisher;
+      publisher.setSession(this);
       return Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", []);
     };
 
@@ -393,6 +435,8 @@
       this.eventReceived = __bind(this.eventReceived, this);
       this.removeEventHandler = __bind(this.removeEventHandler, this);
       this.addEventHandlers = __bind(this.addEventHandlers, this);
+      this.publish = __bind(this.publish, this);
+      this.publish = __bind(this.publish, this);
       this.on = __bind(this.on, this);
       this.userHandlers = {};
       this.connections = {};
@@ -482,6 +526,7 @@
       var e, _i, _len, _ref;
       pdebug("sessionConnectedHandler", event);
       pdebug("what is userHandlers", this.userHandlers);
+      this.sessionConnection = event.connection;
       event = null;
       if (this.userHandlers["sessionConnected"]) {
         _ref = this.userHandlers["sessionConnected"];
@@ -659,17 +704,6 @@
         height: 0
       };
     }
-
-    TBStream.prototype.toJSON = function() {
-      return {
-        streamId: this.streamId,
-        name: this.name,
-        hasAudio: this.hasAudio,
-        hasVideo: this.hasVideo,
-        creationTime: this.creationTime,
-        connection: this.connection.toJSON()
-      };
-    };
 
     return TBStream;
 

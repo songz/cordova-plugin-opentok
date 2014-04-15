@@ -95,19 +95,33 @@ class TBPublisher
     position = getPosition(@domId)
     @userHandlers = {}
     TBUpdateObjects()
-    Cordova.exec(@streamCreatedHandler, TBSuccess, OTPlugin, "addEvent", ["pubStreamCreated"] )
-    Cordova.exec(@streamDestroyedHandler, TBError, OTPlugin, "addEvent", ["pubStreamDestroyed"] )
     Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName] )
-  streamCreatedHandler: (response) =>
-    pdebug "publisher streamCreatedHandler", response
-    arr = response.split( StringSplitter )
-    stream = new TBStream( {}, "" )
-    for e in @userHandlers["streamCreated"]
-      e( {streams:[stream.toJSON()], stream: stream.toJSON()} )
+    Cordova.exec(@eventReceived, TBSuccess, OTPlugin, "addEvent", ["publisherEvents"] )
+  setSession: (session) =>
+    @session = session
+  eventReceived: (response) =>
+    pdebug "publisher event received", response
+    @[response.eventType](response.data)
+  streamCreated: (event) =>
+    pdebug "publisher streamCreatedHandler", event
+    pdebug "publisher streamCreatedHandler", @session
+    pdebug "publisher streamCreatedHandler", @session.sessionConnection
+    @stream = new TBStream( event.stream, @session.sessionConnection )
+    streamEvent = new TBEvent( {stream: @stream } )
+    pdebug "publisher userHandlers", @userHandlers
+    pdebug "publisher userHandlers", @userHandlers['streamCreated']
+    if @userHandlers["streamCreated"]
+      for e in @userHandlers["streamCreated"]
+        e( streamEvent )
+    pdebug "omg done", streamEvent
     return @
-  streamDestroyedHandler: (response) =>
-    for e in @userHandlers["streamDestroyed"]
-      e( {streams:[stream.toJSON()], stream: stream.toJSON()} )
+  streamDestroyed: (event) =>
+    pdebug "publisher streamDestroyed event", event
+    streamEvent = new TBEvent( {stream: @stream, reason: "clientDisconnected" } )
+    if @userHandlers["streamDestroyed"]
+      for e in @userHandlers["streamDestroyed"]
+        e( streamEvent )
+    # remove stream DOM?
     return @
 
   destroy: ->
@@ -124,13 +138,17 @@ class TBPublisher
     pdebug "removed handlers, resulting handlers:", @userHandlers
     #todo
     return @
-  on: ( event, handler ) ->
+  on: (one, two, three) =>
+    # Set Handlers based on Events
     pdebug "adding event handlers", @userHandlers
-    if @userHandlers[event]?
-      @userHandlers[event].push( handler )
-    else
-      @userHandlers[event] = [handler]
-    return @
+    if typeof( one ) == "object"
+      for k,v of one
+        @addEventHandlers( k, v )
+      return
+    if typeof( one ) == "string"
+      for e in one.split( ' ' )
+        @addEventHandlers( e, two )
+      return
   publishAudio: (state) ->
     @publishMedia( "publishAudio", state )
     return @
@@ -140,6 +158,12 @@ class TBPublisher
   setStyle: (style, value ) ->
     return @
 
+  addEventHandlers: (event, handler) =>
+    pdebug "adding Event", event
+    if @userHandlers[event]?
+      @userHandlers[event].push( handler )
+    else
+      @userHandlers[event] = [handler]
   publishMedia: (media, state) ->
     if media not in ["publishAudio", "publishVideo"] then return
     publishState = "true"
@@ -252,11 +276,13 @@ class TBSession
         @addEventHandlers( e, two )
       return
 # todo - other events: connectionCreated, connectionDestroyed, signal?, streamPropertyChanged, signal:type?
-  publish: (divName, properties) ->
-    @publisher = new TBPublisher(divName, properties, @)
+  publish: (divName, properties) =>
+    @publisher = new TBPublisher(divName, properties)
+    @publisher.setSession(@)
     return @publisher
-  publish: (publisher) ->
+  publish: (publisher) =>
     @publisher = publisher
+    publisher.setSession(@)
     Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", [] )
   signal: (signal, handler) ->
     return @
@@ -350,6 +376,7 @@ class TBSession
   sessionConnected: (event) =>
     pdebug "sessionConnectedHandler", event
     pdebug "what is userHandlers", @userHandlers
+    @sessionConnection = event.connection
     event = null
     if @userHandlers["sessionConnected"]
       for e in @userHandlers["sessionConnected"]
@@ -475,15 +502,6 @@ class TBStream
     for k,v of prop
       @[k] = v
     @videoDimensions = {width: 0, height: 0}
-  toJSON: ->
-    return {
-      streamId: @streamId
-      name: @name
-      hasAudio: @hasAudio
-      hasVideo: @hasVideo
-      creationTime: @creationTime
-      connection: @connection.toJSON()
-    }
 
 # Connection Object:
 #   Properties:

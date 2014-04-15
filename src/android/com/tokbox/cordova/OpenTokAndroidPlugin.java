@@ -166,14 +166,14 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
 
     @Override
     public void streamCreated(PublisherKit arg0, Stream arg1) {
-      // TODO Auto-generated method stub
-      
+      Log.i(TAG, "publisher stream received");
+      streamCollection.put(arg1.getStreamId(), arg1);
+      triggerStreamCreated( arg1, "publisherEvents");
     }
 
     @Override
     public void streamDestroyed(PublisherKit arg0, Stream arg1) {
-      // TODO Auto-generated method stub
-      
+      triggerStreamDestroyed( arg1, "publisherEvents");
     }
 
   }
@@ -368,6 +368,8 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
     JSONObject data = new JSONObject();
     try{
       data.put("status", "connected");
+      JSONObject connection = createDataFromConnection( mSession.getConnection() );
+      data.put("connection", connection);
     }catch (JSONException e) {}
     triggerJSEvent( "sessionEvents", "sessionConnected", data);
   }
@@ -418,25 +420,8 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
   @Override
   public void receivedStream(Session arg0, Stream arg1) {
     Log.i(TAG, "stream received");
-//    String message = stream.getConnection().getConnectionId() + "$2#9$" 
-//        +stream.getStreamId() + "$2#9$"
-//        +stream.getName() + "$2#9$" 
-//        + (stream.hasAudio() ? "T" : "F") + "$2#9$"
-//        + (stream.hasVideo() ? "T" : "F") + "$2#9$"
-//        + stream.getCreationTime() + "$2#9$" ;
-//    Log.i(TAG, "stream array ready, returning: " + message.toString() );
-//    Log.i(TAG, "stream name: " + stream.getName() );
-
     streamCollection.put(arg1.getStreamId(), arg1);
-
-    JSONObject data= new JSONObject();
-    try{
-      JSONObject stream = createDataFromStream( arg1 );
-      data.put("stream", stream);
-      triggerJSEvent( "sessionEvents", "streamCreated", data);
-    }catch (JSONException e) {}
-    
-    Log.i(TAG, "stream received done");
+    triggerStreamCreated( arg1, "sessionEvents");
   }
 
   @Override
@@ -447,12 +432,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
 
     subscriberCollection.remove( arg1.getStreamId() );
   
-    JSONObject data= new JSONObject();
-    try{
-      JSONObject stream = createDataFromStream( arg1 );
-      data.put("stream", stream);
-      triggerJSEvent( "sessionEvents", "streamDestroyed", data);
-    }catch (JSONException e) {}
+    triggerStreamDestroyed( arg1, "sessionEvents");
   }
 
   @Override
@@ -495,6 +475,24 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
   }
   
   // Helper Methods
+  public void triggerStreamDestroyed( Stream arg1, String eventType ){
+    JSONObject data= new JSONObject();
+    try{
+      JSONObject stream = createDataFromStream( arg1 );
+      data.put("stream", stream);
+      triggerJSEvent( "sessionEvents", "streamDestroyed", data);
+    }catch (JSONException e) {}
+  }
+  public void triggerStreamCreated( Stream arg1, String eventType ){
+    JSONObject data= new JSONObject();
+    try{
+      JSONObject stream = createDataFromStream( arg1 );
+      data.put("stream", stream);
+      triggerJSEvent( eventType, "streamCreated", data);
+    }catch (JSONException e) {}
+    
+    Log.i(TAG, "stream received done");
+  }
   public JSONObject createDataFromConnection( Connection arg1 ){
     JSONObject connection = new JSONObject();
     
@@ -531,3 +529,4 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
     myEventListeners.get(event).sendPluginResult(myResult);
   }
 }
+
