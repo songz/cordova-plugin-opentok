@@ -361,40 +361,42 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
 
   @Override
   public void connected(Session arg0) {
-    // TODO Auto-generated method stub
-
     Log.i(TAG, "session connected, triggering sessionConnected Event. My Cid is: "+ 
         mSession.getConnection().getConnectionId()    );      
     sessionConnected = true;
-    JSONObject message = new JSONObject();        
+
+    JSONObject data = new JSONObject();
     try{
-
-      JSONObject connection= new JSONObject();
-      connection.put("connectionId", mSession.getConnection().getConnectionId());
-
-      message.put("connection", connection);
+      data.put("status", "connected");
     }catch (JSONException e) {}
-
-    myEventListeners.get("sessSessionConnected").success( message );
+    triggerJSEvent( "sessionEvents", "sessionConnected", data);
   }
 
   @Override
   public void connectionCreated(Session arg0, Connection arg1) {
-    // TODO Auto-generated method stub
+    Log.i(TAG, "connectionCreated");    
 
-    Log.i(TAG, "connection created: " + arg1.getConnectionId());
+    JSONObject data= new JSONObject();
+    try{
+      JSONObject connection = createDataFromConnection( arg1 );
+      data.put("connection", connection);
+    }catch (JSONException e) {}
+    triggerJSEvent( "sessionEvents", "connectionCreated", data);
   }
 
   @Override
-  public void connectionDestroyed(Session arg0, Connection arg1) {
-    // TODO Auto-generated method stub
-
-    Log.i(TAG, "connection dropped: " + arg1.getConnectionId());
+  public void connectionDestroyed(Session arg0, Connection arg1) {Log.i(TAG, "connection dropped: " + arg1.getConnectionId());
+   
+    JSONObject data= new JSONObject();
+    try{
+      JSONObject connection = createDataFromConnection( arg1 );
+      data.put("connection", connection);
+    }catch (JSONException e) {}
+    triggerJSEvent( "sessionEvents", "connectionDestroyed", data);
   }
 
   @Override
   public void disconnected(Session arg0) {
-    // TODO Auto-generated method stub
     ViewGroup parent = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
     for (Map.Entry<String, RunnableSubscriber> entry : subscriberCollection.entrySet() ) { 
       if (null != parent) {
@@ -404,41 +406,53 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
     if( myPublisher != null ){
       parent.removeView( myPublisher.mView  );
     }
+    
+    JSONObject data = new JSONObject();   
+    try{
+      data.put("reason", "clientDisconnected");
+    }catch (JSONException e) {}
 
-    myEventListeners.get("sessSessionDisconnected").success();
+    triggerJSEvent( "sessionEvents", "sessionDisconnected", data);
   }
 
   @Override
-  public void droppedStream(Session arg0, Stream stream) {
-    // TODO Auto-generated method stub
+  public void receivedStream(Session arg0, Stream arg1) {
+    Log.i(TAG, "stream received");
+//    String message = stream.getConnection().getConnectionId() + "$2#9$" 
+//        +stream.getStreamId() + "$2#9$"
+//        +stream.getName() + "$2#9$" 
+//        + (stream.hasAudio() ? "T" : "F") + "$2#9$"
+//        + (stream.hasVideo() ? "T" : "F") + "$2#9$"
+//        + stream.getCreationTime() + "$2#9$" ;
+//    Log.i(TAG, "stream array ready, returning: " + message.toString() );
+//    Log.i(TAG, "stream name: " + stream.getName() );
 
+    streamCollection.put(arg1.getStreamId(), arg1);
+
+    JSONObject data= new JSONObject();
+    try{
+      JSONObject stream = createDataFromStream( arg1 );
+      data.put("stream", stream);
+      triggerJSEvent( "sessionEvents", "streamCreated", data);
+    }catch (JSONException e) {}
+    
+    Log.i(TAG, "stream received done");
+  }
+
+  @Override
+  public void droppedStream(Session arg0, Stream arg1) {
     Log.i(TAG, "session dropped stream");
-    CallbackContext streamDisconnectedCallback = myEventListeners.get( "sessStreamDestroyed" ); 
-    if( streamDisconnectedCallback != null ){
-      Log.i(TAG, "dropped stream callback found");
+    RunnableSubscriber subscriber = subscriberCollection.get( arg1.getStreamId() );
+    subscriber.removeStreamView();
 
-
-      Log.i(TAG, "destroying corresponding subscriber");
-      RunnableSubscriber subscriber = subscriberCollection.get( stream.getStreamId() );
-      if( subscriber == null ){
-        Log.i(TAG, "stream does not exist in subscriber collection");
-        return;
-      }
-      subscriber.removeStreamView();
-      Log.i(TAG, "removed subscriber stream view");
-      subscriberCollection.remove( stream.getStreamId() );
-      
-      PluginResult myResult = new PluginResult(PluginResult.Status.OK, stream.getStreamId());
-      myResult.setKeepCallback(true);
-      if( stream.getConnection() != null ){
-        if( stream.getConnection().getConnectionId().equalsIgnoreCase( mSession.getConnection().getConnectionId() )){
-          streamDisconnectedCallback = myEventListeners.get( "pubStreamDestroyed" ); 
-        }
-      }
-      streamDisconnectedCallback.sendPluginResult(myResult);
-      Log.i(TAG, "stream disconnected callback sent");
-      
-    }
+    subscriberCollection.remove( arg1.getStreamId() );
+  
+    JSONObject data= new JSONObject();
+    try{
+      JSONObject stream = createDataFromStream( arg1 );
+      data.put("stream", stream);
+      triggerJSEvent( "sessionEvents", "streamDestroyed", data);
+    }catch (JSONException e) {}
   }
 
   @Override
@@ -453,36 +467,6 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
   public void onSignal(Session arg0, String arg1, String arg2, Connection arg3) {
     // TODO Auto-generated method stub
     
-  }
-
-  @Override
-  public void receivedStream(Session arg0, Stream stream) {
-    // TODO Auto-generated method stub
-
-    Log.i(TAG, "stream received");
-    //        JSONArray message = new JSONArray();
-    //        message.put( stream.getConnection().getConnectionId() );
-    //        message.put( stream.getStreamId() );
-    String message = stream.getConnection().getConnectionId() + "$2#9$" 
-        +stream.getStreamId() + "$2#9$"
-        +stream.getName() + "$2#9$" 
-        + (stream.hasAudio() ? "T" : "F") + "$2#9$"
-        + (stream.hasVideo() ? "T" : "F") + "$2#9$"
-        + stream.getCreationTime() + "$2#9$" ;
-
-    Log.i(TAG, "stream array ready, returning: " + message.toString() );
-    Log.i(TAG, "stream name: " + stream.getName() );
-
-    streamCollection.put(stream.getStreamId(), stream);
-    //        myEventListeners.get("streamCreated").success( message );
-    //myEventListeners.get("streamCreated").( message );
-    PluginResult myResult = new PluginResult(PluginResult.Status.OK, message);
-    myResult.setKeepCallback(true);
-    if( stream.getConnection().getConnectionId().equalsIgnoreCase( mSession.getConnection().getConnectionId() )){
-      myEventListeners.get("pubStreamCreated").sendPluginResult(myResult);
-    }else{
-      myEventListeners.get("sessStreamCreated").sendPluginResult(myResult);
-    }
   }
 
   @Override
@@ -509,6 +493,41 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
     // TODO Auto-generated method stub
     
   }
+  
+  // Helper Methods
+  public JSONObject createDataFromConnection( Connection arg1 ){
+    JSONObject connection = new JSONObject();
+    
+    try{
+      connection.put("connectionId", arg1.getConnectionId());
+      connection.put("creationTime", arg1.getCreationTime());
+      connection.put("data", arg1.getData());
+    }catch (JSONException e) {}
+    return connection;
+  }
+  public JSONObject createDataFromStream( Stream arg1 ){
+    JSONObject stream = new JSONObject();
+    try{
+      stream.put("connectionId", arg1.getConnection().getConnectionId() );
+      stream.put("creationTime", arg1.getCreationTime() );
+      stream.put("fps", -999);
+      stream.put("hasAudio", arg1.hasAudio());
+      stream.put("hasVideo", arg1.hasVideo());
+      stream.put("name", arg1.getName());
+      stream.put("streamId", arg1.getStreamId());
+    }catch (JSONException e) {}
+    return stream;
+  }
+  public void triggerJSEvent(String event, String type, JSONObject data ){
+    JSONObject message = new JSONObject();       
+
+    try{
+      message.put("eventType", type);
+      message.put("data", data);
+    }catch (JSONException e) {}
+    
+    PluginResult myResult = new PluginResult(PluginResult.Status.OK, message);
+    myResult.setKeepCallback(true);
+    myEventListeners.get(event).sendPluginResult(myResult);
+  }
 }
-
-

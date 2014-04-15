@@ -101,7 +101,7 @@ class TBPublisher
   streamCreatedHandler: (response) =>
     pdebug "publisher streamCreatedHandler", response
     arr = response.split( StringSplitter )
-    stream = new TBStream( arr )
+    stream = new TBStream( {}, "" )
     for e in @userHandlers["streamCreated"]
       e( {streams:[stream.toJSON()], stream: stream.toJSON()} )
     return @
@@ -219,14 +219,7 @@ class TBSession
       TB.showError( "Session.connect() takes a token and an optional completionHandler" )
       return
     if( connectCompletionCallback? ) then @addEventHandlers( "sessionConnected", connectCompletionCallback )
-    Cordova.exec(@connectionCreatedHandler, TBError, OTPlugin, "addEvent", ["sessConnectionCreated"] )
-    Cordova.exec(@connectionDestroyedHandler, TBError, OTPlugin, "addEvent", ["sessConnectionDestroyed"] )
-    Cordova.exec(@sessionConnectedHandler, TBError, OTPlugin, "addEvent", ["sessSessionConnected"] )
-    Cordova.exec(@sessionDisconnectedHandler, TBError, OTPlugin, "addEvent", ["sessSessionDisconnected"] )
-    Cordova.exec(@streamCreatedHandler, TBSuccess, OTPlugin, "addEvent", ["sessStreamCreated"] )
-    Cordova.exec(@streamDestroyedHandler, TBError, OTPlugin, "addEvent", ["sessStreamDestroyed"] )
-    Cordova.exec(@streamPropertyChanged, TBError, OTPlugin, "addEvent", ["sessStreamPropertyChanged"] )
-    Cordova.exec(@signalReceived, TBError, OTPlugin, "addEvent", ["signalReceived"] )
+    Cordova.exec(@eventReceived, TBError, OTPlugin, "addEvent", ["sessionEvents"] )
     Cordova.exec(TBSuccess, TBError, OTPlugin, "connect", [@token] )
     return
   disconnect: () ->
@@ -306,6 +299,8 @@ class TBSession
 
   constructor: (@apiKey, @sessionId) ->
     @userHandlers = {}
+    @connections = {}
+    @streams = {}
     Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [@apiKey, @sessionId] )
   cleanUpDom: ->
     objects = document.getElementsByClassName('OT_root')
@@ -332,43 +327,65 @@ class TBSession
 
 
   # event listeners
-  streamDestroyedHandler: (streamId) =>
-    pdebug "streamDestroyedHandler", streamId
-    element = streamElements[ streamId ]
-    stream = {streamId: streamId}
-    event = {
-      stream: stream,
-      streams: [stream]
-    }
-    if(element)
-      element.parentNode.removeChild(element)
-      delete( streamElements[ streamId ] )
-      TBUpdateObjects()
-    if @userHandlers["streamDestroyed"]
-      for e in @userHandlers["streamDestroyed"]
+  eventReceived: (response) =>
+    pdebug "session event received", response
+    @[response.eventType](response.data)
+  connectionCreated: (event) =>
+    connection = new TBConnection( event.connection )
+    connectionEvent = new TBEvent( {connection: connection } )
+    @connections[connection.connectionId] = connection
+    if @userHandlers["connectionCreated"]
+      for e in @userHandlers["connectionCreated"]
+        e( connectionEvent )
+    return @
+  connectionDestroyed: (event) =>
+    pdebug "connectionDestroyedHandler", event
+    connection = @connections[ event.connection.connectionId ]
+    connectionEvent = new TBEvent( {connection: connection, reason: "clientDisconnected" } )
+    if @userHandlers["connectionDestroyed"]
+      for e in @userHandlers["connectionDestroyed"]
+        e( connectionEvent )
+    delete( @connections[ connection.connectionId] )
+    return @
+  sessionConnected: (event) =>
+    pdebug "sessionConnectedHandler", event
+    pdebug "what is userHandlers", @userHandlers
+    event = null
+    if @userHandlers["sessionConnected"]
+      for e in @userHandlers["sessionConnected"]
         e(event)
     return @
-  sessionConnectedHandler: (event) =>
-    pdebug "sessionConnectedHandler", event
-    pdebug "what is apiKey: #{@apiKey}", {}
-    pdebug "what is token: #{@token}", {}
-    pdebug "what is userHandlers", @userHandlers
-    @connection = event.connection
-    for e in @userHandlers["sessionConnected"]
-      e(event)
-    return @
-  streamCreatedHandler: (response) =>
-    pdebug "streamCreatedHandler", response
-    arr = response.split( StringSplitter )
-    stream = new TBStream( arr )
-    for e in @userHandlers["streamCreated"]
-      e( {streams:[stream.toJSON()], stream: stream.toJSON()} )
-    return @
-  sessionDisconnectedHandler: (event) =>
-    pdebug "sessionDisconnectedHandler", event
+  sessionDisconnected: (event) =>
+    pdebug "sessionDisconnected event", event
+    sessionDisconnectedEvent = new TBEvent( { reason: event.reason } )
+    if @userHandlers["sessionDisconnected"]
+      for e in @userHandlers["sessionDisconnected"]
+        e( sessionDisconnectedEvent )
     @cleanUpDom()
-    for e in @userHandlers["sessionDisconnected"]
-      e( event )
+    return @
+  streamCreated: (event) =>
+    pdebug "streamCreatedHandler", event
+    stream = new TBStream( event.stream, @connections[event.stream.connectionId] )
+    @streams[ stream.streamId ] = stream
+    streamEvent = new TBEvent( {stream: stream } )
+    if @userHandlers["streamCreated"]
+      for e in @userHandlers["streamCreated"]
+        e( streamEvent )
+    return @
+  streamDestroyed: (event) =>
+    pdebug "streamDestroyed event", event
+    stream = @streams[event.stream.streamId]
+    streamEvent = new TBEvent( {stream: stream, reason: "clientDisconnected" } )
+    if @userHandlers["streamDestroyed"]
+      for e in @userHandlers["streamDestroyed"]
+        e( streamEvent )
+    # remove stream DOM
+    element = streamElements[ stream.streamId ]
+    if(element)
+      element.parentNode.removeChild(element)
+      delete( streamElements[ stream.streamId ] )
+      TBUpdateObjects()
+    delete( @streams[ stream.streamId ] )
     return @
 
   # deprecating
@@ -454,14 +471,9 @@ class TBSubscriber
 #     videoDimensions( Object ) - width and height, numbers
 #     name( String ) - name of the stream
 class TBStream
-  constructor: ( props ) ->
-    pdebug "stream object being created with data:", props
-    @connection = new TBConnection( props[0] )
-    @streamId = props[1]
-    @name = props[2]
-    @hasAudio = if props[3]== "T" then true else false
-    @hasVideo = if props[4]== "T" then true else false
-    @creationTime = props[5]
+  constructor: ( prop, @connection ) ->
+    for k,v of prop
+      @[k] = v
     @videoDimensions = {width: 0, height: 0}
   toJSON: ->
     return {
@@ -479,13 +491,29 @@ class TBStream
 #     creationTime( number ) - timestamp for creation of the connection ( in milliseconds )
 #     data ( string ) - string containing metadata describing the connection
 class TBConnection
-  constructor: (@connectionId) ->
+  constructor: (prop) ->
+    @connectionId = prop.connectionId
+    @creationTime = prop.creationTime
+    @data = prop.data
     return
   toJSON: ->
     return {
       connectionId: @connectionId
+      creationTime: @creationTime
+      data: @data
     }
 
+class TBEvent
+  constructor: (prop) ->
+    for k,v of prop
+      @[k] = v
+    @defaultPrevented = false
+    return
+  isDefaultPrevented: =>
+    return @defaultValue
+  preventDefault: =>
+    # todo: implement preventDefault
+    return
 
 streamElements = {} # keep track of DOM elements for each stream
 
