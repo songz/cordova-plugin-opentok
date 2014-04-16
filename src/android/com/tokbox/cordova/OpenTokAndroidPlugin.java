@@ -42,6 +42,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
   public boolean publishCalled; // we need this because creating publisher before sessionConnected = crash
   public RunnablePublisher myPublisher;
   public HashMap<String, CallbackContext> myEventListeners;
+  public HashMap<String, Connection> connectionCollection;
   public HashMap<String, Stream> streamCollection;
   public HashMap<String, RunnableSubscriber> subscriberCollection;
 
@@ -173,6 +174,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
 
     @Override
     public void streamDestroyed(PublisherKit arg0, Stream arg1) {
+      streamCollection.remove( arg1.getStreamId() );
       triggerStreamDestroyed( arg1, "publisherEvents");
     }
 
@@ -265,6 +267,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
       publishCalled = false;
       sessionConnected = false;
       myEventListeners = new HashMap<String, CallbackContext>();
+      connectionCollection = new HashMap<String, Connection>();
       streamCollection = new HashMap<String, Stream>();
       subscriberCollection = new HashMap<String, RunnableSubscriber>();
 
@@ -316,6 +319,16 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
           Log.i( TAG, "publisher is publishing" );
           myPublisher.startPublishing();
         }
+      }else if( action.equals( "signal" )){
+
+        ArrayList<Connection> connections = new ArrayList<Connection>();
+        for( String e : args.getString(2).split(" ")){
+          Connection c = connectionCollection.get(e);
+          if( c!= null){
+            connections.add(c);
+          }
+        }
+        mSession.sendSignal(args.getString(0), args.getString(1), connections);
       }else if( action.equals( "unpublish" )){
 
       }else if( action.equals( "unsubscribe" )){
@@ -376,7 +389,9 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
 
   @Override
   public void connectionCreated(Session arg0, Connection arg1) {
-    Log.i(TAG, "connectionCreated");    
+    Log.i(TAG, "connectionCreated");   
+
+    connectionCollection.put(arg1.getConnectionId(), arg1);
 
     JSONObject data= new JSONObject();
     try{
@@ -388,7 +403,8 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
 
   @Override
   public void connectionDestroyed(Session arg0, Connection arg1) {Log.i(TAG, "connection dropped: " + arg1.getConnectionId());
-   
+
+  connectionCollection.remove( arg1.getConnectionId() );
     JSONObject data= new JSONObject();
     try{
       JSONObject connection = createDataFromConnection( arg1 );
@@ -427,9 +443,9 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
   @Override
   public void droppedStream(Session arg0, Stream arg1) {
     Log.i(TAG, "session dropped stream");
+    streamCollection.remove( arg1.getStreamId() );
     RunnableSubscriber subscriber = subscriberCollection.get( arg1.getStreamId() );
-    subscriber.removeStreamView();
-
+    subscriber.removeStreamView();    
     subscriberCollection.remove( arg1.getStreamId() );
   
     triggerStreamDestroyed( arg1, "sessionEvents");
@@ -445,8 +461,13 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
 
   @Override
   public void onSignal(Session arg0, String arg1, String arg2, Connection arg3) {
-    // TODO Auto-generated method stub
-    
+    JSONObject data= new JSONObject();
+    try{
+      data.put("type", arg1);
+      data.put("data", arg2);
+      data.put("connectionId", arg3.getConnectionId());
+      triggerJSEvent( "sessionEvents", "signalReceived", data);
+    }catch (JSONException e) {}
   }
 
   @Override
@@ -529,4 +550,3 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements Session.Liste
     myEventListeners.get(event).sendPluginResult(myResult);
   }
 }
-

@@ -372,7 +372,22 @@
       return Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", []);
     };
 
-    TBSession.prototype.signal = function(signal, handler) {
+    TBSession.prototype.signal = function(signal, signalCompletionHandler) {
+      var connectionArray, connectionIdArray, data, e, type, _i, _len;
+      type = signal.type != null ? signal.type : "";
+      data = signal.data != null ? signal.data : "";
+      connectionArray = signal.connections != null ? signal.connections : [];
+      connectionIdArray = [];
+      for (_i = 0, _len = connectionArray.length; _i < _len; _i++) {
+        e = connectionArray[_i];
+        if (typeof e === "object" && (e.connectionId != null)) {
+          connectionIdArray.push(e.connectionId);
+        }
+        if (typeof e === "string") {
+          connectionIdArray.push(e.split(' ')[0]);
+        }
+      }
+      Cordova.exec(TBSuccess, TBError, OTPlugin, "signal", [type, data, connectionIdArray.join(' ')]);
       return this;
     };
 
@@ -426,6 +441,7 @@
     function TBSession(apiKey, sessionId) {
       this.apiKey = apiKey;
       this.sessionId = sessionId;
+      this.signalReceived = __bind(this.signalReceived, this);
       this.streamDestroyed = __bind(this.streamDestroyed, this);
       this.streamCreated = __bind(this.streamCreated, this);
       this.sessionDisconnected = __bind(this.sessionDisconnected, this);
@@ -596,6 +612,32 @@
       }
       delete this.streams[stream.streamId];
       return this;
+    };
+
+    TBSession.prototype.signalReceived = function(event) {
+      var e, streamEvent, _i, _j, _len, _len1, _ref, _ref1, _results;
+      pdebug("signalReceived event", event);
+      streamEvent = new TBEvent({
+        type: event.type,
+        data: event.data,
+        from: this.connections[event.connectionId]
+      });
+      if (this.userHandlers["signal"]) {
+        _ref = this.userHandlers["signal"];
+        for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+          e = _ref[_i];
+          e(streamEvent);
+        }
+      }
+      if ((event.type != null) && event.type.length > 0 && this.userHandlers["signal:" + event.type]) {
+        _ref1 = this.userHandlers["signal:" + event.type];
+        _results = [];
+        for (_j = 0, _len1 = _ref1.length; _j < _len1; _j++) {
+          e = _ref1[_j];
+          _results.push(e(streamEvent));
+        }
+        return _results;
+      }
     };
 
     TBSession.prototype.addEventListener = function(event, handler) {

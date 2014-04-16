@@ -284,7 +284,18 @@ class TBSession
     @publisher = publisher
     publisher.setSession(@)
     Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", [] )
-  signal: (signal, handler) ->
+  signal: (signal, signalCompletionHandler) ->
+    # signal payload: [type, data, connection( separated by spaces )]
+    type = if signal.type? then signal.type else ""
+    data = if signal.data? then signal.data else ""
+    connectionArray = if signal.connections? then signal.connections else []
+    connectionIdArray = []
+    for e in connectionArray
+      if typeof(e) == "object" and e.connectionId?
+        connectionIdArray.push( e.connectionId )
+      if typeof(e) == "string"
+        connectionIdArray.push e.split(' ')[0]
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "signal", [type, data, connectionIdArray.join(' ')] )
     return @
   subscribe: (one, two, three) ->
     if( three? )
@@ -414,6 +425,15 @@ class TBSession
       TBUpdateObjects()
     delete( @streams[ stream.streamId ] )
     return @
+  signalReceived: (event) =>
+    pdebug "signalReceived event", event
+    streamEvent = new TBEvent( {type: event.type, data: event.data, from: @connections[event.connectionId] } )
+    if @userHandlers["signal"]
+      for e in @userHandlers["signal"]
+        e( streamEvent )
+    if event.type? and event.type.length > 0 and @userHandlers["signal:#{event.type}"]
+      for e in @userHandlers["signal:#{event.type}"]
+        e( streamEvent )
 
   # deprecating
   addEventListener: (event, handler) -> # deprecating soon
