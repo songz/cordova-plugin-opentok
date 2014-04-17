@@ -12,6 +12,7 @@
     OTPublisher* _publisher;
     OTSubscriber* _subscriber;
     NSMutableDictionary *subscriberDictionary;
+    NSMutableDictionary *connectionDictionary;
     NSMutableDictionary *streamDictionary;
     NSMutableDictionary *callbackList;
 }
@@ -51,6 +52,7 @@
     // Initialize Dictionary, contains DOM info for every stream
     subscriberDictionary = [[NSMutableDictionary alloc] init];
     streamDictionary = [[NSMutableDictionary alloc] init];
+    connectionDictionary = [[NSMutableDictionary alloc] init];
     
     // Return Result
     CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
@@ -233,6 +235,22 @@
     [subscriberDictionary removeObjectForKey:sid];
 }
 
+// Called by session.unsubscribe(streamId, top, left)
+- (void)signal:(CDVInvokedUrlCommand*)command{
+    NSLog(@"iOS signaling to connections");
+    
+    NSArray *connectionIds = [[command.arguments objectAtIndex:2] componentsSeparatedByString: @" "];
+    if ([connectionIds count] == 0 || [[connectionIds objectAtIndex:0] length] == 0) {
+        connectionIds = [connectionDictionary allKeys];
+    }
+    for (NSString* e in connectionIds){
+        OTConnection* c = [connectionDictionary objectForKey:e];
+        if (c) {
+            [_session signalWithType:[command.arguments objectAtIndex:0] string:[command.arguments objectAtIndex:1] connection:c error:nil];
+        }
+    }
+}
+
 
 #pragma mark -
 #pragma mark Delegates
@@ -308,10 +326,10 @@
     NSLog(@"object for session is %@", sessionDict);
     
     // After session dictionary is constructed, return the result!
-//    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:sessionDict];
-//    NSString* sessionConnectCallback = [callbackList objectForKey:@"sessSessionConnected"];
-//    [self.commandDelegate sendPluginResult:pluginResult callbackId:sessionConnectCallback];
-
+    //    CDVPluginResult *pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsDictionary:sessionDict];
+    //    NSString* sessionConnectCallback = [callbackList objectForKey:@"sessSessionConnected"];
+    //    [self.commandDelegate sendPluginResult:pluginResult callbackId:sessionConnectCallback];
+    
     NSMutableDictionary* eventData = [[NSMutableDictionary alloc] init];
     [eventData setObject:@"status" forKey:@"connected"];
     [self triggerJSEvent: @"sessionEvents" withType: @"sessionConnected" withData: eventData];
@@ -320,6 +338,7 @@
 
 - (void)session:(OTSession *)session connectionCreated:(OTConnection *)connection
 {
+    [connectionDictionary setObject: connection forKey: connection.connectionId];
     NSMutableDictionary* data = [[NSMutableDictionary alloc] init];
     NSMutableDictionary* connectionData = [self createDataFromConnection: connection];
     [data setObject: connectionData forKey: @"connection"];
@@ -328,6 +347,7 @@
 
 - (void)session:(OTSession *)session connectionDestroyed:(OTConnection *)connection
 {
+    [connectionDictionary removeObjectForKey: connection.connectionId];
     NSMutableDictionary* data = [[NSMutableDictionary alloc] init];
     NSMutableDictionary* connectionData = [self createDataFromConnection: connection];
     [data setObject: connectionData forKey: @"connection"];
@@ -375,13 +395,24 @@
         [subscriberDictionary removeObjectForKey:key];
     }
     if( _publisher ){
-      [_publisher.view removeFromSuperview];
+        [_publisher.view removeFromSuperview];
     }
     
     // Setting up event object
     NSMutableDictionary* eventData = [[NSMutableDictionary alloc] init];
     [eventData setObject:@"clientDisconnected" forKey:@"reason"];
     [self triggerJSEvent: @"sessionEvents" withType: @"sessionDisconnected" withData: eventData];
+}
+-(void) session:(OTSession *)session receivedSignalType:(NSString *)type fromConnection:(OTConnection *)connection withString:(NSString *)string{
+    
+    NSLog(@"iOS Session Received signal from Connection: %@ with id %@", connection, [connection connectionId]);
+    NSMutableDictionary* data = [[NSMutableDictionary alloc] init];
+    [data setObject: type forKey: @"type"];
+    [data setObject: string forKey: @"data"];
+    if (connection.connectionId) {
+        [data setObject: connection.connectionId forKey: @"connectionId"];
+        [self triggerJSEvent: @"sessionEvents" withType: @"signalReceived" withData: data];
+    }
 }
 
 
@@ -412,6 +443,8 @@
     [self triggerJSEvent: eventType withType: @"streamCreated" withData: data];
 }
 - (void)triggerStreamDestroyed: (OTStream*) stream withEventType: (NSString*) eventType{
+    [streamDictionary removeObjectForKey: stream.streamId];
+    
     NSMutableDictionary* data = [[NSMutableDictionary alloc] init];
     NSMutableDictionary* streamData = [self createDataFromStream: stream];
     [data setObject: streamData forKey: @"stream"];
@@ -469,4 +502,5 @@
 
 
 @end
+
 
