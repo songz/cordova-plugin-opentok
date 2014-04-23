@@ -4,7 +4,10 @@ Cordova Plugin for OpenTok iOS
 Weave video chat into your web (and now mobile!) application.
 
 ## Using Cordova CLI
-**Make sure You have Cordova 3.4 Installed** If you haven't, view [Cordova instructions](http://cordova.apache.org/docs/en/3.4.0/guide_cli_index.md.html) Page.  
+Make sure You have Cordova 3.4.0 Installed. If you haven't, view [Cordova instructions](http://cordova.apache.org/docs/en/3.4.0/guide_cli_index.md.html) Page.  
+**DO NOT update** to Cordova 3.4.1 ([released April 9](https://cordova.apache.org/#news) ). There is an arm64 requirement that breaks OpenTok SDK.  
+[Bug filed](https://issues.apache.org/jira/browse/CB-6500) against Cordova.  
+
 Clone this repo to get the source code for OpenTok's Cordova plugin
 
 1. Create a Cordova app by typing into Terminal:  

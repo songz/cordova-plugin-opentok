@@ -277,13 +277,21 @@ class TBSession
       return
 # todo - other events: connectionCreated, connectionDestroyed, signal?, streamPropertyChanged, signal:type?
   publish: (divName, properties) =>
+    if( @alreadyPublishing )
+      pdebug("Session is already publishing", {})
+      return
+    @alreadyPublishing = true
     @publisher = new TBPublisher(divName, properties)
-    @publisher.setSession(@)
-    return @publisher
+    @publish( @publisher )
   publish: (publisher) =>
+    if( @alreadyPublishing )
+      pdebug("Session is already publishing", {})
+      return
+    @alreadyPublishing = true
     @publisher = publisher
     publisher.setSession(@)
     Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", [] )
+    return @publisher
   signal: (signal, signalCompletionHandler) ->
     # signal payload: [type, data, connection( separated by spaces )]
     type = if signal.type? then signal.type else ""
@@ -316,6 +324,7 @@ class TBSession
     subscriber = new TBSubscriber(one, domId, {})
     return subscriber
   unpublish:() ->
+    @alreadyPublishing = false
     console.log("JS: Unpublish")
     element = document.getElementById( @publisher.domId )
     if(element)
@@ -338,6 +347,7 @@ class TBSession
     @userHandlers = {}
     @connections = {}
     @streams = {}
+    @alreadyPublishing = false
     Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [@apiKey, @sessionId] )
   cleanUpDom: ->
     objects = document.getElementsByClassName('OT_root')
@@ -395,6 +405,7 @@ class TBSession
     return @
   sessionDisconnected: (event) =>
     pdebug "sessionDisconnected event", event
+    @alreadyPublishing = false
     sessionDisconnectedEvent = new TBEvent( { reason: event.reason } )
     if @userHandlers["sessionDisconnected"]
       for e in @userHandlers["sessionDisconnected"]

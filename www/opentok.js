@@ -361,15 +361,25 @@
     };
 
     TBSession.prototype.publish = function(divName, properties) {
+      if (this.alreadyPublishing) {
+        pdebug("Session is already publishing", {});
+        return;
+      }
+      this.alreadyPublishing = true;
       this.publisher = new TBPublisher(divName, properties);
-      this.publisher.setSession(this);
-      return this.publisher;
+      return this.publish(this.publisher);
     };
 
     TBSession.prototype.publish = function(publisher) {
+      if (this.alreadyPublishing) {
+        pdebug("Session is already publishing", {});
+        return;
+      }
+      this.alreadyPublishing = true;
       this.publisher = publisher;
       publisher.setSession(this);
-      return Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", []);
+      Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", []);
+      return this.publisher;
     };
 
     TBSession.prototype.signal = function(signal, signalCompletionHandler) {
@@ -414,6 +424,7 @@
 
     TBSession.prototype.unpublish = function() {
       var element;
+      this.alreadyPublishing = false;
       console.log("JS: Unpublish");
       element = document.getElementById(this.publisher.domId);
       if (element) {
@@ -457,6 +468,7 @@
       this.userHandlers = {};
       this.connections = {};
       this.streams = {};
+      this.alreadyPublishing = false;
       Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [this.apiKey, this.sessionId]);
     }
 
@@ -557,6 +569,7 @@
     TBSession.prototype.sessionDisconnected = function(event) {
       var e, sessionDisconnectedEvent, _i, _len, _ref;
       pdebug("sessionDisconnected event", event);
+      this.alreadyPublishing = false;
       sessionDisconnectedEvent = new TBEvent({
         reason: event.reason
       });
