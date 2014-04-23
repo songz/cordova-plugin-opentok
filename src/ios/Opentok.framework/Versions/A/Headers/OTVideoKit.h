@@ -52,7 +52,7 @@ typedef enum {
 } OTPixelFormat;
 
 /**
- * Defines the video format assigned to an  of an OTVideoFrame object.
+ * Defines the video format assigned to an instance of an <OTVideoFrame> object.
  */
 @interface OTVideoFormat : NSObject
 
@@ -99,7 +99,8 @@ typedef enum {
 @end
 
 /**
- * Defines a frame of a video.
+ * Defines a frame of a video. See <[OTVideoRender renderVideoFrame:]> and
+ * <[OTVideoCaptureConsumer consumeFrame:]>.
  */
 @interface OTVideoFrame : NSObject
 

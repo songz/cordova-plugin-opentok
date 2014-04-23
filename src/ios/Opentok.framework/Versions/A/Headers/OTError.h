@@ -91,6 +91,9 @@ typedef enum {
 } OTSubscriberErrorCode;
 
 
+/**
+ * Defines errors for the OpenTok iOS SDK.
+ */
 @interface OTError : NSError
 
 @end

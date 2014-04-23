@@ -52,7 +52,7 @@
 
 /**
  * The name of the stream. In the OpenTok iOS SDK, you can specify a published stream's name
- * when you send the <[OTPublisher initWithDelegate:name:]> message.
+ * when you send the <[OTPublisherKit initWithDelegate:name:]> message.
  */
 @property(readonly) NSString* name;
 
@@ -60,13 +60,13 @@
 
 /**
  * Whether the stream is publishing audio (YES) or not (NO).
- * See <[OTPublisher publishAudio]> and <[OTSubscriber subscribeToAudio]>.
+ * See <[OTPublisherKit publishAudio]> and <[OTSubscriberKit subscribeToAudio]>.
  */
 @property(readonly) BOOL hasAudio;
 
 /**
  * Whether the stream is publishing video (YES) or not (NO).
- * See <[OTPublisher publishVideo]> and <[OTSubscriber subscribeToVideo]>.
+ * See <[OTPublisherKit publishVideo]> and <[OTSubscriberKit subscribeToVideo]>.
  */
 @property(readonly) BOOL hasVideo;
 

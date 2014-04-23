@@ -16,7 +16,7 @@
 
 /**
  * A publisher captures an audio-video stream from the device's microphone and camera. You can then
- * publish the audio-video stream to an OpenTok session by sending the <[OTSession publish:]>
+ * publish the audio-video stream to an OpenTok session by sending the <[OTSession publish:error:]>
  * message.
  *
  * To use this class, you must add the XCode -ObjC flag to the "Other Linker
@@ -58,7 +58,9 @@
 @optional
 /**
  * Sent when the camera device is changed.
- * @prarm publisher The publisher that signalled this event.
+ *
+ * @param publisher The publisher that signalled this event.
+ * @param position The position of the new camera.
  */
 -(void)publisher:(OTPublisher*)publisher didChangeCameraPosition:(AVCaptureDevicePosition)position;
 

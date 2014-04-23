@@ -13,7 +13,7 @@
 
 /**
  * A publisher captures an audio-video stream from the sources you specify. You can then
- * publish the audio-video stream to an OpenTok session by sending the <[OTSession publish:]>
+ * publish the audio-video stream to an OpenTok session by sending the <[OTSession publish:error:]>
  * message.
  *
  * Use OTPublisherKit to capture a stream from the device's microphone and camera.
@@ -78,10 +78,10 @@
 /**
  * A string that will be associated with this publisher's stream. This string is displayed at the bottom of publisher
  * videos and at the bottom of subscriber videos associated with the published stream. You can set this name after
- * initializing the publisher and before sending the <[OTSession publish:]> message. Setting the property after
- * sending the <[OTSession publish:]> message has no effect on the name displayed for the stream.
+ * initializing the publisher and before sending the <[OTSession publish:error:]> message. Setting the property after
+ * sending the <[OTSession publish:error:]> message has no effect on the name displayed for the stream.
  *
- * Note that you can also set the name when you send the <[OTPublisher initWithDelegate:name:]> message.
+ * Note that you can also set the name when you send the <[OTPublisherKit initWithDelegate:name:]> message.
  *
  * This value defaults to an empty string.
  */
@@ -120,8 +120,8 @@
 
 /**
  * Used for sending messages for an OTPublisher instance. The OTPublisher class includes a
- * `delegate` property. When you send the <[OTPublisher initWithDelegate:]> message or the
- * <[OTPublisher initWithDelegate:name:]> message, you specify an OTSessionDelegate object.
+ * `delegate` property. When you send the <[OTPublisherKit initWithDelegate:]> message or the
+ * <[OTPublisherKit initWithDelegate:name:]> message, you specify an OTSessionDelegate object.
  */
 @protocol OTPublisherKitDelegate <NSObject>
 
@@ -151,8 +151,5 @@
  * @param stream The stream that ended.
  */
 - (void)publisher:(OTPublisherKit*)publisher streamDestroyed:(OTStream*)stream;
-
-- (void)publisher:(OTPublisherKit *)publisher
-archivingStatusChanged:(BOOL)isArchiving;
 
 @end

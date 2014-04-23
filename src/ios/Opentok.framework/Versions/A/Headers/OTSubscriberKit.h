@@ -88,9 +88,9 @@
  * the view of the OTSubscriber object is added to a superview.
  *
  * You can stream audio only (without subscribing to the video stream) by setting the
- * <[OTSubscriber subscribeToVideo]> property to NO immediately after initializing the OTSubscriber object.
+ * <[OTSubscriberKit subscribeToVideo]> property to NO immediately after initializing the OTSubscriber object.
  * You can stream video only (without subscribing to the audio stream) by setting the
- * <[OTSubscriber subscribeToAudio]> property to NO immediately after initializing the
+ * <[OTSubscriberKit subscribeToAudio]> property to NO immediately after initializing the
  * OTSubscriber object.
  *
  * When the subscriber connects to the stream, the <[OTSubscriberKitDelegate subscriberDidConnectToStream:]> message
@@ -111,7 +111,7 @@
 
 /**
  * Used to send messages for an OTSubscriber instance. When you send
- * the <[OTSubscriber initWithStream:delegate:]> message, you specify an
+ * the <[OTSubscriberKit initWithStream:delegate:]> message, you specify an
  * OTSubscriberKitDelegate object.
  */
 @protocol OTSubscriberKitDelegate <NSObject>
@@ -151,7 +151,7 @@
  * This message is available for WebRTC only.
  *
  * @param stream The stream that changed video dimensions.
- * @param didChangeVideoDimensions The new dimensions of the encoded stream.
+ * @param dimensions The new dimensions of the encoded stream.
  */
 - (void)stream:(OTStream*)stream didChangeVideoDimensions:(CGSize)dimensions;
 

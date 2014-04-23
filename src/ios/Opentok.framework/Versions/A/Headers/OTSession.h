@@ -39,7 +39,7 @@ typedef enum {
 
 /**
  * The first step in using the OpenTok iOS SDK is to initialize
- * an OTSession object with a valid
+ * an OTSession object with your API key and a valid
  * [session ID]( http://tokbox.com/opentok/tutorials/create-session )
  * Use the OTSession object to connect to OpenTok using your developer
  * [API key]( https://dashboard.tokbox.com/projects ) and a valid
@@ -119,12 +119,11 @@ typedef enum {
 /** @name Initializing and connecting to a session */
 
 /**
- * Initialize this session with a given 
- * [session ID]( http://tokbox.com/opentok/tutorials/create-session )
+ * Initialize this session with your OpenTok API key , a
+ * [session ID]( http://tokbox.com/opentok/tutorials/create-session ),
  * and delegate before connecting to OpenTok. Send the 
- * <[OTSession connectWithToken:]> message
+ * <[OTSession connectWithToken:error:]> message
  * to connect to the session.
- *
  *
  * @param apiKey Your OpenTok API key.
  * @param sessionId The session ID of this instance.
@@ -133,9 +132,9 @@ typedef enum {
  *
  * @return The OTSession object, or nil if initialization fails.
  */
-- (id)initWithApiKey:(NSString *)apiKey
-           sessionId:(NSString *)aSessionId
-            delegate:(id<OTSessionDelegate>)aDelegate;
+- (id)initWithApiKey:(NSString*)apiKey
+           sessionId:(NSString*)sessionId
+            delegate:(id<OTSessionDelegate>)delegate;
 
 
 /**
@@ -158,16 +157,18 @@ typedef enum {
  * Note that sessions automatically disconnect when the app is suspended.
  *
  * Be sure to set up a delegate method for the 
- * [OTSessionDelegate session:didFailWithError:] message. See the
- * OTSessionErrorCode emum defined in OTError.h. It defines code values for the
- * error. An error with code
- * OTSDKUpdateRequired indicates that the OpenTok iOS SDK used to compile the 
- * app is not longer compatible
- * with the OpenTok infrastructure.
+ * <[OTSessionDelegate session:didFailWithError:]> message.
  *
  * @param token The token generated for this connection.
- * @param error Out parameter used if an error occurs while processing the 
- * request. May be NULL.
+ *
+ * @param error Set if an error occurs synchronously while processing the
+ * request. The `OTSessionErrorCode` enum (defined in the OTError.h file)
+ * defines values for the `code` property of this object. This object is NULL
+ * if no synchronous error occurs.
+ *
+ * If an asynchronous error occurs, the
+ * <[OTSessionDelegate session:didFailWithError:]> message is sent to
+ * the session's delegate.
  */
 - (void)connectWithToken:(NSString*)token
                    error:(OTError **)error;
@@ -181,8 +182,11 @@ typedef enum {
  * When the session disconnects, the <[OTSessionDelegate sessionDidDisconnect:]>
  * message is sent to the
  * session's delegate.
- * @param error Out parameter used if an error occurs while processing the
- * request. May be NULL.
+ *
+ * @param error Set if an error occurs synchronously while processing the
+ * request. The `OTSessionErrorCode` enum (defined in the OTError.h file)
+ * defines values for the `code` property of this object. This object is NULL
+ * if no error occurs.
  */
 - (void)disconnect:(OTError**)error;
 
@@ -199,7 +203,7 @@ __attribute__((deprecated("use disconnect: instead")));
  * is sent to the publisher delegate delegate.
  *
  * Also, when the operation is complete, the
- * <[OTSubscriberDelegate session:didAddPublisher:]>
+ * <[OTSessionDelegate session:didAddPublisher:]>
  * message is sent to the publisher's delegate.
  *
  * If publishing fails, 
@@ -210,8 +214,15 @@ __attribute__((deprecated("use disconnect: instead")));
  * Note that multiple publishers are not supported.
  *
  * @param publisher The <OTPublisherKit> object to stream with.
- * @param error Out parameter used if an error occurs while processing the
- * request. May be NULL.
+ *
+ * @param error Set if an error occurs synchronously while processing the
+ * request. The `OTPublisherErrorCode` enum (defined in the OTError.h file)
+ * defines values for the `code` property of this object. This object is NULL
+ * if no error occurs.
+ *
+ * If an asynchronous error occurs, the
+ * <[OTPublisherKitDelegate publisher:didFailWithError:]> message is sent to
+ * the publisher's delegate.
  */
 - (void)publish:(OTPublisherKit*)publisher
           error:(OTError**)error;
@@ -229,8 +240,11 @@ __attribute__((deprecated("use publish:error: instead")));
  * instance has been cleanly removed from the session.
  *
  * @param publisher The <OTPublisher> object to remove from the session.
- * @param error Out parameter used if an error occurs while processing the
- * request. May be NULL.
+ *
+ * @param error Set if an error occurs synchronously while processing the
+ * request. The `OTPublisherErrorCode` enum (defined in the OTError.h file)
+ * defines values for the `code` property of this object. This object is NULL
+ * if no error occurs.
  */
 - (void)unpublish:(OTPublisherKit*)publisher
             error:(OTError**)error;
@@ -242,9 +256,17 @@ __attribute__((deprecated("use unpublish:error: instead")));
  * Connects this subscriber instance to the session and begins subscribing.
  * If the subscriber passed is created from an `OTStream` instance from a 
  * different `OTSession` instance, the behavior of this function is undefined.
+ *
  * @param subscriber The subscriber to connect and begin subscribing.
- * @param error Out parameter used if an error occurs while processing the
- * request. May be NULL.
+ *
+* @param error Set if an error occurs synchronously while processing the
+ * request. The `OTSubscriberErrorCode` enum (defined in the OTError.h file)
+ * defines values for the `code` property of this object. This object is NULL
+ * if no error occurs.
+ *
+ * If an asynchronous error occurs, the
+ * <[OTSubscriberKitDelegate subscriber:didFailWithError:]> message is sent to
+ * the subscriber's delegate.
  */
 - (void)subscribe:(OTSubscriberKit*)subscriber
             error:(OTError**)error;
@@ -256,8 +278,11 @@ __attribute__((deprecated("use subscribe:error: instead")));
  * Disconnects this subscriber instance from the session and begins object 
  * cleanup.
  * @param subscriber The subscriber to disconnect and remove from this session.
- * @param error Out parameter used if an error occurs while processing the
- * request. May be NULL.
+ *
+ * @param error Set if an error occurs synchronously while processing the
+ * request. The `OTSubscriberErrorCode` enum (defined in the OTError.h file)
+ * defines values for the `code` property of this object. This object is NULL
+ * if no error occurs.
  */
 - (void)unsubscribe:(OTSubscriberKit*)subscriber
               error:(OTError**)error;
@@ -329,7 +354,7 @@ __attribute__((deprecated("use unsubscribe:error: instead")));
  * @param session The <OTSession> instance that sent this message.
  * @param error An <OTError> object describing the issue. The 
  * `OTSessionErrorCode` enum
- * (defined in the OTError class) defines values for the `code` property of 
+ * (defined in the OTError.h file) defines values for the `code` property of
  * this object.
  */
 - (void)session:(OTSession*)session didFailWithError:(OTError*)error;
@@ -420,5 +445,14 @@ didRemovePublisher:(OTPublisherKit*)publisher;
 receivedSignalType:(NSString*)type
     fromConnection:(OTConnection*)connection
         withString:(NSString*)string;
+
+- (void)session:(OTSession*)session
+archiveCreatedWithId:(NSString*)archiveId
+           name:(NSString*)name
+         status:(NSString*)status;
+
+- (void)session:(OTSession*)session
+archiveUpdatedWithId:(NSString*)archiveId
+         status:(NSString*)status;
 
 @end
