@@ -26,6 +26,7 @@
 // Publisher
 - (void)publishAudio:(CDVInvokedUrlCommand*)command;
 - (void)publishVideo:(CDVInvokedUrlCommand*)command;
+- (void)setCameraPosition:(CDVInvokedUrlCommand*)command;
 - (void)destroy:(CDVInvokedUrlCommand*)command;
 
 // Session
