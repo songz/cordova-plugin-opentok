@@ -206,6 +206,14 @@
       return this;
     };
 
+    TBPublisher.prototype.setCameraPosition = function(cameraPosition) {
+      pdebug("setting camera position", {
+        cameraPosition: cameraPosition
+      });
+      Cordova.exec(TBSuccess, TBError, OTPlugin, "setCameraPosition", [cameraPosition]);
+      return this;
+    };
+
     TBPublisher.prototype.setStyle = function(style, value) {
       return this;
     };
