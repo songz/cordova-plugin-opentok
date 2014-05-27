@@ -22,7 +22,7 @@ class TBSession
     if( typeof(connectCompletionCallback) != "function" and connectCompletionCallback? )
       TB.showError( "Session.connect() takes a token and an optional completionHandler" )
       return
-    if( connectCompletionCallback? ) then @addEventHandlers( "sessionConnected", connectCompletionCallback )
+    if( connectCompletionCallback? ) then @on('sessionConnected', connectCompletionCallback)
     Cordova.exec(@eventReceived, TBError, OTPlugin, "addEvent", ["sessionEvents"] )
     Cordova.exec(TBSuccess, TBError, OTPlugin, "connect", [@token] )
     return
@@ -36,26 +36,6 @@ class TBSession
     return @
   getSubscribersForStream: (stream) ->
     return @
-  off: (one, two, three) ->
-    if typeof( one ) == "object"
-      for k,v of one
-        @removeEventHandler( k, v )
-      return
-    if typeof( one ) == "string"
-      for e in one.split( ' ' )
-        @removeEventHandler( e, two )
-  on: (one, two, three) =>
-    # Set Handlers based on Events
-    pdebug "adding event handlers", @userHandlers
-    if typeof( one ) == "object"
-      for k,v of one
-        @addEventHandlers( k, v )
-      return
-    if typeof( one ) == "string"
-      for e in one.split( ' ' )
-        @addEventHandlers( e, two )
-      return
-# todo - other events: connectionCreated, connectionDestroyed, signal?, streamPropertyChanged, signal:type?
   publish: (divName, properties) =>
     if( @alreadyPublishing )
       pdebug("Session is already publishing", {})
@@ -124,10 +104,10 @@ class TBSession
     return Cordova.exec(TBSuccess, TBError, OTPlugin, "unsubscribe", [subscriber.streamId] )
 
   constructor: (@apiKey, @sessionId) ->
-    @userHandlers = {}
     @connections = {}
     @streams = {}
     @alreadyPublishing = false
+    OT.getHelper().eventing(@)
     Cordova.exec(TBSuccess, TBSuccess, OTPlugin, "initSession", [@apiKey, @sessionId] )
   cleanUpDom: ->
     objects = document.getElementsByClassName('OT_root')
@@ -136,24 +116,9 @@ class TBSession
       if e and e.parentNode and e.parentNode.removeChild
         e.parentNode.removeChild(e)
       objects = document.getElementsByClassName('OT_root')
-  addEventHandlers: (event, handler) =>
-    pdebug "adding Event", event
-    if @userHandlers[event]?
-      @userHandlers[event].push( handler )
-    else
-      @userHandlers[event] = [handler]
-  removeEventHandler: (event, handler) =>
-    pdebug "removing event #{event}", @userHandlers
-    if not handler?
-      delete @userHandlers[event]
-    else
-      if @userHandlers[event]?
-        @userHandlers[event] = @userHandlers[event].filter ( item, index ) ->
-          return item != handler
-    return @
-
 
   # event listeners
+  # todo - other events: connectionCreated, connectionDestroyed, signal?, streamPropertyChanged, signal:type?
   eventReceived: (response) =>
     pdebug "session event received", response
     @[response.eventType](response.data)
@@ -161,35 +126,26 @@ class TBSession
     connection = new TBConnection( event.connection )
     connectionEvent = new TBEvent( {connection: connection } )
     @connections[connection.connectionId] = connection
-    if @userHandlers["connectionCreated"]
-      for e in @userHandlers["connectionCreated"]
-        e( connectionEvent )
+    @trigger("connectionCreated", connectionEvent)
     return @
   connectionDestroyed: (event) =>
     pdebug "connectionDestroyedHandler", event
     connection = @connections[ event.connection.connectionId ]
     connectionEvent = new TBEvent( {connection: connection, reason: "clientDisconnected" } )
-    if @userHandlers["connectionDestroyed"]
-      for e in @userHandlers["connectionDestroyed"]
-        e( connectionEvent )
+    @trigger("connectionDestroyed", connectionEvent)
     delete( @connections[ connection.connectionId] )
     return @
   sessionConnected: (event) =>
     pdebug "sessionConnectedHandler", event
-    pdebug "what is userHandlers", @userHandlers
+    @trigger("sessionConnected")
     @sessionConnection = event.connection
     event = null
-    if @userHandlers["sessionConnected"]
-      for e in @userHandlers["sessionConnected"]
-        e(event)
     return @
   sessionDisconnected: (event) =>
     pdebug "sessionDisconnected event", event
     @alreadyPublishing = false
     sessionDisconnectedEvent = new TBEvent( { reason: event.reason } )
-    if @userHandlers["sessionDisconnected"]
-      for e in @userHandlers["sessionDisconnected"]
-        e( sessionDisconnectedEvent )
+    @trigger("sessionDisconnected", sessionDisconnectedEvent)
     @cleanUpDom()
     return @
   streamCreated: (event) =>
@@ -197,17 +153,13 @@ class TBSession
     stream = new TBStream( event.stream, @connections[event.stream.connectionId] )
     @streams[ stream.streamId ] = stream
     streamEvent = new TBEvent( {stream: stream } )
-    if @userHandlers["streamCreated"]
-      for e in @userHandlers["streamCreated"]
-        e( streamEvent )
+    @trigger("streamCreated", streamEvent)
     return @
   streamDestroyed: (event) =>
     pdebug "streamDestroyed event", event
     stream = @streams[event.stream.streamId]
     streamEvent = new TBEvent( {stream: stream, reason: "clientDisconnected" } )
-    if @userHandlers["streamDestroyed"]
-      for e in @userHandlers["streamDestroyed"]
-        e( streamEvent )
+    @trigger("streamDestroyed", streamEvent)
     # remove stream DOM
     element = streamElements[ stream.streamId ]
     if(element)
@@ -219,12 +171,8 @@ class TBSession
   signalReceived: (event) =>
     pdebug "signalReceived event", event
     streamEvent = new TBEvent( {type: event.type, data: event.data, from: @connections[event.connectionId] } )
-    if @userHandlers["signal"]
-      for e in @userHandlers["signal"]
-        e( streamEvent )
-    if event.type? and event.type.length > 0 and @userHandlers["signal:#{event.type}"]
-      for e in @userHandlers["signal:#{event.type}"]
-        e( streamEvent )
+    @trigger("signal", streamEvent)
+    @trigger("signal:#{event.type}", streamEvent)
 
   # deprecating
   addEventListener: (event, handler) -> # deprecating soon

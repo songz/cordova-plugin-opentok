@@ -6,7 +6,7 @@ module.exports = function(grunt) {
     watch:{
       scripts: {
         files:['**/*.coffee'],
-        tasks:["coffee", "uglify"],
+        tasks:["coffee", "concat"],
         options:{
           spawn: true,
         }
@@ -20,6 +20,15 @@ module.exports = function(grunt) {
         files: {
           "./www/opentok.js" : "./src/js/*.coffee"
         }
+      }
+    },
+    concat:{
+      options:{
+        separator: ';'
+      },
+      dist:{
+        src:["./www/opentok.js", "./src/js/lib/OT-common-js-helpers.js"],
+        dest:"./www/opentok.js"
       }
     },
     uglify: {
@@ -37,7 +46,8 @@ module.exports = function(grunt) {
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-coffee');
   grunt.loadNpmTasks('grunt-contrib-watch');
+  grunt.loadNpmTasks('grunt-contrib-concat');
 
   // Default task(s).
-  grunt.registerTask('default', ["coffee"]);
+  grunt.registerTask('default', ["coffee", "concat"]);
 };
