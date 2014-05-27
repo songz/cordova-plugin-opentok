@@ -39,8 +39,8 @@ class TBPublisher
       height = DefaultHeight
     replaceWithVideoStream(@domId, PublisherStreamId, {width:width, height:height})
     position = getPosition(@domId)
-    @userHandlers = {}
     TBUpdateObjects()
+    OT.getHelper().eventing(@)
     Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName] )
     Cordova.exec(@eventReceived, TBSuccess, OTPlugin, "addEvent", ["publisherEvents"] )
   setSession: (session) =>
@@ -54,19 +54,12 @@ class TBPublisher
     pdebug "publisher streamCreatedHandler", @session.sessionConnection
     @stream = new TBStream( event.stream, @session.sessionConnection )
     streamEvent = new TBEvent( {stream: @stream } )
-    pdebug "publisher userHandlers", @userHandlers
-    pdebug "publisher userHandlers", @userHandlers['streamCreated']
-    if @userHandlers["streamCreated"]
-      for e in @userHandlers["streamCreated"]
-        e( streamEvent )
-    pdebug "omg done", streamEvent
+    @trigger("streamCreated", streamEvent)
     return @
   streamDestroyed: (event) =>
     pdebug "publisher streamDestroyed event", event
     streamEvent = new TBEvent( {stream: @stream, reason: "clientDisconnected" } )
-    if @userHandlers["streamDestroyed"]
-      for e in @userHandlers["streamDestroyed"]
-        e( streamEvent )
+    @trigger("streamDestroyed", streamEvent)
     # remove stream DOM?
     return @
 
@@ -76,25 +69,6 @@ class TBPublisher
     return ""
   getStyle: ->
     return {}
-  off: ( event, handler ) ->
-    pdebug "removing event #{event}", @userHandlers
-    if @userHandlers[event]?
-      @userHandlers[event] = @userHandlers[event].filter ( item, index ) ->
-        return item != handler
-    pdebug "removed handlers, resulting handlers:", @userHandlers
-    #todo
-    return @
-  on: (one, two, three) =>
-    # Set Handlers based on Events
-    pdebug "adding event handlers", @userHandlers
-    if typeof( one ) == "object"
-      for k,v of one
-        @addEventHandlers( k, v )
-      return
-    if typeof( one ) == "string"
-      for e in one.split( ' ' )
-        @addEventHandlers( e, two )
-      return
   publishAudio: (state) ->
     @publishMedia( "publishAudio", state )
     return @
@@ -108,12 +82,6 @@ class TBPublisher
   setStyle: (style, value ) ->
     return @
 
-  addEventHandlers: (event, handler) =>
-    pdebug "adding Event", event
-    if @userHandlers[event]?
-      @userHandlers[event].push( handler )
-    else
-      @userHandlers[event] = [handler]
   publishMedia: (media, state) ->
     if media not in ["publishAudio", "publishVideo"] then return
     publishState = "true"
@@ -161,11 +129,3 @@ class TBPublisher
     else
       @domId = TBGenerateDomHelper()
     @domId = if( @domId and document.getElementById( @domId ) ) then @domId else TBGenerateDomHelper()
-
-  # deprecating
-  removeEventListener: ( event, handler ) ->
-    @off( event, handler )
-    return @
-
-
-

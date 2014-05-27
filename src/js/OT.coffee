@@ -34,7 +34,14 @@ window.OT =
     TBUpdateObjects()
 
   # helpers
-
+  getHelper: ->
+    if(typeof(jasmine)=="undefined" || !jasmine || !jasmine['getEnv'])
+      window.jasmine = {
+        getEnv: ->
+          return
+      }
+    this.OTHelper = this.OTHelper || OTHelpers.noConflict()
+    return this.OTHelper
 
   # deprecating
   showError: (a) ->
