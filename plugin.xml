@@ -20,12 +20,13 @@
         <uses-permission android:name="android.permission.INTERNET" />
         <uses-permission android:name="android.permission.RECORD_AUDIO" />
         <uses-permission android:name="android.permission.WAKE_LOCK" />
+        <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
         <uses-feature android:name="android.hardware.camera" android:required="true" />
         <uses-feature android:name="android.hardware.autofocus" android:required="true" />
       </config-file>
 
       <!-- copy opentok sdk -->
-      <source-file src="src/android/libs/opentok-android-sdk-2.0.jar" target-dir="libs/" />
+      <source-file src="src/android/libs/opentok-android-sdk-2.2.jar" target-dir="libs/" />
       <source-file src="src/android/libs/armeabi/libopentok.so" target-dir="libs/armeabi" />
 
       <config-file target="config.xml" parent="/*">
