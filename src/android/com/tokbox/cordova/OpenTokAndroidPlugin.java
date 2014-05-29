@@ -114,7 +114,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
 
   public class RunnablePublisher extends RunnableUpdateViews implements 
     PublisherKit.PublisherListener, Publisher.CameraListener{
-    //  property contains: [stream.streamId, position.top, position.left, width, height, subscribeToVideo, zIndex] )
+    //  property contains: [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName] )
     public Publisher mPublisher;
 
     public RunnablePublisher( JSONArray args ){
@@ -145,11 +145,16 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         mPublisher.setCameraListener(this);
         mPublisher.setPublisherListener(this);
         try{
-          if( this.mProperty.getString(8) != null && !(this.mProperty.getString(8).equalsIgnoreCase("front") ) ){
-            mPublisher.swapCamera();
+          // Camera is swapped in streamCreated event
+          if( compareStrings(this.mProperty.getString(7), "false") ){
+            mPublisher.setPublishVideo(false); // default is true
           }
+          if( compareStrings(this.mProperty.getString(6), "false") ){
+            mPublisher.setPublishAudio(false); // default is true
+          }
+          Log.i(TAG, "all set up for publisher");
         }catch( Exception e ){
-          Log.i(TAG, "error when trying to retrieve cameraName property");
+          Log.i(TAG, "error when trying to retrieve publish audio/video property");
         }
         this.mView = mPublisher.getView();
         frame.addView( this.mView );
@@ -168,6 +173,14 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     @Override
     public void onStreamCreated(PublisherKit arg0, Stream arg1) {
       Log.i(TAG, "publisher stream received");
+      try{
+        if( compareStrings(this.mProperty.getString(8), "back") ){
+          Log.i(TAG, "swapping camera");
+          mPublisher.swapCamera(); // default is front
+        }
+      }catch(Exception e){
+        Log.i(TAG, "error when trying to retrieve cameraName property");
+      }
       streamCollection.put(arg1.getStreamId(), arg1);
       triggerStreamCreated( arg1, "publisherEvents");
     }
@@ -510,6 +523,12 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
 
   
   // Helper Methods
+  public boolean compareStrings(String a, String b){
+    if(a != null && b != null && a.equalsIgnoreCase(b) ){
+      return true;
+    }
+    return false;
+  }
   public void triggerStreamDestroyed( Stream arg1, String eventType ){
     JSONObject data= new JSONObject();
     try{
