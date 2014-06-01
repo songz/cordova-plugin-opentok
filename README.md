@@ -4,8 +4,7 @@ Cordova Plugin for OpenTok iOS
 Weave video chat into your web (and now mobile!) application.
 
 ## Using Cordova CLI
-Make sure You have Cordova 3.4.0 Installed. If you haven't, view [Cordova instructions](http://cordova.apache.org/docs/en/3.4.0/guide_cli_index.md.html) Page.  
-**DO NOT update** to Cordova 3.4.1 ([released April 9](https://cordova.apache.org/#news) ). There is an arm64 requirement that breaks OpenTok SDK.  
+Make sure You have Cordova 3.5.0 Installed. If you haven't, view [Cordova instructions](http://cordova.apache.org/docs/en/3.5.0/guide_cli_index.md.html) Page.  
 [Bug filed](https://issues.apache.org/jira/browse/CB-6500) against Cordova.  
 
 Clone this repo to get the source code for OpenTok's Cordova plugin
@@ -88,13 +87,14 @@ Have Fun!
   * [Solution at Cordova](http://shazronatadobe.wordpress.com/2014/03/12/xcode-5-1-and-cordova-ios/)
 * Building ios project gives **Apple Mach-O Linker Errors** that looks like this: ![Building ios project, linker errors](https://f.cloud.github.com/assets/5085574/2421687/5c826df2-ab85-11e3-9a6a-7e8994b37b62.png)
   * Solution: 
-    * Go to project settings and change 'Build Active Architecture Only' to NO. 
-    * In the project settings, remove armv7s and arm64 from Valid Architectures   ![change build active architecture in project settings](https://cloud.githubusercontent.com/assets/686933/2671191/a30032de-c0d7-11e3-9b27-bd2ccfa7459c.png)
+    * Go to project build settings and change 'Build Active Architecture Only' to NO. 
+    * Do the same for cordovaLib build settings: change 'Build Active Architecture Only' to NO. 
+    * In the project build settings, remove armv7s and arm64 from Valid Architectures   ![change build active architecture in project settings](https://cloud.githubusercontent.com/assets/686933/2671191/a30032de-c0d7-11e3-9b27-bd2ccfa7459c.png)
 * The provided sample code works, but how do I use my own credentials?
   * Replace data.apiKey, data.sid, data.token with your own apiKey, sessionId, token, respectively.
 * How do I generate a sessionId or a Token? 
   * You can generate sessionId and its corresponding tokens manually from your [dashboard](https://dashboard.tokbox.com/)  
-  * [Tutorials on how to generate sessionId and Token programmatically](http://www.tokbox.com/blog/getting-started-demo-apps/)
+  * [Tutorials on how to generate sessionId and Token programmatically](http://www.tokbox.com/blog/getting-started-demo-apps/)3
 
 License
 ===
