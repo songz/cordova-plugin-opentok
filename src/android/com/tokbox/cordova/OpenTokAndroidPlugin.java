@@ -197,6 +197,12 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       
     }
 
+    @Override
+    public void onCameraError(Publisher arg0, OpentokError arg1) {
+      // TODO Auto-generated method stub
+      
+    }
+
   }
 
   public class RunnableSubscriber extends RunnableUpdateViews implements 
@@ -350,10 +356,15 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         for( String e : args.getString(2).split(" ")){
           Connection c = connectionCollection.get(e);
           if( c!= null){
+            Log.i(TAG, "sending signal to connection " + c.getConnectionId());
             connections.add(c);
+            mSession.sendSignal(args.getString(0), args.getString(1), c);
           }
         }
-        mSession.sendSignal(args.getString(0), args.getString(1), connections);
+        if(connections.size() == 0){
+          Log.i(TAG, "sending signal to EVERYBODY ");
+          mSession.sendSignal(args.getString(0), args.getString(1));
+        }
       }else if( action.equals( "unpublish" )){
 
       }else if( action.equals( "unsubscribe" )){
@@ -491,6 +502,8 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
   // signalListener
   public void onSignalReceived(Session arg0, String arg1, String arg2, Connection arg3) {
     JSONObject data= new JSONObject();
+    Log.i(TAG, "signal type: " + arg1);
+    Log.i(TAG, "signal data: " + arg2);
     try{
       data.put("type", arg1);
       data.put("data", arg2);
@@ -583,4 +596,3 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     myEventListeners.get(event).sendPluginResult(myResult);
   }
 }
-
