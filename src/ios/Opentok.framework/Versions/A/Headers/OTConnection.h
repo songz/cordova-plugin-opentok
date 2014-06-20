@@ -1,7 +1,7 @@
 //
 //  OTConnection.h
 //
-//  Copyright (c) 2013 TokBox, Inc. All rights reserved.
+//  Copyright (c) 2014 TokBox, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>

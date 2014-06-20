@@ -1,7 +1,7 @@
 //
 //  OTStream.h
 //
-//  Copyright (c) 2013 Tokbox, Inc. All rights reserved.
+//  Copyright (c) 2014 Tokbox, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -38,14 +38,6 @@
 @property(readonly) NSString* streamId;
 
 /**
- * The type of the stream. This value can be `"basic"` or `"archive"`.
- * The value `"basic"` identifies a stream published by a user connected to the session.
- * The value `"archive"` identifies an [archive stream](http://www.tokbox.com/opentok/docs/concepts/archiving.html)
- * (from an archive being played back).
- */
-@property(readonly) NSString* type;
-
-/**
  * The timestamp for the creation of the stream on the OpenTok media server.
  */
 @property(readonly) NSDate *creationTime;
@@ -71,11 +63,10 @@
 @property(readonly) BOOL hasVideo;
 
 /**
- * The current dimensions of the video media track on this stream. This property can change if a stream published from an
- * iOS device resizes, based on a change in the device orientation. When this occurs, the [OTSubscriberKitDelegate stream:didChangeVideoDimensions:]
- * message is sent (for an OTSubscriber subscribing to the stream).
- *
- * This property is available for WebRTC only.
+ * The current dimensions of the video media track on this stream. 
+ * This property can change if a stream published from an
+ * iOS device resizes, based on a change in the device orientation, or a change
+ * in video resolution occurs.
  */
 @property (readonly) CGSize videoDimensions;
 

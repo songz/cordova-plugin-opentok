@@ -301,10 +301,6 @@
     // SessionId
     [sessionDict setObject:session.sessionId forKey:@"sessionId"];
     
-    // Session ConnectionCount
-    NSString* strInt = [NSString stringWithFormat:@"%d", session.connectionCount];
-    [sessionDict setObject:strInt forKey:@"connectionCount"];
-    
     // SessionStreams
     NSMutableArray* streamsArray = [[NSMutableArray alloc] init];
     for(id key in session.streams){
@@ -512,5 +508,3 @@
 
 
 @end
-
-

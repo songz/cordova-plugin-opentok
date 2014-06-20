@@ -1,7 +1,7 @@
 //
 //  OTPublisherKit.h
 //
-//  Copyright (c) 2013 Tokbox, Inc. All rights reserved.
+//  Copyright (c) 2014 Tokbox, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -12,15 +12,16 @@
 @protocol OTVideoCapture, OTVideoRender, OTPublisherKitDelegate;
 
 /**
- * A publisher captures an audio-video stream from the sources you specify. You can then
- * publish the audio-video stream to an OpenTok session by sending the <[OTSession publish:error:]>
- * message.
+ * A publisher captures an audio-video stream from the sources you specify. You
+ * can then publish the audio-video stream to an OpenTok session by sending the
+ * <[OTSession publish:error:]> message.
  *
- * Use OTPublisherKit to capture a stream from the device's microphone and camera.
+ * Use OTPublisherKit to interface with <[OTSession]> to push audio and video
+ * to other peers or the OpenTok Cloud Media Router (aka. "Mantis").
  *
- * The OpenTok iOS SDK supports publishing on all devices, except the iPhone 3GS.
- * see "Developer and client requirements" in the README file for
- * [the OpenTok on WebRTC iOS SDK](https://github.com/opentok/opentok-ios-sdk-webrtc).
+ * The OpenTok iOS SDK supports publishing on all multi-core iOS devices.
+ * See "Developer and client requirements" in the README file for the
+ * [OpenTok iOS SDK](http://tokbox.com/opentok/libraries/client/ios).
  */
 @interface OTPublisherKit : NSObject
 
@@ -76,12 +77,17 @@
 @property(readonly) OTStream* stream;
 
 /**
- * A string that will be associated with this publisher's stream. This string is displayed at the bottom of publisher
- * videos and at the bottom of subscriber videos associated with the published stream. You can set this name after
- * initializing the publisher and before sending the <[OTSession publish:error:]> message. Setting the property after
- * sending the <[OTSession publish:error:]> message has no effect on the name displayed for the stream.
+ * A string that will be associated with this publisher's stream. This string is
+ * displayed at the bottom of publisher
+ * videos and at the bottom of subscriber videos associated with the published
+ * stream. You can set this name after
+ * initializing the publisher and before sending the
+ * <[OTSession publish:error:]> message. Setting the property after
+ * sending the <[OTSession publish:error:]> message has no effect on the name
+ * displayed for the stream.
  *
- * Note that you can also set the name when you send the <[OTPublisherKit initWithDelegate:name:]> message.
+ * Note that you can also set the name when you send the
+ * <[OTPublisherKit initWithDelegate:name:]> message.
  *
  * This value defaults to an empty string.
  */
@@ -106,12 +112,14 @@
 /** @name Setting publisher device configuration */
 
 /**
- * The <OTVideoCapture> object used to capture video to stream to the OpenTok session.
+ * The <OTVideoCapture> instance used to capture video to stream to the OpenTok
+ * session.
  */
 @property(nonatomic, retain) id<OTVideoCapture> videoCapture;
 
 /**
- * The <OTVideoRender> object used to render video to stream to the OpenTok session.
+ * The <OTVideoRender> instance used to render video to stream to the OpenTok
+ * session.
  */
 @property(nonatomic, retain) id<OTVideoRender> videoRender;
 
@@ -119,9 +127,11 @@
 
 
 /**
- * Used for sending messages for an OTPublisher instance. The OTPublisher class includes a
- * `delegate` property. When you send the <[OTPublisherKit initWithDelegate:]> message or the
- * <[OTPublisherKit initWithDelegate:name:]> message, you specify an OTSessionDelegate object.
+ * Used for sending messages for an OTPublisher instance. The OTPublisher class
+ * includes a `delegate` property. When you send the
+ * <[OTPublisherKit initWithDelegate:]> message or the
+ * <[OTPublisherKit initWithDelegate:name:]> message, you specify an 
+ * OTSessionDelegate object.
  */
 @protocol OTPublisherKitDelegate <NSObject>
 
@@ -130,7 +140,8 @@
  * the publisher can be considered fully detached from a session and may
  * be released.
  * @param publisher The publisher that signalled this event.
- * @param error The error (an <OTError> object). The `OTPublisherErrorCode` enum (defined in the OTError class)
+ * @param error The error (an <OTError> object). The `OTPublisherErrorCode` 
+ * enum (defined in the OTError class)
  * defines values for the `code` property of this object.
  */
 - (void)publisher:(OTPublisherKit*)publisher didFailWithError:(OTError*)error;
