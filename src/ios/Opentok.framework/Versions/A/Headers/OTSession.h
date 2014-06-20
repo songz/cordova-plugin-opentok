@@ -1,7 +1,7 @@
 //
 //  OTSession.h
 //
-//  Copyright (c) 2013 Tokbox, Inc. All rights reserved.
+//  Copyright (c) 2014 Tokbox, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
@@ -12,30 +12,21 @@
 @protocol OTSessionDelegate;
 
 /**
- * @enum OTSessionConnectionStatus
- *
- * @abstract
  * The connection status codes, available through 
- * OTSession.sessionConnectionStatus.
- *
- * @constant   OTSessionConnectionStatusNotConnected
- * The session is not connected.
- * @constant   OTSessionConnectionStatusConnected
- * The session is connected.
- * @constant   OTSessionConnectionStatusConnecting
- * The session is connecting.
- * @constant   OTSessionConnectionStatusDisconnecting
- * The session is disconnecting.
- * @constant   OTSessionConnectionStatusFailed
- * The session has experienced a fatal error.
+ * <[OTSession sessionConnectionStatus]>.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, OTSessionConnectionStatus) {
+    /**  The session is not connected. */
     OTSessionConnectionStatusNotConnected,
+    /** The session is connected. */
     OTSessionConnectionStatusConnected,
+    /** The session is connecting. */
     OTSessionConnectionStatusConnecting,
+    /** The session is disconnecting. */
     OTSessionConnectionStatusDisconnecting,
+    /** The session has experienced a fatal error.  */
     OTSessionConnectionStatusFailed,
-} OTSessionConnectionStatus;
+};
 
 /**
  * The first step in using the OpenTok iOS SDK is to initialize
@@ -74,18 +65,10 @@ typedef enum {
 @property(readonly) OTSessionConnectionStatus sessionConnectionStatus;
 
 /**
- * The [session ID]( http://tokbox.com/opentok/tutorials/create-session )
- * of this instance. Once initialized, this is an immutable value.
+ * The [Session ID]( http://tokbox.com/opentok/tutorials/create-session )
+ * of this instance. This is an immutable value.
  */
 @property(readonly) NSString* sessionId;
-
-/**
- * The number of discrete clients connected to this session. Individual iOS 
- * clients
- * connect to a session by sending the <[OTSession connectWithToken:]>
- * message.
- */
-@property(readonly) int connectionCount;
 
 /**
  * The streams that are a part of this session, keyed by streamId.
@@ -202,10 +185,6 @@ __attribute__((deprecated("use disconnect: instead")));
  * <[OTPublisherKitDelegate publisher:streamCreated:]> message
  * is sent to the publisher delegate delegate.
  *
- * Also, when the operation is complete, the
- * <[OTSessionDelegate session:didAddPublisher:]>
- * message is sent to the publisher's delegate.
- *
  * If publishing fails, 
  * <[OTPublisherKitDelegate publisher:didFailWithError:]>
  * is sent to the publisher delegate and no session delegate message will be
@@ -235,9 +214,7 @@ __attribute__((deprecated("use publish:error: instead")));
  *
  * Upon removing the publisher, the 
  * <[OTPublisherKitDelegate publisher:streamDestroyed:]> message is sent
- * to the publisher delegate after streaming has stopped. Additionally,
- * <[OTSessionDelegate session:didRemovePublisher:]> is invoked after the 
- * instance has been cleanly removed from the session.
+ * to the publisher delegate after streaming has stopped.
  *
  * @param publisher The <OTPublisher> object to remove from the session.
  *
@@ -304,8 +281,9 @@ __attribute__((deprecated("use unsubscribe:error: instead")));
  *
  * @param type The type of the signal. The type is also set in the
  * <[OTSessionDelegate session:receivedSignalType:fromConnection:withString:]>
- * message.
- * @param string The data to send. The limit to the size of data is 8KiB. 
+ * message. The maximum length of the type string is 128 characters, and it must
+ * contain only letters (A-Z and a-z), numbers (0-9), "-", "_", and "~".
+ * @param string The data to send. The limit to the size of data is 8KB.
  * @param connection A destination OTConnection object.
  * Set this parameter to nil to signal all participants in the session.
  * @param error If sending a signal fails, this value is set to an OTError
@@ -416,24 +394,6 @@ connectionCreated:(OTConnection*) connection;
 connectionDestroyed:(OTConnection*) connection;
 
 /**
- * Sent when this client starts publishing a stream to the session.
- *
- * @param session The <OTSession> instance that sent this message.
- * @param publisher The <OTPublsiherKit> object that defines the stream being 
- * sent.
- */
-- (void)session:(OTSession*)session didAddPublisher:(OTPublisherKit*)publisher;
-/**
- * Sent when this client stops publishing a stream to the session.
- *
- * @param session The <OTSession> instance that sent this message.
- * @param publisher The <OTPublsiherKit> object that defines the stream that
- * stopped being sent.
- */
-- (void)   session:(OTSession*)session
-didRemovePublisher:(OTPublisherKit*)publisher;
-
-/**
  * Sent when a message is received in the session.
  * @param session The <OTSession> instance that sent this message.
  * @param type The type string of the signal.
@@ -446,13 +406,43 @@ receivedSignalType:(NSString*)type
     fromConnection:(OTConnection*)connection
         withString:(NSString*)string;
 
-- (void)session:(OTSession*)session
-archiveCreatedWithId:(NSString*)archiveId
-           name:(NSString*)name
-         status:(NSString*)status;
+/** @name Monitoring archiving events */
 
-- (void)session:(OTSession*)session
-archiveUpdatedWithId:(NSString*)archiveId
-         status:(NSString*)status;
+/**
+ * Sent when an archive recording of a session starts. If you connect to a
+ * session in which recording is already in progress, this message is sent
+ * when you connect.
+ *
+ * In response to this message, you may want to add a user interface
+ * notification (such as an icon in the Publisher view) that indicates
+ * that the session is being recorded.
+ *
+ * For more information see the OpenTok
+ * [Archiving Overview]( http://www.tokbox.com/opentok/tutorials/archiving ).
+ *
+ * @param session The <OTSession> instance that sent this message.
+ * @param archiveId The unique ID of the archive.
+ * @param name The name of the archive (if one was provided when the archive
+ * was created).
+ */
+- (void)     session:(OTSession*)session
+archiveStartedWithId:(NSString*)archiveId
+                name:(NSString*)name;
+
+/**
+ * Sent when an archive recording of a session stops.
+ *
+ * In response to this message, you may want to change or remove a user
+ * interface notification (such as an icon in the Publisher view) that
+ * indicates that the session is being recorded.
+ *
+ * For more information, see the OpenTok
+ * [Archiving Overview]( http://www.tokbox.com/opentok/tutorials/archiving ).
+ *
+ * @param session The <OTSession> instance that sent this message.
+ * @param archiveId The unique ID of the archive.
+ */
+- (void)     session:(OTSession*)session
+archiveStoppedWithId:(NSString*)archiveId;
 
 @end

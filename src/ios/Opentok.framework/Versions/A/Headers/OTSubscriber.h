@@ -2,21 +2,15 @@
 //  OTSubscriber.h
 //  OpenTok iOS SDK
 //
-//  Copyright (c) 2013 Tokbox, Inc. All rights reserved.
+//  Copyright (c) 2014 Tokbox, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <OpenTok/OpenTok.h>
 
-@class OTVideoView;
-
 /**
  * Renders OpenTok streams, and provides a UIView that renders video and
  * provides some simple end-user controls.
- *
- * To use this class, you must add the XCode -ObjC flag to the "Other Linker
- * Flags" build setting. (This class uses a third-party library that uses
- * Objective-C categories.)
  */
 @interface OTSubscriber : OTSubscriberKit
 
@@ -25,5 +19,27 @@
  * view to your view heirarchy to display a video stream.
  */
 @property(readonly) UIView* view;
+
+@end
+
+/** @name OTSubscriberKitDelegate */
+
+/**
+ * OTSubscriberDelegate extends OTSubscriberKitDelegate with additional
+ * optional callbacks specific to the OTSubscriber implementation.
+ * Currently, there is only one additional callback, but others may be
+ * added in a future release.
+ */
+
+@protocol OTSubscriberDelegate <OTSubscriberKitDelegate>
+
+/**
+ * Sent when a frame of video has been decoded. Although the
+ * subscriber will connect in a relatively short time, video can take
+ * more time to synchronize. This message is sent after the
+ * <[OTSubscriberKitDelegate subscriberDidConnectToStream:]> message is sent.
+ * @param subscriber The subscriber that generated this event.
+ */
+- (void)subscriberVideoDataReceived:(OTSubscriber*)subscriber;
 
 @end

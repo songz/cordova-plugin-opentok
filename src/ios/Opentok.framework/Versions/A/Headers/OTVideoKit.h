@@ -1,55 +1,39 @@
 //
 //  OTVideoKit.h
 //
-//  Copyright (c) 2013 TokBox, Inc. All rights reserved.
+//  Copyright (c) 2014 TokBox, Inc. All rights reserved.
 //
 
 #import <Foundation/Foundation.h>
 #import <CoreMedia/CMTime.h>
 
 /**
- * @enum OTVideoOrientation
- *
- * @abstract
  * Defines values for video orientations (up, down, left, right) for the
- * orieintation property of an OTVideoFrame object.
- *
- * @constant   OTVideoOrientationUp
- * The video is oriented top up. No rotation is applies.
- * @constant   OTVideoOrientationDown
- * The video is rotated 180 degrees.
- * @constant   OTVideoOrientationLeft
- * The video is rotated 90 degrees.
- * @constant   OTVideoOrientationRight
- * The video is rotated 270 degrees.
+ * orieintation property of an <OTVideoFrame> object.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, OTVideoOrientation) {
+    /** The video is oriented top up. No rotation is applies. */
     OTVideoOrientationUp = 1,
+    /** The video is rotated 180 degrees. */
     OTVideoOrientationDown = 2,
+   /** The video is rotated 90 degrees. */
     OTVideoOrientationLeft = 3,
+   /** The video is rotated 270 degrees. */
     OTVideoOrientationRight = 4,
-    
-} OTVideoOrientation;
+};
 
 /**
- * @enum OTPixelFormat
- *
- * @abstract
  * Defines values for pixel format for the pixelFormat property of an
- * OTVideoFrame object.
- *
- * @constant   OTPixelFormatI420
- * I420 format.
- * @constant   OTPixelFormatARGB
- * ARGB format.
- * @constant   OTPixelFormatNV12
- * NV12 format.
+ * <OTVideoFrame> object.
  */
-typedef enum {
+typedef NS_ENUM(NSInteger, OTPixelFormat) {
+    /** I420 format. */
     OTPixelFormatI420 = 'I420',
+    /** ARGB format. */
     OTPixelFormatARGB = 'ARGB',
+    /** NV12 format. */
     OTPixelFormatNV12 = 'NV12',
-} OTPixelFormat;
+};
 
 /**
  * Defines the video format assigned to an instance of an <OTVideoFrame> object.
