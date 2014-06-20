@@ -454,8 +454,10 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     Log.i(TAG, "session dropped stream");
     streamCollection.remove( arg1.getStreamId() );
     RunnableSubscriber subscriber = subscriberCollection.get( arg1.getStreamId() );
-    subscriber.removeStreamView();    
-    subscriberCollection.remove( arg1.getStreamId() );
+    if(subscriber != null){
+      subscriber.removeStreamView();
+      subscriberCollection.remove( arg1.getStreamId() );
+    }
   
     triggerStreamDestroyed( arg1, "sessionEvents");
   }
@@ -596,3 +598,4 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     myEventListeners.get(event).sendPluginResult(myResult);
   }
 }
+
