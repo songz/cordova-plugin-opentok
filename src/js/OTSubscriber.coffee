@@ -34,15 +34,20 @@ class TBSubscriber
     return @
 
   constructor: (stream, divName, properties) ->
+    element = document.getElementById(divName)
     pdebug "creating subscriber", properties
     @streamId = stream.streamId
-    console.log( "creating a subscriber, replacing div #{divName}" )
+    if(properties? && properties.width=="100%" && properties.height == "100%")
+      element.style.width="100%"
+      element.style.height="100%"
+      properties.width = ""
+      properties.height = ""
     divPosition = getPosition( divName )
     subscribeToVideo="true"
-    zIndex = TBGetZIndex(document.getElementById(divName))
+    zIndex = TBGetZIndex(element)
     if(properties?)
-      width = properties.width ? divPosition.width
-      height = properties.height ? divPosition.height
+      width = properties.width || divPosition.width
+      height = properties.height || divPosition.height
       name = properties.name ? ""
       subscribeToVideo = "true"
       subscribeToAudio = "true"
@@ -53,9 +58,9 @@ class TBSubscriber
     if (not width?) or width == 0 or (not height?) or height==0
       width = DefaultWidth
       height = DefaultHeight
-    console.log( "setting width to #{width}, and height to #{height}" )
     obj = replaceWithVideoStream(divName, stream.streamId, {width:width, height:height})
     position = getPosition(obj.id)
+    pdebug "final subscriber position", position
     Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToAudio, subscribeToVideo] )
 
   # deprecating
