@@ -105,11 +105,12 @@ var TBError, TBGenerateDomHelper, TBGetZIndex, TBSuccess, TBUpdateObjects, getPo
 streamElements = {};
 
 getPosition = function(divName) {
-  var curleft, curtop, height, pubDiv, width;
+  var computedStyle, curleft, curtop, height, marginBottom, marginLeft, marginRight, marginTop, pubDiv, width;
   pubDiv = document.getElementById(divName);
   if (!pubDiv) {
     return {};
   }
+  computedStyle = window.getComputedStyle ? getComputedStyle(pubDiv, null) : {};
   width = pubDiv.offsetWidth;
   height = pubDiv.offsetHeight;
   curtop = pubDiv.offsetTop;
@@ -118,11 +119,15 @@ getPosition = function(divName) {
     curleft += pubDiv.offsetLeft;
     curtop += pubDiv.offsetTop;
   }
+  marginTop = parseInt(computedStyle.marginTop) || 0;
+  marginBottom = parseInt(computedStyle.marginBottom) || 0;
+  marginLeft = parseInt(computedStyle.marginLeft) || 0;
+  marginRight = parseInt(computedStyle.marginRight) || 0;
   return {
-    top: curtop,
-    left: curleft,
-    width: width,
-    height: height
+    top: curtop + marginTop,
+    left: curleft + marginLeft,
+    width: width - (marginLeft + marginRight),
+    height: height - (marginTop + marginBottom)
   };
 };
 
@@ -701,17 +706,23 @@ TBSubscriber = (function() {
   };
 
   function TBSubscriber(stream, divName, properties) {
-    var divPosition, height, name, obj, position, subscribeToAudio, subscribeToVideo, width, zIndex, _ref, _ref1, _ref2;
+    var divPosition, element, height, name, obj, position, subscribeToAudio, subscribeToVideo, width, zIndex, _ref;
+    element = document.getElementById(divName);
     pdebug("creating subscriber", properties);
     this.streamId = stream.streamId;
-    console.log("creating a subscriber, replacing div " + divName);
+    if ((properties != null) && properties.width === "100%" && properties.height === "100%") {
+      element.style.width = "100%";
+      element.style.height = "100%";
+      properties.width = "";
+      properties.height = "";
+    }
     divPosition = getPosition(divName);
     subscribeToVideo = "true";
-    zIndex = TBGetZIndex(document.getElementById(divName));
+    zIndex = TBGetZIndex(element);
     if ((properties != null)) {
-      width = (_ref = properties.width) != null ? _ref : divPosition.width;
-      height = (_ref1 = properties.height) != null ? _ref1 : divPosition.height;
-      name = (_ref2 = properties.name) != null ? _ref2 : "";
+      width = properties.width || divPosition.width;
+      height = properties.height || divPosition.height;
+      name = (_ref = properties.name) != null ? _ref : "";
       subscribeToVideo = "true";
       subscribeToAudio = "true";
       if ((properties.subscribeToVideo != null) && properties.subscribeToVideo === false) {
@@ -725,12 +736,12 @@ TBSubscriber = (function() {
       width = DefaultWidth;
       height = DefaultHeight;
     }
-    console.log("setting width to " + width + ", and height to " + height);
     obj = replaceWithVideoStream(divName, stream.streamId, {
       width: width,
       height: height
     });
     position = getPosition(obj.id);
+    pdebug("final subscriber position", position);
     Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToAudio, subscribeToVideo]);
   }
 
