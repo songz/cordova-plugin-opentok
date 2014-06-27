@@ -229,6 +229,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
 
     public void run() {
       if( mSubscriber == null ){
+        logMessage("NEW SUBSCRIBER BEING CREATED");
         mSubscriber = new Subscriber(cordova.getActivity(), mStream);
         mSubscriber.setVideoListener(this);
         mSubscriber.setSubscriberListener(this);
@@ -241,6 +242,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       super.run();
     }
 
+    
 
     // listeners
     @Override
@@ -441,6 +443,11 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       parent.removeView( myPublisher.mView  );
     }
     
+    // delete all data and prevent updateviews from drawing non existent things
+    subscriberCollection.clear();
+    connectionCollection.clear();
+    streamCollection.clear();
+    
     JSONObject data = new JSONObject();   
     try{
       data.put("reason", "clientDisconnected");
@@ -538,6 +545,9 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
 
   
   // Helper Methods
+  public void logMessage(String a){
+    Log.i(TAG, a);
+  }
   public boolean compareStrings(String a, String b){
     if(a != null && b != null && a.equalsIgnoreCase(b) ){
       return true;
@@ -598,4 +608,3 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     myEventListeners.get(event).sendPluginResult(myResult);
   }
 }
-
