@@ -218,7 +218,7 @@ TBPublisher = (function() {
     this.sanitizeInputs(one, two, three);
     pdebug("creating publisher", {});
     position = getPosition(this.domId);
-    name = "TBNameHolder";
+    name = "";
     publishAudio = "true";
     publishVideo = "true";
     cameraName = "front";
@@ -226,7 +226,7 @@ TBPublisher = (function() {
     if (this.properties != null) {
       width = (_ref = this.properties.width) != null ? _ref : position.width;
       height = (_ref1 = this.properties.height) != null ? _ref1 : position.height;
-      name = (_ref2 = this.properties.name) != null ? _ref2 : "TBNameHolder";
+      name = (_ref2 = this.properties.name) != null ? _ref2 : "";
       cameraName = (_ref3 = this.properties.cameraName) != null ? _ref3 : "front";
       if ((this.properties.publishAudio != null) && this.properties.publishAudio === false) {
         publishAudio = "false";

@@ -67,9 +67,6 @@
     
     // Get Parameters
     NSString* name = [command.arguments objectAtIndex:0];
-    if ([name isEqualToString:@"TBNameHolder"]) {
-        name = [[UIDevice currentDevice] name];
-    }
     int top = [[command.arguments objectAtIndex:1] intValue];
     int left = [[command.arguments objectAtIndex:2] intValue];
     int width = [[command.arguments objectAtIndex:3] intValue];
