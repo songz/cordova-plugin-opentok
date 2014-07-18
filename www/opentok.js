@@ -574,7 +574,7 @@ TBSession = (function() {
   TBSession.prototype.sessionConnected = function(event) {
     pdebug("sessionConnectedHandler", event);
     this.trigger("sessionConnected");
-    this.sessionConnection = event.connection;
+    this.connection = new TBConnection(event.connection);
     event = null;
     return this;
   };

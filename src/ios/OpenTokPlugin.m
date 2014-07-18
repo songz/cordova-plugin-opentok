@@ -301,33 +301,13 @@
     // SessionId
     [sessionDict setObject:session.sessionId forKey:@"sessionId"];
     
-    // SessionStreams
-    NSMutableArray* streamsArray = [[NSMutableArray alloc] init];
-    for(id key in session.streams){
-        OTStream* aStream = [session.streams objectForKey:key];
-        [streamDictionary setObject:aStream forKey:aStream.streamId];
-        
-        NSMutableDictionary* streamInfo = [[NSMutableDictionary alloc] init];
-        [streamInfo setObject:aStream.streamId forKey:@"streamId"];
-        
-        NSMutableDictionary* connectionInfo = [[NSMutableDictionary alloc] init];
-        [connectionInfo setObject:aStream.connection.connectionId forKey:@"streamId"];
-        [streamInfo setObject:connectionInfo forKey:@"connection"];
-        [streamsArray addObject: streamInfo];
-    }
-    [sessionDict setObject:streamsArray forKey:@"streams"];
     
     // After session is successfully connected, the connection property is available
-    NSMutableDictionary* connection = [[NSMutableDictionary alloc] init];
-    [connection setObject:session.connection.connectionId forKey:@"connectionId"];
-    NSString* strDate= [NSString stringWithFormat:@"%.0f", [session.connection.creationTime timeIntervalSince1970]];
-    [connection setObject:strDate forKey:@"creationTime"];
-    [sessionDict setObject:connection forKey:@"connection"];
+    NSMutableDictionary* eventData = [[NSMutableDictionary alloc] init];
+    [eventData setObject:@"status" forKey:@"connected"];
+    NSMutableDictionary* connectionData = [self createDataFromConnection: session.connection];
+    [eventData setObject: connectionData forKey: @"connection"];
     
-    
-    // Session Environment
-    // Changed to production by default
-    [sessionDict setObject:@"production" forKey:@"environment"];
     
     NSLog(@"object for session is %@", sessionDict);
     
@@ -336,8 +316,7 @@
     //    NSString* sessionConnectCallback = [callbackList objectForKey:@"sessSessionConnected"];
     //    [self.commandDelegate sendPluginResult:pluginResult callbackId:sessionConnectCallback];
     
-    NSMutableDictionary* eventData = [[NSMutableDictionary alloc] init];
-    [eventData setObject:@"status" forKey:@"connected"];
+    
     [self triggerJSEvent: @"sessionEvents" withType: @"sessionConnected" withData: eventData];
 }
 
