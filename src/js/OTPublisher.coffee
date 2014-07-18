@@ -19,7 +19,7 @@ class TBPublisher
     @sanitizeInputs( one,two, three )
     pdebug "creating publisher", {}
     position = getPosition(@domId)
-    name="TBNameHolder"
+    name=""
     publishAudio="true"
     publishVideo="true"
     cameraName = "front"
@@ -28,7 +28,7 @@ class TBPublisher
     if @properties?
       width = @properties.width ? position.width
       height = @properties.height ? position.height
-      name = @properties.name ? "TBNameHolder"
+      name = @properties.name ? ""
       cameraName = @properties.cameraName ? "front"
       if(@properties.publishAudio? and @properties.publishAudio==false)
         publishAudio="false"
@@ -129,3 +129,4 @@ class TBPublisher
     else
       @domId = TBGenerateDomHelper()
     @domId = if( @domId and document.getElementById( @domId ) ) then @domId else TBGenerateDomHelper()
+    @apiKey = @apiKey.toString()

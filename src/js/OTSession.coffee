@@ -104,6 +104,7 @@ class TBSession
     return Cordova.exec(TBSuccess, TBError, OTPlugin, "unsubscribe", [subscriber.streamId] )
 
   constructor: (@apiKey, @sessionId) ->
+    @apiKey = @apiKey.toString()
     @connections = {}
     @streams = {}
     @alreadyPublishing = false
@@ -138,7 +139,7 @@ class TBSession
   sessionConnected: (event) =>
     pdebug "sessionConnectedHandler", event
     @trigger("sessionConnected")
-    @sessionConnection = event.connection
+    @connection = new TBConnection( event.connection )
     event = null
     return @
   sessionDisconnected: (event) =>

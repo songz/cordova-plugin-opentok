@@ -141,7 +141,14 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       Log.i(TAG, "view running on UIVIEW!!!");
       if( mPublisher == null ){
         ViewGroup frame = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
-        mPublisher = new Publisher(cordova.getActivity().getApplicationContext(), "publisher" );
+        String publisherName;
+        try{
+          publisherName = this.mProperty.getString(0);
+        }catch(Exception e){
+          publisherName = "Android-Publisher";
+        }
+
+        mPublisher = new Publisher(cordova.getActivity().getApplicationContext(), publisherName);
         mPublisher.setCameraListener(this);
         mPublisher.setPublisherListener(this);
         try{
