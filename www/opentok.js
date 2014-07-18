@@ -373,7 +373,8 @@ TBPublisher = (function() {
     } else {
       this.domId = TBGenerateDomHelper();
     }
-    return this.domId = this.domId && document.getElementById(this.domId) ? this.domId : TBGenerateDomHelper();
+    this.domId = this.domId && document.getElementById(this.domId) ? this.domId : TBGenerateDomHelper();
+    return this.apiKey = this.apiKey.toString();
   };
 
   return TBPublisher;
@@ -519,6 +520,7 @@ TBSession = (function() {
     this.eventReceived = __bind(this.eventReceived, this);
     this.publish = __bind(this.publish, this);
     this.publish = __bind(this.publish, this);
+    this.apiKey = this.apiKey.toString();
     this.connections = {};
     this.streams = {};
     this.alreadyPublishing = false;

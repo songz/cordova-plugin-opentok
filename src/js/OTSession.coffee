@@ -104,6 +104,7 @@ class TBSession
     return Cordova.exec(TBSuccess, TBError, OTPlugin, "unsubscribe", [subscriber.streamId] )
 
   constructor: (@apiKey, @sessionId) ->
+    @apiKey = @apiKey.toString()
     @connections = {}
     @streams = {}
     @alreadyPublishing = false

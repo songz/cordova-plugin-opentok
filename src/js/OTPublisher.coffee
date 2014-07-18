@@ -129,3 +129,4 @@ class TBPublisher
     else
       @domId = TBGenerateDomHelper()
     @domId = if( @domId and document.getElementById( @domId ) ) then @domId else TBGenerateDomHelper()
+    @apiKey = @apiKey.toString()
