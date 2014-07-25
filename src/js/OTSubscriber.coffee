@@ -60,8 +60,9 @@ class TBSubscriber
       height = DefaultHeight
     obj = replaceWithVideoStream(divName, stream.streamId, {width:width, height:height})
     position = getPosition(obj.id)
+    ratios = TBGetScreenRatios()
     pdebug "final subscriber position", position
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToAudio, subscribeToVideo] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, ratios.widthRatio, ratios.heightRatio, subscribeToAudio, subscribeToVideo] )
 
   # deprecating
   removeEventListener: (event, listener) ->

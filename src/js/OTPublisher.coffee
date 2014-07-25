@@ -24,6 +24,7 @@ class TBPublisher
     publishVideo="true"
     cameraName = "front"
     zIndex = TBGetZIndex(document.getElementById(@domId))
+    ratios = TBGetScreenRatios()
 
     if @properties?
       width = @properties.width ? position.width
@@ -41,7 +42,7 @@ class TBPublisher
     position = getPosition(@domId)
     TBUpdateObjects()
     OT.getHelper().eventing(@)
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, ratios.widthRatio, ratios.heightRatio, publishAudio, publishVideo, cameraName] )
     Cordova.exec(@eventReceived, TBSuccess, OTPlugin, "addEvent", ["publisherEvents"] )
   setSession: (session) =>
     @session = session
