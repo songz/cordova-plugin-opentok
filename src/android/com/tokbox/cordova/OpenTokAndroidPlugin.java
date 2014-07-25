@@ -106,8 +106,8 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
           mView.setY( mProperty.getInt(1) * widthRatio );
           mView.setX( mProperty.getInt(2) * heightRatio );
           ViewGroup.LayoutParams params = mView.getLayoutParams();
-          params.height = mProperty.getInt(4) * heightRatio;
-          params.width = mProperty.getInt(3) * widthRatio;
+          params.height = (int) (mProperty.getInt(4) * heightRatio);
+          params.width = (int) (mProperty.getInt(3) * widthRatio);
           mView.setLayoutParams(params);
           updateZIndices();
         }catch( Exception e ){
