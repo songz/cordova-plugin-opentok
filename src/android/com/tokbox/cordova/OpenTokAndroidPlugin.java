@@ -157,10 +157,10 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         mPublisher.setPublisherListener(this);
         try{
           // Camera is swapped in streamCreated event
-          if( compareStrings(this.mProperty.getString(7), "false") ){
+          if( compareStrings(this.mProperty.getString(9), "false") ){
             mPublisher.setPublishVideo(false); // default is true
           }
-          if( compareStrings(this.mProperty.getString(6), "false") ){
+          if( compareStrings(this.mProperty.getString(8), "false") ){
             mPublisher.setPublishAudio(false); // default is true
           }
           Log.i(TAG, "all set up for publisher");
@@ -185,7 +185,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     public void onStreamCreated(PublisherKit arg0, Stream arg1) {
       Log.i(TAG, "publisher stream received");
       try{
-        if( compareStrings(this.mProperty.getString(8), "back") ){
+        if( compareStrings(this.mProperty.getString(10), "back") ){
           Log.i(TAG, "swapping camera");
           mPublisher.swapCamera(); // default is front
         }
