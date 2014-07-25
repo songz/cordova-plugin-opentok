@@ -103,8 +103,8 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
           float widthRatio = (float) mProperty.getDouble(6),
                 heightRatio = (float) mProperty.getDouble(7);
 
-          mView.setY( mProperty.getInt(1) * widthRatio );
-          mView.setX( mProperty.getInt(2) * heightRatio );
+          mView.setY( mProperty.getInt(1) * heightRatio );
+          mView.setX( mProperty.getInt(2) * widthRatio );
           ViewGroup.LayoutParams params = mView.getLayoutParams();
           params.height = (int) (mProperty.getInt(4) * heightRatio);
           params.width = (int) (mProperty.getInt(3) * widthRatio);
