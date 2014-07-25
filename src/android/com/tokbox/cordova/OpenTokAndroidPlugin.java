@@ -99,11 +99,15 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         try{
           Log.i( TAG, "updating view in ui runnable" + mProperty.toString() );
           Log.i( TAG, "updating view in ui runnable " + mView.toString() );
-          mView.setY( (float) mProperty.getInt(1) );
-          mView.setX( (float) mProperty.getInt(2) );
+
+          float widthRatio = (float) mProperty.getDouble(8),
+                heightRatio = (float) mProperty.getDouble(9);
+
+          mView.setY( mProperty.getInt(1) * widthRatio );
+          mView.setX( mProperty.getInt(2) * heightRatio );
           ViewGroup.LayoutParams params = mView.getLayoutParams();
-          params.height = mProperty.getInt(4);
-          params.width = mProperty.getInt(3);
+          params.height = mProperty.getInt(4) * heightRatio;
+          params.width = mProperty.getInt(3) * widthRatio;
           mView.setLayoutParams(params);
           updateZIndices();
         }catch( Exception e ){
