@@ -100,8 +100,8 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
           Log.i( TAG, "updating view in ui runnable" + mProperty.toString() );
           Log.i( TAG, "updating view in ui runnable " + mView.toString() );
 
-          float widthRatio = (float) mProperty.getDouble(8),
-                heightRatio = (float) mProperty.getDouble(9);
+          float widthRatio = (float) mProperty.getDouble(6),
+                heightRatio = (float) mProperty.getDouble(7);
 
           mView.setY( mProperty.getInt(1) * widthRatio );
           mView.setX( mProperty.getInt(2) * heightRatio );
