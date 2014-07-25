@@ -100,7 +100,7 @@ TBEvent = (function() {
 
 })();
 
-var TBError, TBGenerateDomHelper, TBGetZIndex, TBSuccess, TBUpdateObjects, getPosition, pdebug, replaceWithVideoStream, streamElements;
+var TBError, TBGenerateDomHelper, TBGetScreenRatios, TBGetZIndex, TBSuccess, TBUpdateObjects, getPosition, pdebug, replaceWithVideoStream, streamElements;
 
 streamElements = {};
 
@@ -165,11 +165,10 @@ TBSuccess = function() {
 };
 
 TBUpdateObjects = function() {
-  var e, heightRatio, id, objects, position, streamId, widthRatio, _i, _len;
+  var e, id, objects, position, ratios, streamId, _i, _len;
   console.log("JS: Objects being updated in TBUpdateObjects");
   objects = document.getElementsByClassName('OT_root');
-  widthRatio = window.outerWidth / window.innerWidth;
-  heightRatio = window.outerHeight / window.innerHeight;
+  ratios = TBGetScreenRatios();
   for (_i = 0, _len = objects.length; _i < _len; _i++) {
     e = objects[_i];
     console.log("JS: Object updated");
@@ -177,7 +176,7 @@ TBUpdateObjects = function() {
     console.log("JS sessionId: " + streamId);
     id = e.id;
     position = getPosition(id);
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e), widthRatio, heightRatio]);
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e), ratios.widthRatio, ratios.heightRatio]);
   }
 };
 
@@ -203,6 +202,13 @@ TBGetZIndex = function(ele) {
   return 0;
 };
 
+TBGetScreenRatios = function() {
+  return {
+    widthRatio: window.outerWidth / window.innerWidth,
+    heightRatio: window.outerHeight / window.innerHeight
+  };
+};
+
 pdebug = function(msg, data) {
   return console.log("JS Lib: " + msg + " - ", data);
 };
@@ -216,7 +222,7 @@ TBPublisher = (function() {
     this.streamCreated = __bind(this.streamCreated, this);
     this.eventReceived = __bind(this.eventReceived, this);
     this.setSession = __bind(this.setSession, this);
-    var cameraName, height, name, position, publishAudio, publishVideo, width, zIndex, _ref, _ref1, _ref2, _ref3;
+    var cameraName, height, name, position, publishAudio, publishVideo, ratios, width, zIndex, _ref, _ref1, _ref2, _ref3;
     this.sanitizeInputs(one, two, three);
     pdebug("creating publisher", {});
     position = getPosition(this.domId);
@@ -225,6 +231,7 @@ TBPublisher = (function() {
     publishVideo = "true";
     cameraName = "front";
     zIndex = TBGetZIndex(document.getElementById(this.domId));
+    ratios = TBGetScreenRatios();
     if (this.properties != null) {
       width = (_ref = this.properties.width) != null ? _ref : position.width;
       height = (_ref1 = this.properties.height) != null ? _ref1 : position.height;
@@ -248,7 +255,7 @@ TBPublisher = (function() {
     position = getPosition(this.domId);
     TBUpdateObjects();
     OT.getHelper().eventing(this);
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName]);
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, ratios.widthRatio, ratios.heightRatio, publishAudio, publishVideo, cameraName]);
     Cordova.exec(this.eventReceived, TBSuccess, OTPlugin, "addEvent", ["publisherEvents"]);
   }
 
@@ -710,7 +717,7 @@ TBSubscriber = (function() {
   };
 
   function TBSubscriber(stream, divName, properties) {
-    var divPosition, element, height, name, obj, position, subscribeToAudio, subscribeToVideo, width, zIndex, _ref;
+    var divPosition, element, height, name, obj, position, ratios, subscribeToAudio, subscribeToVideo, width, zIndex, _ref;
     element = document.getElementById(divName);
     pdebug("creating subscriber", properties);
     this.streamId = stream.streamId;
@@ -745,8 +752,9 @@ TBSubscriber = (function() {
       height: height
     });
     position = getPosition(obj.id);
+    ratios = TBGetScreenRatios();
     pdebug("final subscriber position", position);
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToAudio, subscribeToVideo]);
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, ratios.widthRatio, ratios.heightRatio, subscribeToAudio, subscribeToVideo]);
   }
 
   TBSubscriber.prototype.removeEventListener = function(event, listener) {
