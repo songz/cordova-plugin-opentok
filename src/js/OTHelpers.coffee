@@ -67,9 +67,7 @@ TBUpdateObjects = ()->
   console.log("JS: Objects being updated in TBUpdateObjects")
   objects = document.getElementsByClassName('OT_root')
 
-  # Ratio between browser window size and viewport size
-  widthRatio = window.outerWidth / window.innerWidth
-  heightRatio = window.outerHeight / window.innerHeight
+  ratios = TBGetScreenRatios()
 
   for e in objects
     console.log("JS: Object updated")
@@ -77,7 +75,7 @@ TBUpdateObjects = ()->
     console.log("JS sessionId: " + streamId )
     id = e.id
     position = getPosition(id)
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e), widthRatio, heightRatio] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e), ratios.widthRatio, ratios.heightRatio] )
   return
 TBGenerateDomHelper = ->
   domId = "PubSub" + Date.now()
@@ -94,6 +92,13 @@ TBGetZIndex = (ele) ->
       return val
     ele = ele.offsetParent
   return 0
+
+TBGetScreenRatios = ()->
+    # Ratio between browser window size and viewport size
+    return {
+        widthRatio: window.outerWidth / window.innerWidth,
+        heightRatio: window.outerHeight / window.innerHeight
+    }
 
 pdebug = (msg, data) ->
   console.log "JS Lib: #{msg} - ", data
