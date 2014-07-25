@@ -66,13 +66,18 @@ TBSuccess = ->
 TBUpdateObjects = ()->
   console.log("JS: Objects being updated in TBUpdateObjects")
   objects = document.getElementsByClassName('OT_root')
+
+  # Ratio between browser window size and viewport size
+  widthRatio = window.outerWidth / window.innerWidth
+  heightRatio = window.outerHeight / window.innerHeight
+
   for e in objects
     console.log("JS: Object updated")
     streamId = e.dataset.streamid
     console.log("JS sessionId: " + streamId )
     id = e.id
     position = getPosition(id)
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e)] )
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e), widthRatio, heightRatio] )
   return
 TBGenerateDomHelper = ->
   domId = "PubSub" + Date.now()
