@@ -165,9 +165,11 @@ TBSuccess = function() {
 };
 
 TBUpdateObjects = function() {
-  var e, id, objects, position, streamId, _i, _len;
+  var e, heightRatio, id, objects, position, streamId, widthRatio, _i, _len;
   console.log("JS: Objects being updated in TBUpdateObjects");
   objects = document.getElementsByClassName('OT_root');
+  widthRatio = window.outerWidth / window.innerWidth;
+  heightRatio = window.outerHeight / window.innerHeight;
   for (_i = 0, _len = objects.length; _i < _len; _i++) {
     e = objects[_i];
     console.log("JS: Object updated");
@@ -175,7 +177,7 @@ TBUpdateObjects = function() {
     console.log("JS sessionId: " + streamId);
     id = e.id;
     position = getPosition(id);
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e)]);
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "updateView", [streamId, position.top, position.left, position.width, position.height, TBGetZIndex(e), widthRatio, heightRatio]);
   }
 };
 
