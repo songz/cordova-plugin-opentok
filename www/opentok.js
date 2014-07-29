@@ -255,7 +255,7 @@ TBPublisher = (function() {
     position = getPosition(this.domId);
     TBUpdateObjects();
     OT.getHelper().eventing(this);
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, ratios.widthRatio, ratios.heightRatio, publishAudio, publishVideo, cameraName]);
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName, ratios.widthRatio, ratios.heightRatio]);
     Cordova.exec(this.eventReceived, TBSuccess, OTPlugin, "addEvent", ["publisherEvents"]);
   }
 
@@ -754,7 +754,7 @@ TBSubscriber = (function() {
     position = getPosition(obj.id);
     ratios = TBGetScreenRatios();
     pdebug("final subscriber position", position);
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, ratios.widthRatio, ratios.heightRatio, subscribeToAudio, subscribeToVideo]);
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "subscribe", [stream.streamId, position.top, position.left, width, height, zIndex, subscribeToAudio, subscribeToVideo, ratios.widthRatio, ratios.heightRatio]);
   }
 
   TBSubscriber.prototype.removeEventListener = function(event, listener) {
