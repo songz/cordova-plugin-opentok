@@ -165,8 +165,9 @@
     [_session unpublish:_publisher error:nil];
     
     // Remove publisher view
-    [_publisher.view removeFromSuperview];
-    _publisher = nil;
+    if (_publisher) {
+        [_publisher.view removeFromSuperview];
+    }
 }
 
 
