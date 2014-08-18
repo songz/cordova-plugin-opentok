@@ -27,7 +27,7 @@
 - (void)publishAudio:(CDVInvokedUrlCommand*)command;
 - (void)publishVideo:(CDVInvokedUrlCommand*)command;
 - (void)setCameraPosition:(CDVInvokedUrlCommand*)command;
-- (void)destroy:(CDVInvokedUrlCommand*)command;
+- (void)destroyPublisher:(CDVInvokedUrlCommand*)command;
 
 // Session
 -(void)connect:(CDVInvokedUrlCommand*)command;

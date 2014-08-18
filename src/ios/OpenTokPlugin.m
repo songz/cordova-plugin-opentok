@@ -159,7 +159,15 @@
         [_publisher setCameraPosition:AVCaptureDevicePositionFront];
     }
 }
-- (void)destroy:(CDVInvokedUrlCommand*)command{
+- (void)destroyPublisher:(CDVInvokedUrlCommand *)command{
+    NSLog(@"iOS Destroying Publisher");
+    // Unpublish publisher
+    [_session unpublish:_publisher error:nil];
+    
+    // Remove publisher view
+    if (_publisher) {
+        [_publisher.view removeFromSuperview];
+    }
 }
 
 

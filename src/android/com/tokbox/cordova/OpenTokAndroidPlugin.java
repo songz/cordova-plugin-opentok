@@ -456,6 +456,8 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
 
   @Override
   public void onDisconnected(Session arg0) {
+    sessionConnected = false;
+
     ViewGroup parent = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
     for (Map.Entry<String, RunnableSubscriber> entry : subscriberCollection.entrySet() ) { 
       if (null != parent) {
@@ -470,7 +472,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     subscriberCollection.clear();
     connectionCollection.clear();
     streamCollection.clear();
-    
+
     JSONObject data = new JSONObject();   
     try{
       data.put("reason", "clientDisconnected");
