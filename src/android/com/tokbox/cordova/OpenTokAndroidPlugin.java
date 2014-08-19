@@ -143,6 +143,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       edit.clear();
       edit.putBoolean("opentok.publisher.accepted", true);
       edit.commit();
+      cordova.getActivity().runOnUiThread( this );
     }
 
     public void setPropertyFromArray( JSONArray args ){
@@ -153,6 +154,14 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       cordova.getActivity().runOnUiThread( this );
     }
 
+
+    public void destroyPublisher(){
+      ViewGroup parent = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
+        parent.removeView( this.mView );
+        this.mPublisher.destroy();
+        this.mPublisher = null;
+    }
+    
     public void run() {
       Log.i(TAG, "view running on UIVIEW!!!");
       if( mPublisher == null ){
@@ -181,6 +190,8 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         }
         this.mView = mPublisher.getView();
         frame.addView( this.mView );
+      }
+      if(sessionConnected && mPublisher != null){
         mSession.publish(mPublisher);
       }
       super.run();
@@ -327,13 +338,24 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     }
 
   @Override
-    public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
+  public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
       Log.i( TAG, action );
       // TB Methods
       if( action.equals("initPublisher")){
         myPublisher = new RunnablePublisher( args );
       }else if( action.equals( "destroyPublisher" )){
+      if( myPublisher != null ){
+         cordova.getActivity().runOnUiThread(new Runnable() {
+              @Override
+              public void run() {
+                myPublisher.destroyPublisher();
+                myPublisher = null;
+             }
+         });
 
+         callbackContext.success();
+         return true;
+      }
       }else if( action.equals( "initSession" )){
         Log.i( TAG, "created new session with data: "+args.toString());
         mSession = new Session(this.cordova.getActivity().getApplicationContext(), args.getString(0), args.getString(1));
@@ -434,9 +456,12 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
 
   @Override
   public void onPublisherRemoved(Session arg0, PublisherKit arg1) {
-    // TODO Auto-generated method stub
-    
+    if(myPublisher != null){
+      myPublisher.destroyPublisher();
+      myPublisher = null;
+    }
   }
+  
   
   // sessionListener
   @Override
@@ -457,17 +482,23 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
   @Override
   public void onDisconnected(Session arg0) {
     sessionConnected = false;
-
-    ViewGroup parent = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
-    for (Map.Entry<String, RunnableSubscriber> entry : subscriberCollection.entrySet() ) { 
-      if (null != parent) {
-        parent.removeView( entry.getValue().mView  );
-      }
-    }
-    if( myPublisher != null ){
-      parent.removeView( myPublisher.mView  );
-    }
     
+    cordova.getActivity().runOnUiThread(new Runnable() {
+      @Override
+      public void run() {
+        ViewGroup parent = (ViewGroup) cordova.getActivity().findViewById(android.R.id.content);
+          if( myPublisher != null ){
+            myPublisher.destroyPublisher();
+            myPublisher = null;
+          }
+          for (Map.Entry<String, RunnableSubscriber> entry : subscriberCollection.entrySet() ) { 
+              if (null != parent) {
+                parent.removeView( entry.getValue().mView  );
+              }
+          } 
+     }
+   });
+
     // delete all data and prevent updateviews from drawing non existent things
     subscriberCollection.clear();
     connectionCollection.clear();
@@ -633,3 +664,4 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     myEventListeners.get(event).sendPluginResult(myResult);
   }
 }
+
