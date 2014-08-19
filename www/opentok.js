@@ -218,6 +218,7 @@ var TBPublisher,
 
 TBPublisher = (function() {
   function TBPublisher(one, two, three) {
+    this.removePublisherElement = __bind(this.removePublisherElement, this);
     this.streamDestroyed = __bind(this.streamDestroyed, this);
     this.streamCreated = __bind(this.streamCreated, this);
     this.eventReceived = __bind(this.eventReceived, this);
@@ -248,6 +249,7 @@ TBPublisher = (function() {
       width = DefaultWidth;
       height = DefaultHeight;
     }
+    this.pubElement = document.getElementById(this.domId);
     replaceWithVideoStream(this.domId, PublisherStreamId, {
       width: width,
       height: height
@@ -292,8 +294,15 @@ TBPublisher = (function() {
     return this;
   };
 
+  TBPublisher.prototype.removePublisherElement = function() {
+    this.pubElement.parentNode.removeChild(this.pubElement);
+    return this.pubElement = false;
+  };
+
   TBPublisher.prototype.destroy = function() {
-    return Cordova.exec(TBSuccess, TBError, OTPlugin, "destroyPublisher", []);
+    if (this.pubElement) {
+      return Cordova.exec(this.removePublisherElement, TBError, OTPlugin, "destroyPublisher", []);
+    }
   };
 
   TBPublisher.prototype.getImgData = function() {
@@ -437,14 +446,18 @@ TBSession = (function() {
     return this.publish(this.publisher);
   };
 
-  TBSession.prototype.publish = function(publisher) {
+  TBSession.prototype.publish = function() {
     if (this.alreadyPublishing) {
       pdebug("Session is already publishing", {});
       return;
     }
     this.alreadyPublishing = true;
-    this.publisher = publisher;
-    publisher.setSession(this);
+    if (typeof arguments[0] === "object") {
+      this.publisher = arguments[0];
+    } else {
+      this.publisher = OT.initPublisher(arguments);
+    }
+    this.publisher.setSession(this);
     Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", []);
     return this.publisher;
   };

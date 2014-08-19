@@ -43,13 +43,16 @@ class TBSession
     @alreadyPublishing = true
     @publisher = new TBPublisher(divName, properties)
     @publish( @publisher )
-  publish: (publisher) =>
+  publish: () =>
     if( @alreadyPublishing )
       pdebug("Session is already publishing", {})
       return
     @alreadyPublishing = true
-    @publisher = publisher
-    publisher.setSession(@)
+    if(typeof arguments[0] == "object")
+      @publisher = arguments[0]
+    else
+      @publisher = OT.initPublisher(arguments)
+    @publisher.setSession(@)
     Cordova.exec(TBSuccess, TBError, OTPlugin, "publish", [] )
     return @publisher
   signal: (signal, signalCompletionHandler) ->

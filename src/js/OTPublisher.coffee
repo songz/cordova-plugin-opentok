@@ -38,6 +38,7 @@ class TBPublisher
     if (not width?) or width == 0 or (not height?) or height==0
       width = DefaultWidth
       height = DefaultHeight
+    @pubElement = document.getElementById(@domId)
     replaceWithVideoStream(@domId, PublisherStreamId, {width:width, height:height})
     position = getPosition(@domId)
     TBUpdateObjects()
@@ -64,8 +65,13 @@ class TBPublisher
     # remove stream DOM?
     return @
 
+  removePublisherElement: =>
+    @pubElement.parentNode.removeChild(@pubElement)
+    @pubElement = false
+
   destroy: ->
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "destroyPublisher", [] )
+    if(@pubElement)
+      Cordova.exec( @removePublisherElement, TBError, OTPlugin, "destroyPublisher", [])
   getImgData: ->
     return ""
   getStyle: ->

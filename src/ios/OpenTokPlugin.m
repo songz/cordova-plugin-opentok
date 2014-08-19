@@ -168,6 +168,10 @@
     if (_publisher) {
         [_publisher.view removeFromSuperview];
     }
+    
+    // Return to Javascript
+    CDVPluginResult* pluginResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+    [self.commandDelegate sendPluginResult:pluginResult callbackId:command.callbackId];
 }
 
 

@@ -64,6 +64,16 @@ Have Fun!
 
 ----
 
+## Contribute
+1. Run `npm install` to install the necessary grunt files  
+2. Run `grunt watch` to run grunt tasks automatically after modifying files. This compiles the coffee files to JS and concatenates them  
+2. Modify JS components in `src/js/`  
+2. Modify iOS components in `src/ios/`  
+2. Modify Android components in `src/android/`  
+2. Send pull request!  
+
+----
+
 ## [Documentation for Cordova Plugin](/opentok/PhoneGap-Plugin/blob/master/docs/README.md)
 
 ----
