@@ -256,18 +256,10 @@
 
 // Called by session.unsubscribe(streamId, top, left)
 - (void)signal:(CDVInvokedUrlCommand*)command{
-    NSLog(@"iOS signaling to connections");
-    
-    NSArray *connectionIds = [[command.arguments objectAtIndex:2] componentsSeparatedByString: @" "];
-    if ([connectionIds count] == 0 || [[connectionIds objectAtIndex:0] length] == 0) {
-        connectionIds = [connectionDictionary allKeys];
-    }
-    for (NSString* e in connectionIds){
-        OTConnection* c = [connectionDictionary objectForKey:e];
-        if (c) {
-            [_session signalWithType:[command.arguments objectAtIndex:0] string:[command.arguments objectAtIndex:1] connection:c error:nil];
-        }
-    }
+    NSLog(@"iOS signaling to connectionId %@", [command.arguments objectAtIndex:2]);
+    OTConnection* c = [connectionDictionary objectForKey: [command.arguments objectAtIndex:2]];
+    NSLog(@"iOS signaling to connection %@", c);
+    [_session signalWithType:[command.arguments objectAtIndex:0] string:[command.arguments objectAtIndex:1] connection:c error:nil];
 }
 
 
@@ -309,6 +301,8 @@
     
     // SessionId
     [sessionDict setObject:session.sessionId forKey:@"sessionId"];
+    
+    [connectionDictionary setObject: session.connection forKey: session.connection.connectionId];
     
     
     // After session is successfully connected, the connection property is available

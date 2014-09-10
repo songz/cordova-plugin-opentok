@@ -463,21 +463,12 @@ TBSession = (function() {
   };
 
   TBSession.prototype.signal = function(signal, signalCompletionHandler) {
-    var connectionArray, connectionIdArray, data, e, type, _i, _len;
+    var data, to, type;
     type = signal.type != null ? signal.type : "";
     data = signal.data != null ? signal.data : "";
-    connectionArray = signal.connections != null ? signal.connections : [];
-    connectionIdArray = [];
-    for (_i = 0, _len = connectionArray.length; _i < _len; _i++) {
-      e = connectionArray[_i];
-      if (typeof e === "object" && (e.connectionId != null)) {
-        connectionIdArray.push(e.connectionId);
-      }
-      if (typeof e === "string") {
-        connectionIdArray.push(e.split(' ')[0]);
-      }
-    }
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "signal", [type, data, connectionIdArray.join(' ')]);
+    to = signal.to != null ? signal.to : "";
+    to = typeof to === "string" ? to : to.connectionId;
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "signal", [type, data, to]);
     return this;
   };
 

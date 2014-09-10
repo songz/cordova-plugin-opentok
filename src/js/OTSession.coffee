@@ -59,14 +59,9 @@ class TBSession
     # signal payload: [type, data, connection( separated by spaces )]
     type = if signal.type? then signal.type else ""
     data = if signal.data? then signal.data else ""
-    connectionArray = if signal.connections? then signal.connections else []
-    connectionIdArray = []
-    for e in connectionArray
-      if typeof(e) == "object" and e.connectionId?
-        connectionIdArray.push( e.connectionId )
-      if typeof(e) == "string"
-        connectionIdArray.push e.split(' ')[0]
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "signal", [type, data, connectionIdArray.join(' ')] )
+    to = if signal.to? then signal.to else ""
+    to = if typeof(to)=="string" then to else to.connectionId
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "signal", [type, data, to] )
     return @
   subscribe: (one, two, three) ->
     if( three? )
