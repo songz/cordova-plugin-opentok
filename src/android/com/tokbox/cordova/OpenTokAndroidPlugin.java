@@ -143,7 +143,6 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       edit.clear();
       edit.putBoolean("opentok.publisher.accepted", true);
       edit.commit();
-      cordova.getActivity().runOnUiThread( this );
     }
 
     public void setPropertyFromArray( JSONArray args ){
@@ -190,8 +189,6 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         }
         this.mView = mPublisher.getView();
         frame.addView( this.mView );
-      }
-      if(sessionConnected && mPublisher != null){
         mSession.publish(mPublisher);
       }
       super.run();
