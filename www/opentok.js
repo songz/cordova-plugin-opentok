@@ -588,6 +588,7 @@ TBSession = (function() {
     pdebug("sessionConnectedHandler", event);
     this.trigger("sessionConnected");
     this.connection = new TBConnection(event.connection);
+    this.connections[event.connection.connectionId] = this.connection;
     event = null;
     return this;
   };
