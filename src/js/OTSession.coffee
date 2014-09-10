@@ -138,6 +138,7 @@ class TBSession
     pdebug "sessionConnectedHandler", event
     @trigger("sessionConnected")
     @connection = new TBConnection( event.connection )
+    @connections[event.connection.connectionId] = @connection
     event = null
     return @
   sessionDisconnected: (event) =>
