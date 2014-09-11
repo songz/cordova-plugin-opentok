@@ -395,19 +395,11 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
           myPublisher.startPublishing();
         }
       }else if( action.equals( "signal" )){
-
-        ArrayList<Connection> connections = new ArrayList<Connection>();
-        for( String e : args.getString(2).split(" ")){
-          Connection c = connectionCollection.get(e);
-          if( c!= null){
-            Log.i(TAG, "sending signal to connection " + c.getConnectionId());
-            connections.add(c);
-            mSession.sendSignal(args.getString(0), args.getString(1), c);
-          }
-        }
-        if(connections.size() == 0){
-          Log.i(TAG, "sending signal to EVERYBODY ");
+        Connection c = connectionCollection.get(args.getString(2));
+        if(c==null){
           mSession.sendSignal(args.getString(0), args.getString(1));
+        }else{
+          mSession.sendSignal(args.getString(0), args.getString(1), c);
         }
       }else if( action.equals( "unpublish" )){
 
@@ -466,6 +458,8 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     Log.i(TAG, "session connected, triggering sessionConnected Event. My Cid is: "+ 
     mSession.getConnection().getConnectionId()    );      
     sessionConnected = true;
+
+    connectionCollection.put(mSession.getConnection().getConnectionId(), mSession.getConnection());
 
     JSONObject data = new JSONObject();
     try{
@@ -661,4 +655,3 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     myEventListeners.get(event).sendPluginResult(myResult);
   }
 }
-
