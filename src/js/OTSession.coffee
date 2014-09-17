@@ -1,4 +1,4 @@
-# Session Object:
+ # Session Object:
 #   Properties:
 #     capabilities ( Capabilities ) - A Capabilities object includes info about capabilities of the client. All properties of capabilities object are undefined until connected to a session
 #     connection ( Connection ) - connection property is only available once session object dispatches sessionConnected event
@@ -63,19 +63,43 @@ class TBSession
     to = if typeof(to)=="string" then to else to.connectionId
     Cordova.exec(TBSuccess, TBError, OTPlugin, "signal", [type, data, to] )
     return @
-  subscribe: (one, two, three) ->
-    if( three? )
-      # stream, domId, properties
+  subscribe: (one, two, three, four) ->
+    @subscriberCallbacks = {}
+    if( four? )
+      # stream,domId, properties, completionHandler
       subscriber = new TBSubscriber(one, two, three)
+      @subscriberCallbacks[one.streamId] = four
       return subscriber
+    if( three? )
+      # stream, domId, properties || stream, domId, completionHandler || stream, properties, completionHandler
+      if( (typeof(two) == "string" || two.nodeType == 1) && typeof(three) == "object" )
+        console.log("stream, domId, props")
+        subscriber = new TBSubscriber(one, two, three)
+        return subscriber
+      if( (typeof(two) == "string" || two.nodeType == 1) && typeof(three) == "function" )
+        console.log("stream, domId, completionHandler")
+        @subscriberCallbacks[one.streamId]=three
+        subscriber = new TBSubscriber(one, domId, {})
+        return subscriber
+      if( typeof(two) == "object" && typeof(three) == "function" )
+        console.log("stream, props, completionHandler")
+        @subscriberCallbacks[one.streamId] = three
+        domId = TBGenerateDomHelper()
+        subscriber = new TBSubscriber( one, domId, two )
+        return subscriber
     if( two? )
-      # stream, domId || stream, properties
+      # stream, domId || stream, properties || stream,completionHandler
+      if( (typeof(two) == "string" || two.nodeType == 1) )
+        subscriber = new TBSubscriber(one, two, {})
+        return subscriber
       if( typeof(two) == "object" )
         domId = TBGenerateDomHelper()
         subscriber = new TBSubscriber(one, domId, two)
         return subscriber
-      else
-        subscriber = new TBSubscriber(one, two, {})
+      if( typeof(two) == "function" )
+        @subscriberCallbacks[one.streamId] = two
+        domId = TBGenerateDomHelper()
+        subscriber = new TBSubscriber(one, domId, {})
         return subscriber
     # stream
     domId = TBGenerateDomHelper()
@@ -168,6 +192,18 @@ class TBSession
       TBUpdateObjects()
     delete( @streams[ stream.streamId ] )
     return @
+  subscribedToStream: (event) =>
+    streamId = event.streamId
+    callbackFunc = @subscriberCallbacks[streamId]
+    if !callbackFunc?
+      return
+    if event.errorCode?
+      error = new OTError(event.errorCode)
+      callbackFunc(error)
+      return
+    else
+      callbackFunc()
+      return
   signalReceived: (event) =>
     pdebug "signalReceived event", event
     streamEvent = new TBEvent( {type: event.type, data: event.data, from: @connections[event.connectionId] } )
@@ -181,6 +217,3 @@ class TBSession
   removeEventListener: ( event, handler ) ->
     @off( event, handler )
     return @
-
-
-

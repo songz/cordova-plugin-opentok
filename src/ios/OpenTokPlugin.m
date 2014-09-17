@@ -270,13 +270,20 @@
  ****/
 - (void)subscriberDidConnectToStream:(OTSubscriberKit*)sub{
     NSLog(@"iOS Connected To Stream");
+    NSMutableDictionary* eventData = [[NSMutableDictionary alloc] init];
+    NSString* streamId = sub.stream.streamId;
+    [eventData setObject:streamId forKey:@"streamId"];
+    [self triggerJSEvent: @"sessionEvents" withType: @"subscribedToStream" withData: eventData];
     
 }
 - (void)subscriber:(OTSubscriber*)subscrib didFailWithError:(OTError*)error{
     NSLog(@"subscriber didFailWithError %@", error);
-    CDVPluginResult* callbackResult = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString: subscrib.stream.connection.connectionId];
-    [callbackResult setKeepCallbackAsBool:YES];
-    //    [self.commandDelegate [callbackResult toSuccessCallbackString:self.streamDisconnectedId]];
+    NSMutableDictionary* eventData = [[NSMutableDictionary alloc] init];
+    NSString* streamId = subscrib.stream.streamId;
+    NSNumber* errorCode = [NSNumber numberWithInt:1600];
+    [eventData setObject: errorCode forKey:@"errorCode"];
+    [eventData setObject:streamId forKey:@"streamId"];
+    [self triggerJSEvent: @"sessionEvents" withType: @"subscribedToStream" withData: eventData];
 }
 
 
