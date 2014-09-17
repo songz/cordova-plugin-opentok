@@ -74,6 +74,58 @@ TBConnection = (function() {
 
 })();
 
+var OTError;
+
+OTError = (function() {
+  var codesToTitle;
+
+  function OTError(errCode, errMsg) {
+    this.code = errCode;
+    if (errMsg != null) {
+      this.message = errMsg;
+    } else {
+      if (codesToTitle[errCode]) {
+        this.message = codesToTitle[errCode];
+      } else {
+        this.message = "OpenTok Error";
+      }
+    }
+  }
+
+  codesToTitle = {
+    1004: 'OTAuthorizationFailure',
+    1005: 'OTErrorInvalidSession',
+    1006: 'OTConnectionFailed    ',
+    1011: 'OTNullOrInvalidParameter',
+    1010: 'OTNotConnected ',
+    1015: 'OTSessionIllegalState ',
+    1503: 'OTNoMessagingServer    ',
+    1023: 'OTConnectionRefused    ',
+    1020: 'OTSessionStateFailed   ',
+    1403: 'OTP2PSessionMaxParticipants',
+    1021: 'OTSessionConnectionTimeout ',
+    2000: 'OTSessionInternalError  ',
+    1461: 'OTSessionInvalidSignalType',
+    1413: 'OTSessionSignalDataTooLong',
+    1022: 'OTConnectionDropped',
+    1112: 'OTSessionSubscriberNotFound',
+    1113: 'OTSessionPublisherNotFound',
+    0: 'OTPublisherSuccess',
+    1010: 'OTSessionDisconnected',
+    2000: 'OTPublisherInternalError',
+    1610: 'OTPublisherWebRTCError',
+    0: 'OTSubscriberSuccess$',
+    1542: 'OTConnectionTimedOut',
+    1541: 'OTSubscriberSessionDisconnected',
+    1600: 'OTSubscriberWebRTCError',
+    1604: 'OTSubscriberServerCannotFindStream',
+    2000: 'OTSubscriberInternalError'
+  };
+
+  return OTError;
+
+})();
+
 var TBEvent,
   __bind = function(fn, me){ return function(){ return fn.apply(me, arguments); }; };
 
@@ -472,19 +524,48 @@ TBSession = (function() {
     return this;
   };
 
-  TBSession.prototype.subscribe = function(one, two, three) {
+  TBSession.prototype.subscribe = function(one, two, three, four) {
     var domId, subscriber;
-    if ((three != null)) {
+    this.subscriberCallbacks = {};
+    if ((four != null)) {
       subscriber = new TBSubscriber(one, two, three);
+      this.subscriberCallbacks[one.streamId] = four;
       return subscriber;
     }
+    if ((three != null)) {
+      if ((typeof two === "string" || two.nodeType === 1) && typeof three === "object") {
+        console.log("stream, domId, props");
+        subscriber = new TBSubscriber(one, two, three);
+        return subscriber;
+      }
+      if ((typeof two === "string" || two.nodeType === 1) && typeof three === "function") {
+        console.log("stream, domId, completionHandler");
+        this.subscriberCallbacks[one.streamId] = three;
+        subscriber = new TBSubscriber(one, domId, {});
+        return subscriber;
+      }
+      if (typeof two === "object" && typeof three === "function") {
+        console.log("stream, props, completionHandler");
+        this.subscriberCallbacks[one.streamId] = three;
+        domId = TBGenerateDomHelper();
+        subscriber = new TBSubscriber(one, domId, two);
+        return subscriber;
+      }
+    }
     if ((two != null)) {
+      if (typeof two === "string" || two.nodeType === 1) {
+        subscriber = new TBSubscriber(one, two, {});
+        return subscriber;
+      }
       if (typeof two === "object") {
         domId = TBGenerateDomHelper();
         subscriber = new TBSubscriber(one, domId, two);
         return subscriber;
-      } else {
-        subscriber = new TBSubscriber(one, two, {});
+      }
+      if (typeof two === "function") {
+        this.subscriberCallbacks[one.streamId] = two;
+        domId = TBGenerateDomHelper();
+        subscriber = new TBSubscriber(one, domId, {});
         return subscriber;
       }
     }
@@ -524,6 +605,7 @@ TBSession = (function() {
     this.apiKey = apiKey;
     this.sessionId = sessionId;
     this.signalReceived = __bind(this.signalReceived, this);
+    this.subscribedToStream = __bind(this.subscribedToStream, this);
     this.streamDestroyed = __bind(this.streamDestroyed, this);
     this.streamCreated = __bind(this.streamCreated, this);
     this.sessionDisconnected = __bind(this.sessionDisconnected, this);
@@ -634,6 +716,21 @@ TBSession = (function() {
     }
     delete this.streams[stream.streamId];
     return this;
+  };
+
+  TBSession.prototype.subscribedToStream = function(event) {
+    var callbackFunc, error, streamId;
+    streamId = event.streamId;
+    callbackFunc = this.subscriberCallbacks[streamId];
+    if (callbackFunc == null) {
+      return;
+    }
+    if (event.errorCode != null) {
+      error = new OTError(event.errorCode);
+      callbackFunc(error);
+    } else {
+      callbackFunc();
+    }
   };
 
   TBSession.prototype.signalReceived = function(event) {
