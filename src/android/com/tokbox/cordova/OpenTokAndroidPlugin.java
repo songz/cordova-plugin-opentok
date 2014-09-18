@@ -291,7 +291,15 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     @Override
     public void onConnected(SubscriberKit arg0) {
       // TODO Auto-generated method stub
-      Log.i(TAG, "subscriber is connected");
+      JSONObject eventData = new JSONObject();
+      String streamId = arg0.getStream().getStreamId();
+      try{
+        eventData.put("streamId",streamId);
+        triggerJSEvent("sessionEvents","subscribedToStream",eventData);
+      } catch (JSONException e){
+        Log.e(TAG, "JSONException"+e.getMessage());
+      }
+      Log.i(TAG, "subscriber"+streamId+" is connected");
       this.run();
     }
 
@@ -302,6 +310,16 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
 
     @Override
     public void onError(SubscriberKit arg0, OpentokError arg1) {
+      JSONObject eventData = new JSONObject();
+      String streamId = arg0.getStream().getStreamId();
+      int errorCode = arg1.getErrorCode().getErrorCode();
+      try{
+        eventData.put("errorCode", errorCode);
+        eventData.put("streamId", streamId);
+        triggerJSEvent("sessionEvents","subscribedToStream",eventData);
+      } catch(JSONException e){
+        Log.e(TAG, "JSONException"+e.getMessage());
+      }
       Log.e(TAG, "subscriber exception: " + arg1.getMessage() + ", stream id: " + arg0.getStream().getStreamId() );
     }
   }
