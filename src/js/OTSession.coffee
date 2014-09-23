@@ -185,12 +185,13 @@ class TBSession
     streamEvent = new TBEvent( {stream: stream, reason: "clientDisconnected" } )
     @trigger("streamDestroyed", streamEvent)
     # remove stream DOM
-    element = streamElements[ stream.streamId ]
-    if(element)
-      element.parentNode.removeChild(element)
-      delete( streamElements[ stream.streamId ] )
-      TBUpdateObjects()
-    delete( @streams[ stream.streamId ] )
+    if(stream)
+      element = streamElements[ stream.streamId ]
+      if(element)
+        element.parentNode.removeChild(element)
+        delete( streamElements[ stream.streamId ] )
+        TBUpdateObjects()
+      delete( @streams[ stream.streamId ] )
     return @
   subscribedToStream: (event) =>
     streamId = event.streamId
