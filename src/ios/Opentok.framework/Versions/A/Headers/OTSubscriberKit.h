@@ -5,11 +5,59 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <OpenTok/OpenTokObjC.h>
 
 @class OTStream, OTSession;
 
+@protocol OTVideoRender;
 @protocol OTSubscriberKitDelegate;
+@protocol OTSubscriberKitAudioLevelDelegate;
+
+/**
+ * Video enabled and disabled events are accompanied with a reason code, for
+ * determining why the video track was enabled/disabled.
+ */
+typedef NS_ENUM(NSInteger, OTSubscriberVideoEventReason) {
+    /**
+     * The video event was caused by the stream's publisher changing the value
+     * for OTPublisherKit.publishVideo.
+     */
+    OTSubscriberVideoEventPublisherPropertyChanged = 1,
+    
+    /**
+     * The video event was caused by a change to this subscriber's
+     * OTSubscriberKit.subscribeToVideo property.
+     */
+    OTSubscriberVideoEventSubscriberPropertyChanged = 2,
+    
+    /**
+     * The video event was caused by a change to the video stream quality.
+     * Stream quality may change due to network conditions or CPU usage
+     * on either the subscriber or pubisher.
+     * <p>
+     * This reason is only used in sessions that have the
+     * [media mode](http://tokbox.com/opentok/tutorials/create-session/)
+     * set to "routed".
+     * This feature of the OpenTok Media Router has a subscriber drop the video
+     * stream when the video stream quality degrades, and the
+     * <[OTSubscriberKitDelegate subscriberVideoDisabled:reason:]> message
+     * is sent. When conditions improve, the video stream resumes, and the
+     * <[OTSubscriberKitDelegate subscriberVideoEnabled:reason:]> message is
+     * sent.
+     * <p>
+     * When the video stream is dropped, the subscriber continues to receive
+     * the audio stream, if there is one.
+     * <p>
+     * When the Subscriber's stream quality deteriorates to a level that
+     * is low enough that the video stream is at risk of being disabled, the
+     * <[OTSubscriberKitDelegate subscriberVideoDisableWarning:]> message is
+     * sent. The <[OTSubscriberKitDelegate subscriberVideoDisableWarning:]>
+     * message is sent before the
+     * <[OTSubscriberKitDelegate subscriberVideoDisabled:reason:]> message is
+     * sent.
+     */
+    OTSubscriberVideoEventQualityChanged = 3
+    
+};
 
 /**
  * An OTSubscriberKit (subscriber) object renders media data bound to an
@@ -49,6 +97,17 @@
 @property(nonatomic, assign) id<OTSubscriberKitDelegate> delegate;
 
 /**
+ * Periodically receives reports of audio levels for this subscriber.
+ *
+ * This is a separate delegate object from that set as the delegate property
+ * (the OTSubscriberKitDelegate object).
+ *
+ * If you do not set this property, the audio sampling subsystem is disabled.
+ */
+@property (nonatomic, assign)
+id<OTSubscriberKitAudioLevelDelegate>audioLevelDelegate;
+
+/**
  * Whether to subscribe to the stream's audio.
  *
  * The default value is YES.
@@ -59,9 +118,7 @@
 @property(nonatomic) BOOL subscribeToAudio;
 
 /**
- * Whether to subscribe to the stream's video. Setting this property only has an
- * affect if you do so immediately
- * after initializing the OTSubscriber object.
+ * Whether to subscribe to the stream's video.
  *
  * The default value is YES.
  *
@@ -146,14 +203,81 @@
 @optional
 
 /**
- * This message is sent when the OpenTok media server stops sending video to the
- * subscriber.
- * This feature of the OpenTok media server has a subscriber drop the video
- * stream when connectivity degrades.
- * The subscriber continues to receive the audio stream, if there is one.
+ * This message is sent when the subscriber stops receiving video.
+ * Check the reason parameter for the reason why the video stopped.
  *
  * @param subscriber The <OTSubscriber> that will no longer receive video.
+ * @param reason The reason that the video track was disabled. See
+ * <OTSubscriberVideoEventReason>.
  */
-- (void)subscriberVideoDisabled:(OTSubscriberKit*)subscriber;
+- (void)subscriberVideoDisabled:(OTSubscriberKit*)subscriber
+                         reason:(OTSubscriberVideoEventReason)reason;
+
+/**
+ * This message is sent when the subscriber starts (or resumes) receiving video.
+ * Check the reason parameter for the reason why the video started (or resumed).
+ *
+ * @param subscriber The <OTSubscriber> that will no longer receive video.
+ * @param reason The reason that the video track was enabled. See
+ * <OTSubscriberVideoEventReason>.
+ */
+- (void)subscriberVideoEnabled:(OTSubscriberKit*)subscriber
+                        reason:(OTSubscriberVideoEventReason)reason;
+
+/**
+ * This message is sent when the OpenTok Media Router determines that the stream
+ * quality has degraded and the video will be disabled if the quality degrades
+ * further. If the quality degrades further, the subscriber disables the video
+ * and the <[OTSubscriberKitDelegate subscriberVideoDisabled:reason:]> message
+ * is sent. If the stream quality improves, the
+ * <[OTSubscriberKitDelegate subscriberVideoDisableWarningLifted:]> message is
+ * sent.
+ *
+ * This feature is only available in sessions that use the
+ * OpenTok Media Router (sessions with the
+ * [media mode](http://tokbox.com/opentok/tutorials/create-session/#media-mode)
+ * set to routed), not in sessions with the media mode set to relayed.
+ *
+ * This message is mainly sent when connection quality degrades.
+ *
+ * @param subscriber The <OTSubscriber> that may stop receiving video soon.
+ */
+- (void)subscriberVideoDisableWarning:(OTSubscriberKit*)subscriber;
+
+/**
+ * This message is sent when the OpenTok Media Router determines that the stream
+ * quality has improved to the point at which the video being disabled is not an
+ * immediate risk. This message is sent after the
+ * <[OTSubscriberKitDelegate subscriberVideoDisableWarning:]> message is
+ * sent.
+ *
+ * This feature is only available in sessions that use the
+ * OpenTok Media Router (sessions with the
+ * [media mode](http://tokbox.com/opentok/tutorials/create-session/#media-mode)
+ * set to routed), not in sessions with the media mode set to relayed.
+ *
+ * This message is mainly sent when connection quality improves.
+ *
+ * @param subscriber The <OTSubscriber> instance.
+ */
+- (void)subscriberVideoDisableWarningLifted:(OTSubscriberKit*)subscriber;
+
+@end
+
+/**
+ * Used for monitoring the audio levels of the subscriber.
+ */
+@protocol OTSubscriberKitAudioLevelDelegate <NSObject>
+
+/**
+ * Sent on a regular interval with the recent representative audio level.
+ *
+ * @param subscriber The subscriber instance being represented.
+ * @param audioLevel A value between 0 and 1, representing the audio level.
+ * Adjust this value logarithmically for use in a user interface
+ * visualization of the volume (such as a volume meter).
+ */
+- (void)subscriber:(OTSubscriberKit*)subscriber
+audioLevelUpdated:(float)audioLevel;
 
 @end

@@ -47,7 +47,9 @@ typedef NS_ENUM(NSInteger, OTSessionErrorCode) {
     /** The connection timed out while attempting to get the session's state */
     OTSessionStateFailed    = 1020,
     
-    /** A peer-to-peer enabled session can only have two participants. */
+    /** A session with the
+     * [media mode](http://tokbox.com/opentok/tutorials/create-session/#media-mode)
+     * set to routed can only have two participants. */
     OTP2PSessionMaxParticipants = 1403,
     
     /**  The connection timed out while attempting to connect to the session. */

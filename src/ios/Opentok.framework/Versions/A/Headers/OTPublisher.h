@@ -8,11 +8,11 @@
 #import <Foundation/Foundation.h>
 #import <UIKit/UIKit.h>
 #import <AVFoundation/AVFoundation.h>
-#import <OpenTok/OpenTok.h>
 
 @class OTError, OTPublisherKit;
 
-@protocol OTPublisherDelegate, OTPublisherKitDelegate;
+@protocol OTPublisherDelegate;
+@protocol OTPublisherKitDelegate;
 
 /**
  * A publisher captures an audio-video stream from the device's microphone and 
@@ -46,7 +46,6 @@
 @property(nonatomic) AVCaptureDevicePosition cameraPosition;
 
 @end
-
 
 /**
  * Used for sending messages for an OTPublisher instance.

@@ -45,7 +45,7 @@ typedef NS_ENUM(NSInteger, OTPixelFormat) {
  */
 @property(nonatomic, copy) NSString* name;
 /**
- * The pixel format. Valid values are defined in the OTPixelFormat enum.
+ * The pixel format. Valid values are defined in the <OTPixelFormat> enum.
  */
 @property(nonatomic, assign) OTPixelFormat pixelFormat;
 /**
@@ -72,12 +72,6 @@ typedef NS_ENUM(NSInteger, OTPixelFormat) {
 + (OTVideoFormat*)videoFormatI420WithWidth:(uint32_t)width
                                    height:(uint32_t)height;
 
-/**
- * Returns an OTVideoFormat object with the specified width and height.
- *
- * @param width The width, in pixels.
- * @param height The height, in pixels.
- */
 + (OTVideoFormat*)videoFormatNV12WithWidth:(uint32_t)width
                                     height:(uint32_t)height;
 @end
@@ -87,6 +81,8 @@ typedef NS_ENUM(NSInteger, OTPixelFormat) {
  * <[OTVideoCaptureConsumer consumeFrame:]>.
  */
 @interface OTVideoFrame : NSObject
+
+/** @name Properties of OTVideoFrame objects */
 
 /**
  * An array of planes in the video frame.
@@ -104,6 +100,8 @@ typedef NS_ENUM(NSInteger, OTPixelFormat) {
  * The format of the video frame.
  */
 @property(nonatomic, retain) OTVideoFormat* format;
+
+/** @name Instantiating OTVideoFrame objects */
 
 /**
  * Initializes an OTVideoFrame object.
@@ -150,7 +148,8 @@ typedef NS_ENUM(NSInteger, OTPixelFormat) {
 @protocol OTVideoCapture <NSObject>
 
 /**
- * The object that consumes frames for the video capturer.
+ * The <OTVideoCaptureConsumer> object that consumes frames for the video
+ * capturer.
  */
 @property(atomic, assign) id<OTVideoCaptureConsumer>videoCaptureConsumer;
 
