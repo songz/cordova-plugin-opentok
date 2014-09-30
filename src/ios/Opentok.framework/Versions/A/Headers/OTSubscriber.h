@@ -6,7 +6,9 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <OpenTok/OpenTok.h>
+#import <UIKit/UIKit.h>
+
+@class OTSubscriberKit;
 
 /**
  * Renders OpenTok streams, and provides a UIView that renders video and

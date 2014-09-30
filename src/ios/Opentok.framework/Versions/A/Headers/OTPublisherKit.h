@@ -9,15 +9,15 @@
 
 @class OTPublisherKit, OTSession, OTError, OTStream;
 
-@protocol OTVideoCapture, OTVideoRender, OTPublisherKitDelegate;
+@protocol OTVideoCapture;
+@protocol OTVideoRender;
+@protocol OTPublisherKitDelegate;
+@protocol OTPublisherKitAudioLevelDelegate;
 
 /**
  * A publisher captures an audio-video stream from the sources you specify. You
  * can then publish the audio-video stream to an OpenTok session by sending the
  * <[OTSession publish:error:]> message.
- *
- * Use OTPublisherKit to interface with <[OTSession]> to push audio and video
- * to other peers or the OpenTok Cloud Media Router (aka. "Mantis").
  *
  * The OpenTok iOS SDK supports publishing on all multi-core iOS devices.
  * See "Developer and client requirements" in the README file for the
@@ -67,6 +67,17 @@
 @property(nonatomic, assign) id<OTPublisherKitDelegate> delegate;
 
 /**
+ * Periodically receives reports of audio levels for this publisher.
+ *
+ * This is a separate delegate object from that set as the delegate property
+ * (the OTPublisherKitDelegate object).
+ *
+ * If you do not set this property, the audio sampling subsystem is disabled.
+ */
+@property (nonatomic, assign)
+id<OTPublisherKitAudioLevelDelegate> audioLevelDelegate;
+
+/**
  * The session that owns this publisher.
  */
 @property(readonly) OTSession* session;
@@ -78,20 +89,15 @@
 
 /**
  * A string that will be associated with this publisher's stream. This string is
- * displayed at the bottom of publisher
- * videos and at the bottom of subscriber videos associated with the published
- * stream. You can set this name after
- * initializing the publisher and before sending the
- * <[OTSession publish:error:]> message. Setting the property after
- * sending the <[OTSession publish:error:]> message has no effect on the name
- * displayed for the stream.
+ * displayed at the bottom of subscriber videos associated with the published
+ * stream, if an overlay to display the name exists. 
  *
- * Note that you can also set the name when you send the
+ * Name must be set at initialization, when you when you send the
  * <[OTPublisherKit initWithDelegate:name:]> message.
  *
  * This value defaults to an empty string.
  */
-@property(nonatomic, copy) NSString* name;
+@property(readonly) NSString* name;
 
 /** @name Controlling audio and video output for a publisher */
 
@@ -164,3 +170,22 @@
 - (void)publisher:(OTPublisherKit*)publisher streamDestroyed:(OTStream*)stream;
 
 @end
+
+/**
+ * Used for monitoring the audio levels of the publisher.
+ */
+@protocol OTPublisherKitAudioLevelDelegate <NSObject>
+
+/**
+ * Sent on a regular interval with the recent representative audio level.
+ *
+ * @param publisher The publisher instance being represented.
+ * @param audioLevel A value between 0 and 1, representing the audio level.
+ * Adjust this value logarithmically for use in a user interface
+ * visualization of the volume (such as a volume meter).
+ */
+- (void)publisher:(OTPublisherKit*)publisher
+audioLevelUpdated:(float)audioLevel;
+
+@end
+

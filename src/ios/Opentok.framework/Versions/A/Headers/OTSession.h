@@ -5,7 +5,6 @@
 //
 
 #import <Foundation/Foundation.h>
-#import <OpenTok/OpenTokObjC.h>
 
 @class OTError, OTConnection, OTPublisherKit, OTSubscriberKit, OTStream;
 
