@@ -387,8 +387,8 @@
     for ( id key in subscriberDictionary ) {
         OTSubscriber* aStream = [subscriberDictionary objectForKey:key];
         [aStream.view removeFromSuperview];
-        [subscriberDictionary removeObjectForKey:key];
     }
+    [subscriberDictionary removeAllObjects];
     if( _publisher ){
         [_publisher.view removeFromSuperview];
     }
@@ -497,3 +497,4 @@
 
 
 @end
+
