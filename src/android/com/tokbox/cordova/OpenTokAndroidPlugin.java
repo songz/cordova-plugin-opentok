@@ -35,7 +35,7 @@ import com.opentok.android.SubscriberKit;
 
 public class OpenTokAndroidPlugin extends CordovaPlugin implements 
   Session.SessionListener, Session.ConnectionListener, Session.SignalListener, 
-  Session.PublisherListener, Session.StreamPropertiesListener{
+  PublisherKit.PublisherListener, Session.StreamPropertiesListener{
   
   private String sessionId;
   protected Session mSession;
@@ -283,12 +283,6 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     }
 
     @Override
-    public void onVideoDisabled(SubscriberKit arg0) {
-      // TODO Auto-generated method stub
-      Log.i(TAG, "subscriber video disabled, stream id: " + arg0.getStream().getStreamId());
-    }
-
-    @Override
     public void onConnected(SubscriberKit arg0) {
       // TODO Auto-generated method stub
       JSONObject eventData = new JSONObject();
@@ -322,6 +316,30 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       }
       Log.e(TAG, "subscriber exception: " + arg1.getMessage() + ", stream id: " + arg0.getStream().getStreamId() );
     }
+
+  @Override
+  public void onVideoDisableWarning(SubscriberKit arg0) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void onVideoDisableWarningLifted(SubscriberKit arg0) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void onVideoDisabled(SubscriberKit arg0, String arg1) {
+    // TODO Auto-generated method stub
+    
+  }
+
+  @Override
+  public void onVideoEnabled(SubscriberKit arg0, String arg1) {
+    // TODO Auto-generated method stub
+    
+  }
   }
 
   @Override
@@ -377,7 +395,6 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         mSession.setSessionListener(this);
         mSession.setConnectionListener(this);
         mSession.setSignalListener(this);
-        mSession.setPublisherListener(this);
         mSession.setStreamPropertiesListener(this);
         
       // publisher methods
@@ -454,21 +471,6 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     AlertDialog dialog = builder.create();
   }
 
-
- 
-  // publisherListener
-  public void onPublisherAdded(Session arg0, PublisherKit arg1) {
-    // TODO Auto-generated method stub
-  }
-
-  @Override
-  public void onPublisherRemoved(Session arg0, PublisherKit arg1) {
-    if(myPublisher != null){
-      myPublisher.destroyPublisher();
-      myPublisher = null;
-    }
-  }
-  
   
   // sessionListener
   @Override
@@ -672,4 +674,25 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     myResult.setKeepCallback(true);
     myEventListeners.get(event).sendPluginResult(myResult);
   }
+
+@Override
+public void onError(PublisherKit arg0, OpentokError arg1) {
+  // TODO Auto-generated method stub
+  
 }
+
+@Override
+public void onStreamCreated(PublisherKit arg0, Stream arg1) {
+  // TODO Auto-generated method stub
+  
+}
+
+@Override
+public void onStreamDestroyed(PublisherKit arg0, Stream arg1) {
+    if(myPublisher != null){
+        myPublisher.destroyPublisher();
+        myPublisher = null;
+      }
+}
+}
+

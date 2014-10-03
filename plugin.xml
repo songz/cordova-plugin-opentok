@@ -26,8 +26,9 @@
       </config-file>
 
       <!-- copy opentok sdk -->
-      <source-file src="src/android/libs/opentok-android-sdk-2.2.1.jar" target-dir="libs/" />
+      <source-file src="src/android/libs/opentok-android-sdk-2.3.0.jar" target-dir="libs/" />
       <source-file src="src/android/libs/armeabi/libopentok.so" target-dir="libs/armeabi" />
+      <source-file src="src/android/libs/x86/libopentok.so" target-dir="libs/x86" />
 
       <config-file target="config.xml" parent="/*">
         <feature name="OpenTokPlugin">
