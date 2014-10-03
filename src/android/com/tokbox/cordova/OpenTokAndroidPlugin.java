@@ -398,6 +398,13 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         mSession.setStreamPropertiesListener(this);
         
       // publisher methods
+      }else if( action.equals( "setCameraPosition")){
+        String cameraId = args.getString(0);
+        if (cameraId.equals("front")){
+          myPublisher.mPublisher.setCameraId(1);
+        } else if(cameraId.equals("back")){
+          myPublisher.mPublisher.setCameraId(0);
+        }
       }else if( action.equals( "publishAudio") ){
         String val = args.getString(0);
         boolean publishAudio = true;
