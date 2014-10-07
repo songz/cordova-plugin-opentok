@@ -23,6 +23,7 @@ import android.content.SharedPreferences.Editor;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.opentok.android.Connection;
 import com.opentok.android.OpentokError;
 import com.opentok.android.Publisher;
@@ -31,6 +32,7 @@ import com.opentok.android.Session;
 import com.opentok.android.Stream;
 import com.opentok.android.Subscriber;
 import com.opentok.android.SubscriberKit;
+import com.tokbox.cordova.CustomVideoCapturer;
 
 
 public class OpenTokAndroidPlugin extends CordovaPlugin implements 
@@ -132,6 +134,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     PublisherKit.PublisherListener, Publisher.CameraListener{
     //  property contains: [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName] )
     public Publisher mPublisher;
+    public CustomVideoCapturer publisherCapturer;
 
     public RunnablePublisher( JSONArray args ){
       this.mProperty = args;
@@ -162,6 +165,12 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
       this.mPublisher = null;
     }
     
+    public void changeCamera(String positionString){
+      if(publisherCapturer.setCameraIndex(positionString)){
+        publisherCapturer.swapCamera(publisherCapturer.getCameraIndex());
+      }
+    }
+    
     public void run() {
       Log.i(TAG, "view running on UIVIEW!!!");
       if( mPublisher == null ){
@@ -174,7 +183,9 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         }
 
         mPublisher = new Publisher(cordova.getActivity().getApplicationContext(), publisherName);
-        mPublisher.setCameraListener(this);
+        //mPublisher.setCameraListener(this);
+        String cameraPosition = "front";
+        // use an external customer video capturer
         mPublisher.setPublisherListener(this);
         try{
           // Camera is swapped in streamCreated event
@@ -184,10 +195,15 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
           if( compareStrings(this.mProperty.getString(6), "false") ){
             mPublisher.setPublishAudio(false); // default is true
           }
+          cameraPosition = this.mProperty.getString(8);
           Log.i(TAG, "all set up for publisher");
         }catch( Exception e ){
           Log.i(TAG, "error when trying to retrieve publish audio/video property");
         }
+
+        publisherCapturer = 
+            new CustomVideoCapturer(cordova.getActivity().getApplicationContext(), cameraPosition);
+        mPublisher.setCapturer(publisherCapturer);
         this.mView = mPublisher.getView();
         frame.addView( this.mView );
         mSession.publish(mPublisher);
@@ -400,12 +416,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         
       // publisher methods
       }else if( action.equals( "setCameraPosition")){
-        String cameraId = args.getString(0);
-        if (cameraId.equals("front")){
-          myPublisher.mPublisher.setCameraId(1);
-        } else if(cameraId.equals("back")){
-          myPublisher.mPublisher.setCameraId(0);
-        }
+        myPublisher.changeCamera(args.getString(0));
       }else if( action.equals( "publishAudio") ){
         String val = args.getString(0);
         boolean publishAudio = true;
