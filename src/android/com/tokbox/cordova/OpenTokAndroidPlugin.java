@@ -185,6 +185,7 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
         mPublisher = new Publisher(cordova.getActivity().getApplicationContext(), publisherName);
         //mPublisher.setCameraListener(this);
         String cameraPosition = "front";
+        String resolution = "1280x1080";
         // use an external customer video capturer
         mPublisher.setPublisherListener(this);
         try{
@@ -196,13 +197,13 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
             mPublisher.setPublishAudio(false); // default is true
           }
           cameraPosition = this.mProperty.getString(8);
-          Log.i(TAG, "all set up for publisher");
+          resolution = this.mProperty.getString(11);
         }catch( Exception e ){
           Log.i(TAG, "error when trying to retrieve publish audio/video property");
         }
 
         publisherCapturer = 
-            new CustomVideoCapturer(cordova.getActivity().getApplicationContext(), cameraPosition);
+            new CustomVideoCapturer(cordova.getActivity().getApplicationContext(), cameraPosition, resolution);
         mPublisher.setCapturer(publisherCapturer);
         this.mView = mPublisher.getView();
         frame.addView( this.mView );

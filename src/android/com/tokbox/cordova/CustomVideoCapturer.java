@@ -47,7 +47,7 @@ public class CustomVideoCapturer extends BaseVideoCapturer implements
     private Display mCurrentDisplay;
     private SurfaceTexture mSurfaceTexture;
 
-    public CustomVideoCapturer(Context context, String cameraPosString) {
+    public CustomVideoCapturer(Context context, String cameraPosString, String resolution) {
 
         // Initialize front camera by default
         this.setCameraIndex(cameraPosString);
@@ -56,6 +56,13 @@ public class CustomVideoCapturer extends BaseVideoCapturer implements
         WindowManager windowManager = (WindowManager) context
                 .getSystemService(Context.WINDOW_SERVICE);
         mCurrentDisplay = windowManager.getDefaultDisplay();
+        
+
+
+        // Set the preferred capturing size
+        String[] resPart = resolution.split("x");
+        mCaptureWidth = Integer.parseInt(resPart[0]);
+        mCaptureHeight = Integer.parseInt(resPart[1]);
     }
 
     @Override
@@ -65,7 +72,7 @@ public class CustomVideoCapturer extends BaseVideoCapturer implements
         }
 
         // Set the preferred capturing size
-        configureCaptureSize(640, 480);
+        configureCaptureSize(mCaptureWidth, mCaptureHeight);
 
         // Set the capture parameters
         Camera.Parameters parameters = mCamera.getParameters();
@@ -151,7 +158,7 @@ public class CustomVideoCapturer extends BaseVideoCapturer implements
     public CaptureSettings getCaptureSettings() {
 
         // Set the preferred capturing size
-        configureCaptureSize(640, 480);
+        configureCaptureSize(mCaptureWidth, mCaptureHeight);
 
         CaptureSettings settings = new CaptureSettings();
         settings.fps = mCaptureFPS;

@@ -275,7 +275,7 @@ TBPublisher = (function() {
     this.streamCreated = __bind(this.streamCreated, this);
     this.eventReceived = __bind(this.eventReceived, this);
     this.setSession = __bind(this.setSession, this);
-    var cameraName, height, name, position, publishAudio, publishVideo, ratios, width, zIndex, _ref, _ref1, _ref2, _ref3;
+    var cameraName, height, name, position, publishAudio, publishVideo, ratios, resolution, width, zIndex, _ref, _ref1, _ref2, _ref3, _ref4;
     this.sanitizeInputs(one, two, three);
     pdebug("creating publisher", {});
     position = getPosition(this.domId);
@@ -283,6 +283,7 @@ TBPublisher = (function() {
     publishAudio = "true";
     publishVideo = "true";
     cameraName = "front";
+    resolution = "1280x1080";
     zIndex = TBGetZIndex(document.getElementById(this.domId));
     ratios = TBGetScreenRatios();
     if (this.properties != null) {
@@ -290,6 +291,7 @@ TBPublisher = (function() {
       height = (_ref1 = this.properties.height) != null ? _ref1 : position.height;
       name = (_ref2 = this.properties.name) != null ? _ref2 : "";
       cameraName = (_ref3 = this.properties.cameraName) != null ? _ref3 : "front";
+      resolution = (_ref4 = this.properties.resolution) != null ? _ref4 : "1280x1080";
       if ((this.properties.publishAudio != null) && this.properties.publishAudio === false) {
         publishAudio = "false";
       }
@@ -309,7 +311,7 @@ TBPublisher = (function() {
     position = getPosition(this.domId);
     TBUpdateObjects();
     OT.getHelper().eventing(this);
-    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName, ratios.widthRatio, ratios.heightRatio]);
+    Cordova.exec(TBSuccess, TBError, OTPlugin, "initPublisher", [name, position.top, position.left, width, height, zIndex, publishAudio, publishVideo, cameraName, ratios.widthRatio, ratios.heightRatio, resolution]);
     Cordova.exec(this.eventReceived, TBSuccess, OTPlugin, "addEvent", ["publisherEvents"]);
   }
 
@@ -708,13 +710,15 @@ TBSession = (function() {
       reason: "clientDisconnected"
     });
     this.trigger("streamDestroyed", streamEvent);
-    element = streamElements[stream.streamId];
-    if (element) {
-      element.parentNode.removeChild(element);
-      delete streamElements[stream.streamId];
-      TBUpdateObjects();
+    if (stream) {
+      element = streamElements[stream.streamId];
+      if (element) {
+        element.parentNode.removeChild(element);
+        delete streamElements[stream.streamId];
+        TBUpdateObjects();
+      }
+      delete this.streams[stream.streamId];
     }
-    delete this.streams[stream.streamId];
     return this;
   };
 
