@@ -11,10 +11,8 @@
     <platform name="android">
       <asset src="www/opentok.js" target="opentok.js" />
 
-      <source-file src="src/android/com/tokbox/cordova/CustomVideoCapturer.java"
-        target-dir="src/com/tokbox/cordova/" />
-      <source-file src="src/android/com/tokbox/cordova/OpenTokAndroidPlugin.java"
-        target-dir="src/com/tokbox/cordova/" />
+      <source-file src="src/android/com/tokbox/cordova/CustomVideoCapturer.java" target-dir="src/com/tokbox/cordova/" />
+      <source-file src="src/android/com/tokbox/cordova/OpenTokAndroidPlugin.java" target-dir="src/com/tokbox/cordova/" />
 
       <config-file target="AndroidManifest.xml" parent="/manifest">
         <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="17" />
