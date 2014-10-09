@@ -6,10 +6,11 @@
 //
 
 #import "OpentokPlugin.h"
+#import "TBExamplePublisher.h"
 
 @implementation OpenTokPlugin{
     OTSession* _session;
-    OTPublisher* _publisher;
+    TBExamplePublisher* _publisher;
     OTSubscriber* _subscriber;
     NSMutableDictionary *subscriberDictionary;
     NSMutableDictionary *connectionDictionary;
@@ -83,7 +84,10 @@
     }
     
     // Publish and set View
-    _publisher = [[OTPublisher alloc] initWithDelegate:self name:name];
+    _publisher = [[TBExamplePublisher alloc]
+                  initWithDelegateNameResolution:self
+                  name:name
+                  resolution: [command.arguments objectAtIndex:11]];
     [_publisher setPublishAudio:bpubAudio];
     [_publisher setPublishVideo:bpubVideo];
     [self.webView.superview addSubview:_publisher.view];

@@ -42,6 +42,12 @@
     <platform name="ios">
       <asset src="www/opentok.js" target="opentok.js" />
 
+      <header-file src="src/ios/TBExamplePublisher.h" />
+      <source-file src="src/ios/TBExamplePublisher.m" compiler-flags="-fno-objc-arc"/>
+      <header-file src="src/ios/TBExampleVideoCapture.h" />
+      <source-file src="src/ios/TBExampleVideoCapture.m" compiler-flags="-fno-objc-arc"/>
+      <header-file src="src/ios/TBExampleVideoRender.h" />
+      <source-file src="src/ios/TBExampleVideoRender.m" compiler-flags="-fno-objc-arc"/>
       <header-file src="src/ios/OpenTokPlugin.h" />
       <source-file src="src/ios/OpenTokPlugin.m" />
 
