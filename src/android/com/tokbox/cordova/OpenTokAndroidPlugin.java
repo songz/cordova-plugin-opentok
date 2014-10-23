@@ -659,14 +659,17 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
   public JSONObject createDataFromStream( Stream arg1 ){
     JSONObject stream = new JSONObject();
     try{
-      stream.put("connectionId", arg1.getConnection().getConnectionId() );
+      Connection connection = arg1.getConnection();
+      if (connection != null) {
+        stream.put("connectionId", connection.getConnectionId() );
+      }
       stream.put("creationTime", arg1.getCreationTime() );
       stream.put("fps", -999);
       stream.put("hasAudio", arg1.hasAudio());
       stream.put("hasVideo", arg1.hasVideo());
       stream.put("name", arg1.getName());
       stream.put("streamId", arg1.getStreamId());
-    }catch (JSONException e) {}
+    }catch (Exception e) {}
     return stream;
   }
   public void triggerJSEvent(String event, String type, JSONObject data ){
