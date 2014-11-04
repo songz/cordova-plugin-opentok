@@ -52,3 +52,10 @@ window.OT =
     @off( type, handler )
 
 window.TB = OT
+window.addEventListener "orientationchange", (->
+  setTimeout (->
+    OT.updateViews()
+    return
+  ), 1000
+  return
+), false

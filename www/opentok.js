@@ -52,6 +52,12 @@ window.OT = {
 
 window.TB = OT;
 
+window.addEventListener("orientationchange", (function() {
+  setTimeout((function() {
+    OT.updateViews();
+  }), 1000);
+}), false);
+
 var TBConnection;
 
 TBConnection = (function() {
@@ -708,13 +714,15 @@ TBSession = (function() {
       reason: "clientDisconnected"
     });
     this.trigger("streamDestroyed", streamEvent);
-    element = streamElements[stream.streamId];
-    if (element) {
-      element.parentNode.removeChild(element);
-      delete streamElements[stream.streamId];
-      TBUpdateObjects();
+    if (stream) {
+      element = streamElements[stream.streamId];
+      if (element) {
+        element.parentNode.removeChild(element);
+        delete streamElements[stream.streamId];
+        TBUpdateObjects();
+      }
+      delete this.streams[stream.streamId];
     }
-    delete this.streams[stream.streamId];
     return this;
   };
 
