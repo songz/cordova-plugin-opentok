@@ -46,6 +46,7 @@ You can only create one publisher object. Calling TB.initPublisher() more than o
 #### Parameters
 
 **apikey** (String) — The API key that TokBox provided you when you registered for the OpenTok API.
+
 **replaceElementId** (String) - Optional. The id attribute of the existing DOM element that the Publisher video replaces. If you do not specify a replaceElementId, the application appends a new DOM element to the HTML body. 
 
 **properties** (Object) — Optional. This is an optional object that contains the following properties (each of which are optional):
