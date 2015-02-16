@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     id="com.tokbox.cordova.opentok"
-    version="1.0.2">
+    version="1.0.3">
 
     <name>OpenTokCordovaPlugin</name>
     <description>Add live video streaming to your Cordova Application</description>
@@ -40,12 +40,13 @@
 
     <!-- ios -->
     <platform name="ios">
+      <hook type="before_plugin_install" src="scripts/downloadiOSSDK.js" />
       <asset src="www/opentok.js" target="opentok.js" />
 
       <header-file src="src/ios/OpenTokPlugin.h" />
       <source-file src="src/ios/OpenTokPlugin.m" />
 
-      <framework src="src/ios/Opentok.framework" custom="true" />
+      <framework src="src/ios/OpenTok.framework" custom="true" />
       <framework src="Foundation.framework" />
       <framework src="UIKit.framework" />
       <framework src="AVFoundation.framework" />
@@ -58,7 +59,7 @@
       <framework src="SystemConfiguration.framework" />
       <framework src="CFNetwork.framework" />
       <framework src="CoreTelephony.framework" />
-      <framework src="libstdc++.6.0.9.dylib" />
+      <framework src="libc++.dylib" />
       <framework src="libz.dylib" />
       <framework src="libsqlite3.dylib" />
       <framework src="libxml2.dylib" />
