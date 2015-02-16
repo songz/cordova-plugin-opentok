@@ -1,0 +1,59 @@
+{
+  "name": "exec",
+  "description": "Call a child process with the ease of exec and safety of spawn",
+  "author": {
+    "name": "Dave Eddy",
+    "email": "dave@daveeddy.com",
+    "url": "http://www.daveeddy.com"
+  },
+  "version": "0.2.0",
+  "repository": {
+    "url": "https://github.com/bahamas10/node-exec.git",
+    "type": "git"
+  },
+  "main": "exec.js",
+  "scripts": {
+    "test": "for f in examples/*.js; do echo \"$f\"; node \"$f\" || exit 1; echo; done; echo 'Passed'"
+  },
+  "dependencies": {},
+  "devDependencies": {},
+  "optionalDependencies": {},
+  "bin": {},
+  "engines": {
+    "node": ">= v0.8.0"
+  },
+  "keywords": [
+    "exec",
+    "spawn",
+    "child",
+    "wordsplitting",
+    "shell"
+  ],
+  "gitHead": "81d7992c0e8335a8319690b051285e78d3fdbaf0",
+  "bugs": {
+    "url": "https://github.com/bahamas10/node-exec/issues"
+  },
+  "homepage": "https://github.com/bahamas10/node-exec",
+  "_id": "exec@0.2.0",
+  "_shasum": "75ee3657fa9508d3f364354eaa8c2f21c778ed4d",
+  "_from": "exec@",
+  "_npmVersion": "2.1.11",
+  "_nodeVersion": "0.10.33",
+  "_npmUser": {
+    "name": "bahamas10",
+    "email": "dave@daveeddy.com"
+  },
+  "maintainers": [
+    {
+      "name": "bahamas10",
+      "email": "dave@daveeddy.com"
+    }
+  ],
+  "dist": {
+    "shasum": "75ee3657fa9508d3f364354eaa8c2f21c778ed4d",
+    "tarball": "http://registry.npmjs.org/exec/-/exec-0.2.0.tgz"
+  },
+  "deprecated": "use child_process.execFile instead",
+  "directories": {},
+  "_resolved": "https://registry.npmjs.org/exec/-/exec-0.2.0.tgz"
+}

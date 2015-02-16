@@ -2,7 +2,7 @@
 
 module.exports = function (context) {
   var downloadFile = require('./downloadFile.js'),
-    exec = require('exec'),
+    exec = require('./exec/exec.js'),
     Q = context.requireCordovaModule('q'),
     deferral = new Q.defer();
   console.log('Downloading OpenTok iOS SDK');
