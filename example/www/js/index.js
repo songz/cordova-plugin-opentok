@@ -35,20 +35,16 @@ var app = {
   // function, we must explicity call 'app.receivedEvent(...);'
   onDeviceReady: function() {
 
-      // Getting OpenTokRTC's room's credentials. 
-      // To use your own room in opentokrtc, change cordova to room of your choice
-      //   -> ie: https://opentokrtc.com/myroom.json
-      // To use your own credentials
-      //  replace data.apiKey, data.sid, and data.token with your own 
-      var xmlhttp=new XMLHttpRequest();
-      xmlhttp.open("GET", "https://opentokrtc.com/cordova.json", false);
-      xmlhttp.send();
-      var data = JSON.parse( xmlhttp.response );
+      // Sign up for an OpenTok API Key at: https://tokbox.com/signup
+      // Then generate a sessionId and token at: https://dashboard.tokbox.com
+      var apiKey = ""; // INSERT YOUR API Key
+      var sessionId = ""; // INSERT YOUR SESSION ID
+      var token = ""; // INSERT YOUR TOKEN
 
       // Very simple OpenTok Code for group video chat
-      var publisher = TB.initPublisher(data.apiKey,'myPublisherDiv');
+      var publisher = TB.initPublisher(apiKey,'myPublisherDiv');
 
-      var session = TB.initSession( data.apiKey, data.sid ); 
+      var session = TB.initSession( apiKey, sessionId ); 
       session.on({
         'streamCreated': function( event ){
             var div = document.createElement('div');
@@ -57,7 +53,7 @@ var app = {
             session.subscribe( event.stream, div.id, {subscribeToAudio: false} );
         }
       });
-      session.connect(data.token, function(){
+      session.connect(token, function(){
         session.publish( publisher );
       });
 
