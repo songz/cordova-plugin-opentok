@@ -23,12 +23,14 @@ import android.content.SharedPreferences.Editor;
 import android.util.Log;
 import android.view.View;
 import android.view.ViewGroup;
+
 import com.opentok.android.Connection;
 import com.opentok.android.OpentokError;
 import com.opentok.android.Publisher;
 import com.opentok.android.PublisherKit;
 import com.opentok.android.Session;
 import com.opentok.android.Stream;
+import com.opentok.android.Stream.StreamVideoType;
 import com.opentok.android.Subscriber;
 import com.opentok.android.SubscriberKit;
 
@@ -685,24 +687,31 @@ public class OpenTokAndroidPlugin extends CordovaPlugin implements
     myEventListeners.get(event).sendPluginResult(myResult);
   }
 
-@Override
-public void onError(PublisherKit arg0, OpentokError arg1) {
-  // TODO Auto-generated method stub
+  @Override
+  public void onError(PublisherKit arg0, OpentokError arg1) {
+    // TODO Auto-generated method stub
+    
+  }
   
-}
-
-@Override
-public void onStreamCreated(PublisherKit arg0, Stream arg1) {
-  // TODO Auto-generated method stub
+  @Override
+  public void onStreamCreated(PublisherKit arg0, Stream arg1) {
+    // TODO Auto-generated method stub
+    
+  }
   
-}
-
-@Override
-public void onStreamDestroyed(PublisherKit arg0, Stream arg1) {
-    if(myPublisher != null){
-        myPublisher.destroyPublisher();
-        myPublisher = null;
-      }
-}
+  @Override
+  public void onStreamDestroyed(PublisherKit arg0, Stream arg1) {
+      if(myPublisher != null){
+          myPublisher.destroyPublisher();
+          myPublisher = null;
+        }
+  }
+  
+  @Override
+  public void onStreamVideoTypeChanged(Session arg0, Stream arg1,
+      StreamVideoType arg2) {
+    // TODO Auto-generated method stub
+    
+  }
 }
 
