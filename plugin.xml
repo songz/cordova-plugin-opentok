@@ -60,7 +60,7 @@
       <framework src="SystemConfiguration.framework" />
       <framework src="CFNetwork.framework" />
       <framework src="CoreTelephony.framework" />
-      <framework src="libc++.dylib" />g
+      <framework src="libc++.dylib" />
       <framework src="libz.dylib" />
       <framework src="libsqlite3.dylib" />
       <framework src="libxml2.dylib" />
