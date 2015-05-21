@@ -1,6 +1,8 @@
 Cordova Plugin for OpenTok iOS
 ===
 
+[![Gitter](https://badges.gitter.im/Join Chat.svg)](https://gitter.im/songz/cordova-plugin-opentok?utm_source=badge&utm_medium=badge&utm_campaign=pr-badge&utm_content=badge)
+
 Weave video chat into your web (and now mobile!) application.
 
 ## Using Cordova CLI
