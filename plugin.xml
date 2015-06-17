@@ -16,7 +16,6 @@
         target-dir="src/com/tokbox/cordova/" />
 
       <config-file target="AndroidManifest.xml" parent="/manifest">
-        <uses-sdk android:minSdkVersion="16" android:targetSdkVersion="17" />
         <uses-permission android:name="android.permission.CAMERA" />
         <uses-permission android:name="android.permission.INTERNET" />
         <uses-permission android:name="android.permission.RECORD_AUDIO" />
@@ -47,23 +46,30 @@
       <header-file src="src/ios/OpenTokPlugin.h" />
       <source-file src="src/ios/OpenTokPlugin.m" />
 
-      <framework src="src/ios/OpenTok.framework" custom="true" />
-      <framework src="Foundation.framework" />
-      <framework src="UIKit.framework" />
-      <framework src="AVFoundation.framework" />
-      <framework src="QuartzCore.framework" />
-      <framework src="OpenGLES.framework" />
-      <framework src="CoreVideo.framework" />
-      <framework src="AudioToolbox.framework" />
-      <framework src="Security.framework" />
-      <framework src="CoreMedia.framework" />
-      <framework src="SystemConfiguration.framework" />
-      <framework src="CFNetwork.framework" />
-      <framework src="CoreTelephony.framework" />
+      <framework src="libstdc++.dylib" />
       <framework src="libc++.dylib" />
-      <framework src="libz.dylib" />
-      <framework src="libsqlite3.dylib" />
       <framework src="libxml2.dylib" />
+      <framework src="libsqlite3.dylib" />
+      <framework src="libpthread.dylib" />
+      <framework src="VideoToolbox.framework" />
+      <framework src="src/ios/OpenTok.framework" custom="true" />
+      <framework src="AudioToolbox.framework" />
+      <framework src="CoreData.framework" />
+      <framework src="AVFoundation.framework" />
+      <framework src="CoreGraphics.framework" />
+      <framework src="CoreMedia.framework" />
+      <framework src="CoreVideo.framework" />
+      <framework src="OpenGLES.framework" />
+      <framework src="SystemConfiguration.framework" />
+      <framework src="CoreTelephony.framework" />
+      <framework src="GLKit.framework" />
+      <framework src="EventKit.framework" />
+      <framework src="QuartzCore.framework" />
+      <framework src="MapKit.framework" />
+      <framework src="UIKit.framework" />
+      <framework src="Foundation.framework" />
+      <framework src="Security.framework" />
+      <framework src="CFNetwork.framework" />
 
       <!-- Adopts project's config.xml to include the OpenTokPlugin and domain whitelists -->
       <config-file target="config.xml" parent="/*/plugins">
